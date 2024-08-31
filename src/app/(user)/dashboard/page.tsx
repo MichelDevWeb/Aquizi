@@ -7,8 +7,6 @@ import getUserMetrics from "@/actions/getUserMetrics";
 import getHeatMapData from "@/actions/getHeatMapData";
 import MetricCard from "./MetricCard";
 import SubmissionsHeatMap from "./HeatMap";
-import SubscribeBtn from "../billing/SubscribeBtn";
-import { PRICE_ID } from "@/lib/utils";
 
 const page = async () => {
   const session = await auth();

@@ -92,8 +92,6 @@ export async function POST(req: NextRequest) {
     });
 
     const result: any = await runnable.invoke([message]);
-    console.log(result);
-
     const { quizzId } = await saveQuizz(result.quizz);
 
     return NextResponse.json({ quizzId }, { status: 200 });

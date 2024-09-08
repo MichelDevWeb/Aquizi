@@ -1,9 +1,12 @@
+import { cn } from "@/lib/utils";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { SessionProvider } from "next-auth/react";
 import Header from "@/components/ui/header";
 import LoadingSpinner from "@/components/LoadingSpinner";
+import Providers from "@/components/Providers";
+import NavBar from "@/components/NavBar";
+import { Toaster } from "@/components/ui/toaster";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -18,14 +21,19 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <SessionProvider>
-        <body className={"dark"}>
-          <LoadingSpinner />
-          <Header />
+    <html
+      suppressHydrationWarning
+      lang="en"
+    >
+      <body className={cn(inter.className, "antialiased min-h-screen pt-16")}>
+        {/* <Header /> */}
+        <Providers>
+          <NavBar />
           {children}
-        </body>
-      </SessionProvider>
+          <Toaster />
+          <LoadingSpinner />
+        </Providers>
+      </body>
     </html>
   );
 }

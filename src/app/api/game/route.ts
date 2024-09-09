@@ -90,6 +90,7 @@ export async function POST(req: Request, res: Response) {
       await db.insert(questionsv2).values(
         data.questions.map((question: openQuestion) => {
           return {
+            id: uuid(),
             question: question.question,
             answer: question.answer,
             gameId: game.id,

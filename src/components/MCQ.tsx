@@ -39,10 +39,11 @@ const MCQ = ({ game }: Props) => {
   const [selectedChoice, setSelectedChoice] = React.useState<number>(0);
   const [now, setNow] = React.useState(new Date());
 
-  console.log(game);
   const currentQuestion = React.useMemo(() => {
     return game.questionsv2[questionIndex];
   }, [questionIndex, game.questionsv2]);
+
+  console.log(currentQuestion);
 
   const options = React.useMemo(() => {
     if (!currentQuestion) return [];

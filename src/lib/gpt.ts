@@ -66,8 +66,7 @@ export async function strict_output(
       ],
     });
 
-    let res: string =
-      response.choices[0].message?.content?.replace(/'/g, '"') ?? "";
+    let res: string = response.choices[0].message?.content ?? "";
 
     // ensure that we don't replace away apostrophes in text
     res = res.replace(/(\w)"(\w)/g, "$1'$2");

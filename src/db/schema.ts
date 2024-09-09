@@ -7,8 +7,8 @@ import {
   serial,
   boolean,
   pgEnum,
-  jsonb,
   real,
+  json,
 } from "drizzle-orm/pg-core";
 import type { AdapterAccount } from "@auth/core/adapters";
 import { relations } from "drizzle-orm";
@@ -162,7 +162,7 @@ export const questionsv2 = pgTable("questions_v2", {
   question: text("question").notNull(),
   answer: text("answer").notNull(),
   gameId: text("game_id").notNull(),
-  options: jsonb("options"), // for mcq questions
+  options: text("options"), // for mcq questions
   percentageCorrect: real("percentage_correct"), // for open_ended questions
   isCorrect: boolean("is_correct"), // for mcq questions
   questionType: gameType("question_type").notNull(),

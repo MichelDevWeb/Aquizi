@@ -1,7 +1,7 @@
-// import { prisma } from "@/lib/db";
 import { Clock, CopyCheck, Edit2 } from "lucide-react";
 import Link from "next/link";
 import React from "react";
+import { db } from "@/db";
 
 type Props = {
   limit: number;
@@ -9,20 +9,20 @@ type Props = {
 };
 
 const HistoryComponent = async ({ limit, userId }: Props) => {
-  //   const games = await prisma.game.findMany({
-  //     take: limit,
-  //     where: {
-  //       userId,
-  //     },
-  //     orderBy: {
-  //       timeStarted: "desc",
-  //     },
-  //   });
+  const games = await db.query.games.findMany({
+    limit: limit,
+    where: (games, { eq }) => eq(games.userId, userId),
+    orderBy: (games, { desc }) => [desc(games.timeStarted)],
+  });
+
   return (
     <div className="space-y-8">
-      {/* {games.map((game) => {
+      {games.map((game) => {
         return (
-          <div className="flex items-center justify-between" key={game.id}>
+          <div
+            className="flex items-center justify-between"
+            key={game.id}
+          >
             <div className="flex items-center">
               {game.gameType === "mcq" ? (
                 <CopyCheck className="mr-3" />
@@ -47,7 +47,7 @@ const HistoryComponent = async ({ limit, userId }: Props) => {
             </div>
           </div>
         );
-      })} */}
+      })}
     </div>
   );
 };

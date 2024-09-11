@@ -35,13 +35,22 @@ export default async function Home() {
               <h3 className="text-sm">
                 Upload documents, and easily generate your quizzes with AI.
               </h3>
-              <Button
-                variant="neo"
-                className="mt-4 h-14"
-                asChild
-              >
-                <Link href="quizz/new">Get Started</Link>
-              </Button>
+              <div className="flex gap-4">
+                <Button
+                  variant="neo"
+                  className="flex-1 h-14"
+                  asChild
+                >
+                  <Link href="quizz/new">Get Started</Link>
+                </Button>
+                <Button
+                  variant="neo"
+                  className="flex-1 h-14"
+                  asChild
+                >
+                  <Link href="dashboard">Dashboard</Link>
+                </Button>
+              </div>
             </div>
           </div>
         </main>

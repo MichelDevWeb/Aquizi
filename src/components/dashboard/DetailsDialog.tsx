@@ -25,7 +25,7 @@ const DetailsDialog = (props: Props) => {
       </DialogTrigger>
       <DialogContent className="w-[70vw] max-w-[100vw] md:w-[50vw]">
         <DialogHeader>
-          <DialogTitle className="text-2xl">Welcome to Quizzzy!</DialogTitle>
+          <DialogTitle className="text-2xl">Welcome to Aquizi!</DialogTitle>
           <DialogDescription>
             {/* <div className="flex items-center gap-3 my-2">
               <p className="flex items-center">

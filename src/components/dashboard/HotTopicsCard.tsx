@@ -7,26 +7,16 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import WordCloud from "../WordCloud";
-// import { prisma } from "@/lib/db";
+import { db } from "@/db";
 
 type Props = {};
 
 const HotTopicsCard = async (props: Props) => {
-  // const topics = await prisma.topic_count.findMany({});
-  const topics = [
-    {
-      topic: "HTML",
-      count: 10,
-    },
-    {
-      topic: "CSS",
-      count: 15,
-    },
-    {
-      topic: "JavaScript",
-      count: 20,
-    },
-  ];
+  const topics = await db.query.topicCounts.findMany({
+    orderBy: (topicCounts, { desc }) => [desc(topicCounts.count)],
+    limit: 15,
+  });
+
   const formattedTopics = topics.map((topic) => {
     return {
       text: topic.topic,

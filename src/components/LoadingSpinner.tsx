@@ -1,8 +1,9 @@
 "use client";
 
-import * as Progress from "@radix-ui/react-progress";
 import { useEffect, useState } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
+import { Progress } from "./ui/progress";
+import Image from "next/image";
 
 const LoadingSpinner = () => {
   const [progress, setProgress] = useState(0);
@@ -44,19 +45,20 @@ const LoadingSpinner = () => {
   if (!loading && progress === 100) return null;
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm z-50">
-      <Progress.Root
-        className="relative overflow-hidden bg-gray-300 rounded-full w-[300px] h-[25px]"
-        style={{
-          transform: "translateZ(0)",
-        }}
-        value={progress}
-      >
-        <Progress.Indicator
-          className="bg-blue-500 w-full h-full transition-transform duration-[660ms] ease-[cubic-bezier(0.65, 0, 0.35, 1)]"
-          style={{ transform: `translateX(-${100 - progress}%)` }}
+    <div className="fixed inset-0 bg-white z-50">
+      <div className="fixed -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2 w-[70vw] md:w-[60vw] flex flex-col items-center">
+        <Image
+          src={"/images/loading_screen.gif"}
+          width={400}
+          height={400}
+          alt="loading"
         />
-      </Progress.Root>
+        <Progress
+          value={progress}
+          className="w-full mt-4 bg-black"
+        />
+        <h1 className="mt-2 text-xl text-black">Loading...</h1>
+      </div>
     </div>
   );
 };

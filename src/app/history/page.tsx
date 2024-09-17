@@ -16,26 +16,28 @@ const History = async (props: Props) => {
   }
   return (
     <div className="max-w-5xl mx-auto">
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-2xl font-bold">History</CardTitle>
-            <Link
-              className={buttonVariants()}
-              href="/dashboard"
-            >
-              <LucideLayoutDashboard className="mr-2" />
-              Back to Dashboard
-            </Link>
-          </div>
-        </CardHeader>
-        <CardContent className="max-h-[60vh] overflow-y-scroll">
-          <HistoryComponent
-            limit={100}
-            userId={session.user.id as string}
-          />
-        </CardContent>
-      </Card>
+      <main className="p-8 mx-auto max-w-7xl">
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-2xl font-bold">History</CardTitle>
+              <Link
+                className={buttonVariants()}
+                href="/dashboard"
+              >
+                <LucideLayoutDashboard className="mr-2" />
+                Back to Dashboard
+              </Link>
+            </div>
+          </CardHeader>
+          <CardContent className="max-h-[60vh] overflow-y-scroll">
+            <HistoryComponent
+              limit={100}
+              userId={session.user.id as string}
+            />
+          </CardContent>
+        </Card>
+      </main>
     </div>
   );
 };

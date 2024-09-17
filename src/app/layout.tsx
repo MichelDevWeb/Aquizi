@@ -7,6 +7,7 @@ import LoadingSpinner from "@/components/LoadingSpinner";
 import Providers from "@/components/Providers";
 import NavBar from "@/components/NavBar";
 import { Toaster } from "@/components/ui/toaster";
+import Footer from "@/components/Footer";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -26,7 +27,6 @@ export const metadata: Metadata | any = {
     "study",
     "ai",
   ],
-  themeColor: [{ media: "(prefers-color-scheme: dark)", color: "#fff" }],
   authors: [
     { name: "Michel Dev Web" },
     {
@@ -34,12 +34,20 @@ export const metadata: Metadata | any = {
       url: "https://www.linkedin.com/in/michel-nguyen-407950144/",
     },
   ],
-  viewport:
-    "minimum-scale=1, initial-scale=1, width=device-width, shrink-to-fit=no, viewport-fit=cover",
   icons: [
-    { rel: "apple-touch-icon", url: "icons/icon-128x128.png" },
-    { rel: "icon", url: "icons/icon-128x128.png" },
+    { rel: "apple-touch-icon", url: "/icons/icon-128x128.png" },
+    { rel: "icon", url: "/icons/icon-128x128.png" },
   ],
+};
+
+// Move themeColor to viewport
+export const viewport = {
+  initialScale: 1,
+  minimumScale: 1,
+  width: "device-width",
+  shrinkToFit: "no",
+  viewportFit: "cover",
+  themeColor: [{ media: "(prefers-color-scheme: dark)", color: "#fff" }],
 };
 
 export default function RootLayout({
@@ -70,7 +78,7 @@ export default function RootLayout({
           name="keywords"
           content={metadata.keywords as string}
         />
-        {(metadata.themeColor as Array<{ media: string; color: string }>).map(
+        {(viewport.themeColor as Array<{ media: string; color: string }>).map(
           ({ media, color }, index) => (
             <meta
               key={index}
@@ -92,7 +100,7 @@ export default function RootLayout({
         )}
         <meta
           name="viewport"
-          content={metadata.viewport as string}
+          content={viewport as any}
         />
         {(metadata.icons as []).map(({ rel, url }, index) => (
           <link
@@ -107,6 +115,7 @@ export default function RootLayout({
         <Providers>
           <NavBar />
           {children}
+          <Footer />
           <Toaster />
           <LoadingSpinner />
         </Providers>

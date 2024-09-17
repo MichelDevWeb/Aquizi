@@ -16,13 +16,15 @@ export function roundIfNumber(value: string | number | null) {
   return value;
 }
 
-export function convertDateToString(date: Date): string {
+export function convertDateToString(date: Date, isDMY?: boolean): string {
   const timestampDate = new Date(date);
   const year = timestampDate.getFullYear();
   const month = timestampDate.getMonth() + 1;
   const day = timestampDate.getDate();
 
-  const formattedDate = `${year}/${month}/${day}`;
+  const formattedDate = isDMY
+    ? `${day}/${month}/${year}`
+    : `${year}/${month}/${day}`;
   return formattedDate;
 }
 

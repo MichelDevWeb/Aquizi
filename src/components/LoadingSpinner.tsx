@@ -52,6 +52,7 @@ const LoadingSpinner = () => {
           width={400}
           height={400}
           alt="loading"
+          priority={true}
         />
         <Progress
           value={progress}

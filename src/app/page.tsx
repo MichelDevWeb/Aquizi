@@ -41,7 +41,7 @@ export default async function Home() {
                   className="flex-1 h-14"
                   asChild
                 >
-                  <Link href="quizz/new">Get Started</Link>
+                  <Link href="quizz/new">Upload File</Link>
                 </Button>
                 <Button
                   variant="neo"

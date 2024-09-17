@@ -35,6 +35,8 @@ const OpenEnded = ({ game }: Props) => {
   const [questionIndex, setQuestionIndex] = React.useState(0);
   const [blankAnswer, setBlankAnswer] = React.useState("");
   const [averagePercentage, setAveragePercentage] = React.useState(0);
+  // Initialize timeStarted with the current date and time
+  const [timeStarted, setTimeStarted] = React.useState(new Date());
   const currentQuestion = React.useMemo(() => {
     return game.questionsv2[questionIndex];
   }, [questionIndex, game.questionsv2]);
@@ -42,6 +44,7 @@ const OpenEnded = ({ game }: Props) => {
     mutationFn: async () => {
       const payload: z.infer<typeof endGameSchema> = {
         gameId: game.id,
+        timeStarted: timeStarted.toString(),
       };
       const response = await axios.post(`/api/endGame`, payload);
       return response.data;
@@ -116,10 +119,10 @@ const OpenEnded = ({ game }: Props) => {
 
   if (hasEnded) {
     return (
-      <div className="absolute flex flex-col justify-center -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2">
+      <div className="flex flex-col justify-center">
         <div className="px-4 py-2 mt-2 font-semibold text-white bg-green-500 rounded-md whitespace-nowrap">
           You Completed in{" "}
-          {formatTimeDelta(differenceInSeconds(now, game.timeStarted))}
+          {formatTimeDelta(differenceInSeconds(now, timeStarted))}
         </div>
         <Link
           href={`/statistics/${game.id}`}
@@ -133,7 +136,7 @@ const OpenEnded = ({ game }: Props) => {
   }
 
   return (
-    <div className="absolute -translate-x-1/2 -translate-y-1/2 md:w-[80vw] max-w-4xl w-[90vw] top-1/2 left-1/2">
+    <>
       <div className="flex flex-row justify-between">
         <div className="flex flex-col">
           {/* topic */}
@@ -145,7 +148,7 @@ const OpenEnded = ({ game }: Props) => {
           </p>
           <div className="flex self-start mt-3 text-slate-400">
             <Timer className="mr-2" />
-            {formatTimeDelta(differenceInSeconds(now, game.timeStarted))}
+            {formatTimeDelta(differenceInSeconds(now, timeStarted))}
           </div>
         </div>
         <OpenEndedPercentage percentage={averagePercentage} />
@@ -180,7 +183,7 @@ const OpenEnded = ({ game }: Props) => {
           Next <ChevronRight className="w-4 h-4 ml-2" />
         </Button>
       </div>
-    </div>
+    </>
   );
 };
 

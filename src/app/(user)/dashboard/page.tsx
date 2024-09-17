@@ -1,8 +1,4 @@
-import { db } from "@/db";
-import { eq } from "drizzle-orm";
-import { quizzes } from "@/db/schema";
 import { auth } from "@/auth";
-import QuizzesTable, { Quizz } from "./QuizzesTable";
 import getUserMetrics from "@/actions/getUserMetrics";
 import getHeatMapData from "@/actions/getHeatMapData";
 import MetricCard from "./MetricCard";
@@ -24,9 +20,6 @@ const page = async () => {
   if (!userId) {
     return <p>User not found</p>;
   }
-  const userQuizzes: Quizz[] = await db.query.quizzes.findMany({
-    where: eq(quizzes.userId, userId),
-  });
   const userData = await getUserMetrics();
   const heatMapData = await getHeatMapData();
 
@@ -54,7 +47,6 @@ const page = async () => {
         <div>
           {heatMapData ? <SubmissionsHeatMap data={heatMapData.data} /> : null}
         </div>
-        <QuizzesTable quizzes={userQuizzes} />
       </div>
 
       <div className="grid gap-4 mt-4 md:grid-cols-2">

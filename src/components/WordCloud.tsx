@@ -1,19 +1,32 @@
 "use client";
 import { useTheme } from "next-themes";
 import { useRouter } from "next/navigation";
-import React from "react";
-import D3WordCloud from "react-d3-cloud";
+import React, { useEffect, useState } from "react";
+import dynamic from "next/dynamic";
+
+// Dynamically import D3WordCloud to avoid SSR issues
+const D3WordCloud = dynamic(() => import("react-d3-cloud"), { ssr: false });
 
 type Props = {
   formattedTopics: { text: string; value: number }[];
 };
 
 const fontSizeMapper = (word: { value: number }) =>
-  Math.log2(word.value) * 5 + 16;
+  Math.log2(word.value) * 5 + 18;
 
 const WordCloud = ({ formattedTopics }: Props) => {
   const theme = useTheme();
   const router = useRouter();
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true); // Set to true after component mounts
+  }, []);
+
+  if (!isClient) {
+    return null; // Prevent rendering on the server
+  }
+
   return (
     <>
       <D3WordCloud

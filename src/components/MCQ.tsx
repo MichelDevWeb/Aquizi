@@ -38,16 +38,17 @@ const MCQ = ({ game }: Props) => {
   });
   const [selectedChoice, setSelectedChoice] = React.useState<number>(0);
   const [now, setNow] = React.useState(new Date());
+  // Initialize timeStarted with the current date and time
+  const [timeStarted, setTimeStarted] = React.useState(new Date());
 
   const currentQuestion = React.useMemo(() => {
     return game.questionsv2[questionIndex];
   }, [questionIndex, game.questionsv2]);
 
-  console.log(currentQuestion);
-
   const options = React.useMemo(() => {
     if (!currentQuestion) return [];
     if (!currentQuestion.options) return [];
+
     return JSON.parse(currentQuestion.options as string) as string[];
   }, [currentQuestion]);
 
@@ -67,6 +68,7 @@ const MCQ = ({ game }: Props) => {
     mutationFn: async () => {
       const payload: z.infer<typeof endGameSchema> = {
         gameId: game.id,
+        timeStarted: timeStarted.toString(),
       };
       const response = await axios.post(`/api/endGame`, payload);
       return response.data;
@@ -142,10 +144,10 @@ const MCQ = ({ game }: Props) => {
 
   if (hasEnded) {
     return (
-      <div className="absolute flex flex-col justify-center -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2">
+      <div className="flex flex-col justify-center">
         <div className="px-4 py-2 mt-2 font-semibold text-white bg-green-500 rounded-md whitespace-nowrap">
           You Completed in{" "}
-          {formatTimeDelta(differenceInSeconds(now, game.timeStarted))}
+          {formatTimeDelta(differenceInSeconds(now, timeStarted))}
         </div>
         <Link
           href={`/statistics/${game.id}`}
@@ -159,7 +161,7 @@ const MCQ = ({ game }: Props) => {
   }
 
   return (
-    <div className="absolute -translate-x-1/2 -translate-y-1/2 md:w-[80vw] max-w-4xl w-[90vw] top-1/2 left-1/2">
+    <>
       <div className="flex flex-row justify-between">
         <div className="flex flex-col">
           {/* topic */}
@@ -171,7 +173,7 @@ const MCQ = ({ game }: Props) => {
           </p>
           <div className="flex self-start mt-3 text-slate-400">
             <Timer className="mr-2" />
-            {formatTimeDelta(differenceInSeconds(now, game.timeStarted))}
+            {formatTimeDelta(differenceInSeconds(now, timeStarted))}
           </div>
         </div>
         <MCQCounter
@@ -187,7 +189,7 @@ const MCQ = ({ game }: Props) => {
               {game.questionsv2.length}
             </div>
           </CardTitle>
-          <CardDescription className="flex-grow text-lg">
+          <CardDescription className="flex-grow text-lg break-words">
             {currentQuestion?.question}
           </CardDescription>
         </CardHeader>
@@ -198,14 +200,14 @@ const MCQ = ({ game }: Props) => {
             <Button
               key={option}
               variant={selectedChoice === index ? "default" : "outline"}
-              className="justify-start w-full py-8 mb-4"
+              className="justify-start w-full py-4 mb-4"
               onClick={() => setSelectedChoice(index)}
             >
               <div className="flex items-center justify-start">
                 <div className="p-2 px-3 mr-5 border rounded-md">
                   {index + 1}
                 </div>
-                <div className="text-start">{option}</div>
+                <div className="text-start break-words">{option}</div>
               </div>
             </Button>
           );
@@ -223,7 +225,7 @@ const MCQ = ({ game }: Props) => {
           Next <ChevronRight className="w-4 h-4 ml-2" />
         </Button>
       </div>
-    </div>
+    </>
   );
 };
 

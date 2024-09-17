@@ -7,7 +7,7 @@ import { eq } from "drizzle-orm";
 export async function POST(req: Request, res: Response) {
   try {
     const body = await req.json();
-    const { gameId } = endGameSchema.parse(body);
+    const { gameId, timeStarted } = endGameSchema.parse(body);
 
     const game = await db.query.games.findFirst({
       where: (games, { eq }) => eq(games.id, gameId),
@@ -24,7 +24,7 @@ export async function POST(req: Request, res: Response) {
     }
     await db
       .update(games)
-      .set({ timeEnded: new Date() })
+      .set({ timeStarted: new Date(timeStarted), timeEnded: new Date() })
       .where(eq(games.id, gameId));
     return NextResponse.json({
       message: "Game ended",

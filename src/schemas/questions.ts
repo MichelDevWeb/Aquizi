@@ -13,4 +13,5 @@ export const checkAnswerSchema = z.object({
 
 export const endGameSchema = z.object({
   gameId: z.string(),
+  timeStarted: z.string() || z.date(),
 });

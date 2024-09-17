@@ -40,18 +40,21 @@ const LoadingQuestions = ({ finished }: Props) => {
   }, [finished]);
 
   return (
-    <div className="absolute -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2 w-[70vw] md:w-[60vw] flex flex-col items-center">
-      <Image
-        src={"/images/loading.gif"}
-        width={400}
-        height={400}
-        alt="loading"
-      />
-      <Progress
-        value={progress}
-        className="w-full mt-4"
-      />
-      <h1 className="mt-2 text-xl">{loadingText}</h1>
+    <div className="fixed inset-0 bg-white z-50">
+      <div className="fixed -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2 w-[70vw] md:w-[60vw] flex flex-col items-center">
+        <Image
+          src={"/images/loading.gif"}
+          width={400}
+          height={400}
+          alt="loading"
+          priority={true}
+        />
+        <Progress
+          value={progress}
+          className="w-full mt-4 bg-black"
+        />
+        <h1 className="mt-2 text-xl text-black">{loadingText}</h1>
+      </div>
     </div>
   );
 };

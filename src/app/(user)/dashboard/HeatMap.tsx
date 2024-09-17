@@ -33,6 +33,7 @@ const SubmissionsHeatMap = (props: Props) => {
       startDate={new Date("2024/01/01")}
       panelColors={panelColors}
       rectRender={(props, data) => {
+        props.rx = 5;
         if (!data.count) return <rect {...props} />;
         return (
           <Tooltip

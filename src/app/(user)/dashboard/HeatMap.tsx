@@ -6,7 +6,7 @@ import { convertDateToString } from "@/lib/utils";
 
 type Props = {
   data: {
-    createdAt: Date;
+    createdAt: Date | string;
     count: number;
   }[];
 };

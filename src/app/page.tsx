@@ -41,7 +41,7 @@ export default async function Home() {
                   className="flex-1 h-14"
                   asChild
                 >
-                  <Link href="quizz/new">Upload File</Link>
+                  <Link href="quizz/new">Upload</Link>
                 </Button>
                 <Button
                   variant="neo"
@@ -59,19 +59,21 @@ export default async function Home() {
   }
 
   return (
-    <div className="absolute -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2">
-      <Card className="w-[300px]">
-        <CardHeader>
-          <CardTitle>Welcome to Aquizi 🔥!</CardTitle>
-          <CardDescription>
-            Aquizi is a platform for creating quizzes using AI!. Get started by
-            loggin in below!
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <SignInButton text="Sign In with Google" />
-        </CardContent>
-      </Card>
+    <div className="flex flex-col flex-1">
+      <main className="justify-center p-8 mx-auto max-w-7xl">
+        <Card className="w-[300px]">
+          <CardHeader>
+            <CardTitle>Welcome to Aquizi 🔥!</CardTitle>
+            <CardDescription>
+              Aquizi is a platform for creating quizzes using AI!. Get started
+              by loggin in below!
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <SignInButton text="Sign In with Google" />
+          </CardContent>
+        </Card>
+      </main>
     </div>
   );
 }

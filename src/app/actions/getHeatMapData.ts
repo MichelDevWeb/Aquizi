@@ -1,7 +1,7 @@
-import { quizzes, questions, quizzSubmissions, users } from "@/db/schema";
+import { games } from "@/db/schema";
 import { auth } from "@/auth";
 import { db } from "@/db";
-import { count, eq, avg, sql } from "drizzle-orm";
+import { sql } from "drizzle-orm";
 
 const getHeatMapData = async () => {
   const session = await auth();
@@ -13,13 +13,14 @@ const getHeatMapData = async () => {
 
   const data = await db
     .select({
-      createdAt: quizzSubmissions.createdAt,
-      count: sql<number>`cast(count(${quizzSubmissions.id}) as int)`,
+      createdAt: sql<string>`date_trunc('day', ${games.timeStarted})`,
+      count: sql<number>`cast(count(${games.id}) as int)`,
     })
-    .from(quizzSubmissions)
-    .innerJoin(quizzes, eq(quizzSubmissions.quizzId, quizzes.id))
-    .innerJoin(users, eq(quizzes.userId, users.id))
-    .groupBy(quizzSubmissions.createdAt);
+    .from(games)
+    .where(
+      sql`(${games.userId} = ${userId} AND ${games.timeStarted} is not null AND ${games.timeEnded} is not null)`
+    )
+    .groupBy(sql<string>`date_trunc('day', ${games.timeStarted})`);
 
   return { data };
 };

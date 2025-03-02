@@ -34,6 +34,8 @@
     "clsx": "^2.1.0",
     "date-fns": "^3.6.0",
     "drizzle-orm": "^0.29.3",
+    "firebase": "^11.4.0",
+    "firebase-admin": "^12.7.0",
     "framer-motion": "^10.18.0",
     "keyword-extractor": "^0.0.28",
     "langchain": "^0.1.30",

@@ -10,10 +10,22 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { questionsv2 } from "@/db/schema";
+
+// Define Firestore types
+interface Question {
+  id: string;
+  question: string;
+  answer: string;
+  gameId: string;
+  questionType: "mcq" | "open_ended";
+  options?: string;
+  userAnswer?: string;
+  isCorrect?: boolean;
+  percentageCorrect?: number;
+}
 
 type Props = {
-  questions: (typeof questionsv2.$inferSelect)[];
+  questions: Question[];
 };
 
 const QuestionsList = ({ questions }: Props) => {

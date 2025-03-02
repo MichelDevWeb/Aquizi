@@ -20,7 +20,7 @@ const panelColors = {
 };
 
 const SubmissionsHeatMap = (props: Props) => {
-  const formattedDates = props.data.map((item) => ({
+  const formattedDates = props.data?.map((item) => ({
     date: convertDateToString(item.createdAt),
     count: item.count,
   }));

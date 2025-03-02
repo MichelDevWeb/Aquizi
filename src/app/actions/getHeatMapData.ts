@@ -1,28 +1,53 @@
-import { games } from "@/db/schema";
-import { auth } from "@/auth";
-import { db } from "@/db";
-import { sql } from "drizzle-orm";
+import { collection, query, where, getDocs, Timestamp } from 'firebase/firestore';
+import { db, COLLECTIONS } from '@/lib/firestore/firestore-config';
 
-const getHeatMapData = async () => {
-  const session = await auth();
-  const userId = session?.user?.id;
-
+const getHeatMapData = async (userId?: string) => {
   if (!userId) {
-    return;
+    return null;
   }
 
-  const data = await db
-    .select({
-      createdAt: sql<string>`date_trunc('day', ${games.timeStarted})`,
-      count: sql<number>`cast(count(${games.id}) as int)`,
-    })
-    .from(games)
-    .where(
-      sql`(${games.userId} = ${userId} AND ${games.timeStarted} is not null AND ${games.timeEnded} is not null)`
-    )
-    .groupBy(sql<string>`date_trunc('day', ${games.timeStarted})`);
-
-  return { data };
+  try {
+    // Get all games for the user
+    const gamesQuery = query(
+      collection(db, COLLECTIONS.GAMES),
+      where('userId', '==', userId),
+      where('timeStarted', '!=', null),
+      where('timeEnded', '!=', null)
+    );
+    
+    const gamesSnapshot = await getDocs(gamesQuery);
+    
+    // Group games by day
+    const gamesByDay = new Map<string, number>();
+    
+    gamesSnapshot.forEach((doc) => {
+      const data = doc.data();
+      if (data.timeStarted) {
+        // Convert Firestore timestamp to Date
+        const date = data.timeStarted instanceof Timestamp 
+          ? data.timeStarted.toDate() 
+          : new Date(data.timeStarted);
+        
+        // Format date as YYYY-MM-DD
+        const dateKey = date.toISOString().split('T')[0];
+        
+        // Increment count for this day
+        const currentCount = gamesByDay.get(dateKey) || 0;
+        gamesByDay.set(dateKey, currentCount + 1);
+      }
+    });
+    
+    // Convert Map to array format expected by the heatmap
+    const data = Array.from(gamesByDay.entries()).map(([createdAt, count]) => ({
+      createdAt,
+      count
+    }));
+    
+    return { data };
+  } catch (error) {
+    console.error("Error fetching heat map data:", error);
+    return { data: [] };
+  }
 };
 
 export default getHeatMapData;

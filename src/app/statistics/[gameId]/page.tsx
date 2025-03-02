@@ -1,15 +1,41 @@
+'use client';
+
 import { buttonVariants } from "@/components/ui/button";
-import { auth } from "@/auth";
 import { LucideLayoutDashboard } from "lucide-react";
 import Link from "next/link";
-
-import { redirect } from "next/navigation";
-import React from "react";
+import { useRouter } from "next/navigation";
+import React, { useEffect, useState } from "react";
 import ResultsCard from "@/components/statistics/ResultsCard";
 import AccuracyCard from "@/components/statistics/AccuracyCard";
 import TimeTakenCard from "@/components/statistics/TimeTakenCard";
 import QuestionsList from "@/components/statistics/QuestionsList";
-import { db } from "@/db";
+import { getDocumentById, getDocuments } from "@/lib/firestore/firestore-utils";
+import { COLLECTIONS, FIELDS } from "@/lib/firestore/firestore-config";
+import { where } from "firebase/firestore";
+import { useAuth } from "@/lib/firebase/firebase-auth";
+import { Skeleton } from "@/components/ui/skeleton";
+
+// Define Firestore types
+interface Game {
+  id: string;
+  gameType: string;
+  timeStarted: Date;
+  timeEnded?: Date;
+  userId: string;
+  topic: string;
+}
+
+interface Question {
+  id: string;
+  question: string;
+  answer: string;
+  gameId: string;
+  questionType: "mcq" | "open_ended";
+  options?: string;
+  userAnswer?: string;
+  isCorrect?: boolean;
+  percentageCorrect?: number;
+}
 
 type Props = {
   params: {
@@ -17,51 +43,94 @@ type Props = {
   };
 };
 
-const Statistics = async ({ params: { gameId } }: Props) => {
-  const session: any = await auth();
-  if (!session?.user) {
-    return redirect("/");
-  }
-  const game = await db.query.games.findFirst({
-    where: (games, { eq }) => eq(games.id, gameId),
-    with: {
-      questionsv2: {
-        columns: {
-          id: true,
-          options: true,
-          question: true,
-          answer: true,
-          userAnswer: true,
-          percentageCorrect: true,
-          isCorrect: true,
-          gameId: true,
-          questionType: true,
-        },
-      },
-    },
-  });
+const Statistics = ({ params: { gameId } }: Props) => {
+  const { user, loading } = useAuth();
+  const router = useRouter();
+  const [game, setGame] = useState<Game | null>(null);
+  const [questions, setQuestions] = useState<Question[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [accuracy, setAccuracy] = useState(0);
 
-  if (!game) {
-    return redirect("/");
-  }
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push('/firebase-auth');
+    }
+  }, [user, loading, router]);
 
-  let accuracy: number = 0;
-
-  if (game.gameType === "mcq") {
-    let totalCorrect = game.questionsv2.reduce((acc, question) => {
-      if (question.isCorrect) {
-        return acc + 1;
+  useEffect(() => {
+    const fetchGameData = async () => {
+      if (user) {
+        try {
+          // Get game from Firestore
+          const gameData = await getDocumentById<Game>(COLLECTIONS.GAMES, gameId);
+          
+          if (!gameData) {
+            router.push("/dashboard");
+            return;
+          }
+          
+          setGame(gameData);
+          
+          // Get questions for the game
+          const questionsData = await getDocuments<Question>(
+            COLLECTIONS.QUESTIONS,
+            [where(FIELDS.QUESTION.GAME_ID, "==", gameId)]
+          );
+          
+          setQuestions(questionsData);
+          
+          // Calculate accuracy
+          let calculatedAccuracy = 0;
+          
+          if (gameData.gameType === "mcq") {
+            let totalCorrect = questionsData.reduce((acc, question) => {
+              if (question.isCorrect) {
+                return acc + 1;
+              }
+              return acc;
+            }, 0);
+            calculatedAccuracy = (totalCorrect / questionsData.length) * 100;
+          } else if (gameData.gameType === "open_ended") {
+            let totalPercentage = questionsData.reduce((acc, question) => {
+              return acc + (question.percentageCorrect ?? 0);
+            }, 0);
+            calculatedAccuracy = totalPercentage / questionsData.length;
+          }
+          
+          setAccuracy(Math.round(calculatedAccuracy * 100) / 100);
+          setIsLoading(false);
+        } catch (error) {
+          console.error('Error fetching game data:', error);
+          router.push("/dashboard");
+        }
       }
-      return acc;
-    }, 0);
-    accuracy = (totalCorrect / game.questionsv2.length) * 100;
-  } else if (game.gameType === "open_ended") {
-    let totalPercentage = game.questionsv2.reduce((acc, question) => {
-      return acc + (question.percentageCorrect ?? 0);
-    }, 0);
-    accuracy = totalPercentage / game.questionsv2.length;
+    };
+
+    if (user) {
+      fetchGameData();
+    }
+  }, [gameId, user, router]);
+
+  if (loading || isLoading) {
+    return (
+      <div className="p-8 mx-auto max-w-7xl">
+        <div className="flex items-center justify-between space-y-2">
+          <Skeleton className="h-10 w-64" />
+          <Skeleton className="h-10 w-40" />
+        </div>
+        <div className="grid gap-4 mt-4 md:grid-cols-7">
+          <Skeleton className="h-40 col-span-3" />
+          <Skeleton className="h-40 col-span-2" />
+          <Skeleton className="h-40 col-span-2" />
+        </div>
+        <Skeleton className="h-96 w-full mt-4" />
+      </div>
+    );
   }
-  accuracy = Math.round(accuracy * 100) / 100;
+
+  if (!user || !game || questions.length === 0) {
+    return null; // Will redirect in useEffect
+  }
 
   return (
     <>
@@ -87,7 +156,7 @@ const Statistics = async ({ params: { gameId } }: Props) => {
             timeStarted={new Date(game.timeStarted ?? 0)}
           />
         </div>
-        <QuestionsList questions={game.questionsv2} />
+        <QuestionsList questions={questions} />
       </div>
     </>
   );

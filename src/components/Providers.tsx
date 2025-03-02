@@ -1,6 +1,5 @@
 "use client";
 import React from "react";
-import { SessionProvider } from "next-auth/react";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 import { type ThemeProviderProps } from "next-themes/dist/types";
 import {
@@ -8,6 +7,8 @@ import {
   QueryClientProvider,
   useQuery,
 } from "@tanstack/react-query";
+import { AuthProvider } from "@/lib/firebase/firebase-auth";
+
 const queryClient = new QueryClient();
 
 const Providers = ({ children }: ThemeProviderProps) => {
@@ -18,7 +19,9 @@ const Providers = ({ children }: ThemeProviderProps) => {
         defaultTheme="system"
         enableSystem
       >
-        <SessionProvider>{children}</SessionProvider>
+        <AuthProvider>
+          {children}
+        </AuthProvider>
       </NextThemesProvider>
     </QueryClientProvider>
   );

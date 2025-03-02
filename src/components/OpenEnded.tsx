@@ -15,19 +15,35 @@ import BlankAnswerInput from "./BlankAnswerInput";
 import { useMutation } from "@tanstack/react-query";
 import { z } from "zod";
 import { checkAnswerSchema, endGameSchema } from "@/schemas/questions";
-import axios from "axios";
 import { useToast } from "./ui/use-toast";
 import Link from "next/link";
-import { games, questionsv2 } from "@/db/schema";
+import apiClient from "@/lib/api-client";
+
+// Define Firestore types
+interface Game {
+  id: string;
+  gameType: string;
+  timeStarted: Date;
+  timeEnded?: Date;
+  userId: string;
+  topic: string;
+  questionsv2: Question[];
+}
+
+interface Question {
+  id: string;
+  question: string;
+  answer: string;
+  gameId: string;
+  questionType: "mcq" | "open_ended";
+  options?: string;
+  userAnswer?: string;
+  isCorrect?: boolean;
+  percentageCorrect?: number;
+}
 
 type Props = {
-  game: typeof games.$inferSelect & {
-    questionsv2: (typeof questionsv2.$inferSelect & {
-      id: string;
-      options: string;
-      answer: string;
-    })[];
-  };
+  game: Game;
 };
 
 const OpenEnded = ({ game }: Props) => {
@@ -46,7 +62,7 @@ const OpenEnded = ({ game }: Props) => {
         gameId: game.id,
         timeStarted: timeStarted.toString(),
       };
-      const response = await axios.post(`/api/endGame`, payload);
+      const response = await apiClient.post(`/api/endGame`, payload);
       return response.data;
     },
   });
@@ -66,7 +82,7 @@ const OpenEnded = ({ game }: Props) => {
         questionId: currentQuestion.id,
         userInput: filledAnswer,
       };
-      const response = await axios.post(`/api/checkAnswer`, payload);
+      const response = await apiClient.post(`/api/checkAnswer`, payload);
       return response.data;
     },
   });

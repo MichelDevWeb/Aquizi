@@ -1,10 +1,8 @@
-import { drizzle } from "drizzle-orm/postgres-js";
-import postgres from "postgres";
-import * as schema from "./schema";
+// Re-export Firestore configuration
+import { db as firestoreDb, COLLECTIONS, FIELDS } from '@/lib/firestore/firestore-config';
 
-const connectionString =
-  process.env.DATABASE_URL ||
-  "postgres://postgres:postgres@localhost:5432/postgres";
+// Export Firestore db as the default db
+export const db = firestoreDb;
 
-const client = postgres(connectionString);
-export const db = drizzle(client, { schema });
+// Export collections and fields
+export { COLLECTIONS, FIELDS };

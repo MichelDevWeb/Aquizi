@@ -1,4 +1,5 @@
-import { auth, signOut } from "@/auth";
+'use client';
+
 import { Button } from "./button";
 import Image from "next/image";
 import Link from "next/link";
@@ -7,27 +8,49 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { NavMenu } from "@/components/NavMenu";
+import { useAuth } from "@/lib/firebase/firebase-auth";
+import { useRouter } from "next/navigation";
 
 function SignOut() {
+  const { logout } = useAuth();
+  const router = useRouter();
+
+  const handleSignOut = async () => {
+    try {
+      await logout();
+      router.push('/');
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
+  };
+
   return (
-    <form
-      action={async () => {
-        "use server";
-        await signOut();
-      }}
+    <Button
+      onClick={handleSignOut}
+      variant="ghost"
     >
-      <Button
-        type="submit"
-        variant="ghost"
-      >
-        Sign Out
-      </Button>
-    </form>
+      Sign Out
+    </Button>
   );
 }
 
-const Header = async () => {
-  const session = await auth();
+const Header = () => {
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <header>
+        <nav className="px-4 py-2.5">
+          <div className="flex flex-wrap justify-between items-center mx-auto max-w-screen-xl">
+            <Link href="/dashboard">
+              <h1 className="text-3xl font-bold">Aquizi</h1>
+            </Link>
+            <Button disabled>Loading...</Button>
+          </div>
+        </nav>
+      </header>
+    );
+  }
 
   return (
     <header>
@@ -38,15 +61,15 @@ const Header = async () => {
           </Link>
 
           <div>
-            {session?.user ? (
+            {user ? (
               <div className="flex items-center gap-4">
-                {session.user.name && session.user.image && (
+                {user.displayName && user.photoURL && (
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button variant="ghost">
                         <Image
-                          src={session.user.image}
-                          alt={session.user.name}
+                          src={user.photoURL}
+                          alt={user.displayName}
                           width={32}
                           height={32}
                           className="rounded-full"
@@ -59,7 +82,7 @@ const Header = async () => {
                 <SignOut />
               </div>
             ) : (
-              <Link href="api/auth/signin">
+              <Link href="/firebase-auth">
                 <Button
                   variant="link"
                   className="rounded-xl border"

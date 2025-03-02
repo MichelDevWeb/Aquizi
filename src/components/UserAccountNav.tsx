@@ -1,6 +1,5 @@
 "use client";
 
-import type { User } from "next-auth";
 import React from "react";
 import {
   DropdownMenu,
@@ -11,14 +10,31 @@ import {
 } from "@/components/ui/dropdown-menu";
 import UserAvatar from "./UserAvatar";
 import Link from "next/link";
-import { signOut } from "next-auth/react";
-import { LogOut } from "lucide-react";
+import { LogOut, User as UserIcon, ListTodo, Settings } from "lucide-react";
+import { useAuth } from "@/lib/firebase/firebase-auth";
+import { useRouter } from "next/navigation";
 
 type Props = {
-  user: Pick<User, "name" | "image" | "email">;
+  user: {
+    name: string | null;
+    email: string | null;
+    image: string | null;
+  };
 };
 
 const UserAccountNav = ({ user }: Props) => {
+  const { logout } = useAuth();
+  const router = useRouter();
+
+  const handleSignOut = async () => {
+    try {
+      await logout();
+      router.push("/");
+    } catch (error) {
+      console.error("Error signing out:", error);
+    }
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>
@@ -46,20 +62,35 @@ const UserAccountNav = ({ user }: Props) => {
         </div>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
-          <Link href="/">Meow</Link>
+          <Link href="/dashboard" className="flex items-center">
+            <Settings className="w-4 h-4 mr-2" />
+            Dashboard
+          </Link>
+        </DropdownMenuItem>
+        
+        <DropdownMenuSeparator />
+        <DropdownMenuItem asChild>
+          <Link href="/firebase-dashboard" className="flex items-center">
+            <UserIcon className="w-4 h-4 mr-2" />
+            Profile
+          </Link>
+        </DropdownMenuItem>
+        
+        <DropdownMenuItem asChild>
+          <Link href="/firebase-todos" className="flex items-center">
+            <ListTodo className="w-4 h-4 mr-2" />
+            Todos
+          </Link>
         </DropdownMenuItem>
 
         <DropdownMenuSeparator />
 
         <DropdownMenuItem
-          onSelect={(event) => {
-            event.preventDefault();
-            signOut().catch(console.error);
-          }}
+          onSelect={() => handleSignOut()}
           className="text-red-600 cursor-pointer"
         >
+          <LogOut className="w-4 h-4 mr-2" />
           Sign out
-          <LogOut className="w-4 h-4 ml-2 " />
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

@@ -1,13 +1,9 @@
-import React from "react";
+'use client';
 
-import { auth } from "@/auth";
-import { redirect } from "next/navigation";
+import React, { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import QuizCreation from "@/components/forms/QuizCreation";
-
-export const metadata = {
-  title: "Quiz | Aquizi",
-  description: "Quiz yourself on anything!",
-};
+import { useAuth } from "@/lib/firebase/firebase-auth";
 
 interface Props {
   searchParams: {
@@ -15,11 +11,24 @@ interface Props {
   };
 }
 
-const Quiz = async ({ searchParams }: Props) => {
-  const session: any = await auth();
-  if (!session?.user) {
-    redirect("/");
+const Quiz = ({ searchParams }: Props) => {
+  const { user, loading } = useAuth();
+  const router = useRouter();
+  
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push('/');
+    }
+  }, [user, loading, router]);
+
+  if (loading) {
+    return <div>Loading...</div>;
   }
+
+  if (!user) {
+    return null; // Will redirect in useEffect
+  }
+
   return <QuizCreation topic={searchParams.topic ?? ""} />;
 };
 

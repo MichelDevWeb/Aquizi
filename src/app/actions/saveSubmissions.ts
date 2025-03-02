@@ -1,22 +1,28 @@
-"use server";
+"use client";
 
-import { db } from "@/db";
-import { quizzSubmissions } from "@/db/schema";
-import { auth } from "@/auth";
-import { InferInsertModel, eq } from "drizzle-orm";
+import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
+import { db, COLLECTIONS } from '@/lib/firestore/firestore-config';
 
-type Submission = InferInsertModel<typeof quizzSubmissions>;
+type Submission = {
+  score: number;
+  gameId: string;
+  userId: string;
+};
 
-export async function saveSubmission(sub: Submission, quizzId: number) {
-  const { score } = sub;
+export async function saveSubmission(submission: Submission): Promise<string> {
+  try {
+    const { score, gameId, userId } = submission;
 
-  const newSubmission = await db
-    .insert(quizzSubmissions)
-    .values({
+    const submissionRef = await addDoc(collection(db, COLLECTIONS.SUBMISSIONS), {
       score,
-      quizzId,
-    })
-    .returning({ insertedId: quizzSubmissions.id });
-  const submissionId = newSubmission[0].insertedId;
-  return submissionId;
+      gameId,
+      userId,
+      createdAt: serverTimestamp()
+    });
+
+    return submissionRef.id;
+  } catch (error) {
+    console.error('Error saving submission:', error);
+    throw error;
+  }
 }

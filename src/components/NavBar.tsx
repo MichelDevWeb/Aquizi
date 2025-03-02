@@ -1,15 +1,37 @@
+"use client";
+
 import Link from "next/link";
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 import UserAccountNav from "./UserAccountNav";
 import { ThemeToggle } from "./ThemeToggle";
-import { auth } from "@/auth";
-import SignInButton from "./SignInButton";
+import { useAuth } from "@/lib/firebase/firebase-auth";
+import { Button } from "./ui/button";
 
-const Navbar = async () => {
-  const session = await auth();
+const Navbar = () => {
+  const { user, loading } = useAuth();
+  const [isUserValid, setIsUserValid] = useState(false);
+  
+  useEffect(() => {
+    // Check if user is valid (authenticated and email verified if required)
+    if (user && !loading) {
+      // You can add additional validation checks here if needed
+      // For example, check if email is verified: user.emailVerified
+      setIsUserValid(true);
+    } else {
+      setIsUserValid(false);
+    }
+  }, [user, loading]);
+
+  // Adapt Firebase user to match NextAuth user format expected by UserAccountNav
+  const adaptedUser = user ? {
+    name: user.displayName || 'User',
+    email: user.email || '',
+    image: user.photoURL || '',
+  } : null;
+
   return (
-    <div className="fixed inset-x-0 top-0 bg-white dark:bg-gray-950 z-[10] h-fit border-b border-zinc-300  py-2 ">
+    <div className="fixed inset-x-0 top-0 bg-white dark:bg-gray-950 z-[10] h-fit border-b border-zinc-300 py-2">
       <div className="flex items-center justify-between h-full gap-2 px-8 mx-auto max-w-7xl">
         {/* Logo */}
         <Link
@@ -20,12 +42,18 @@ const Navbar = async () => {
             Aquizi
           </p>
         </Link>
+
         <div className="flex items-center">
           <ThemeToggle className="mr-4" />
-          {session?.user ? (
-            <UserAccountNav user={session.user} />
+          {loading ? (
+            // Show loading state while checking authentication
+            <Button disabled>Loading...</Button>
+          ) : isUserValid && adaptedUser ? (
+            <UserAccountNav user={adaptedUser} />
           ) : (
-            <SignInButton text={"Sign In"} />
+            <Link href="/firebase-auth">
+              <Button>Sign In Firebase</Button>
+            </Link>
           )}
         </div>
       </div>

@@ -2,18 +2,30 @@ import { checkAnswerSchema } from "@/schemas/questions";
 import { NextResponse } from "next/server";
 import { ZodError } from "zod";
 import stringSimilarity from "string-similarity";
-import { db } from "@/db";
-import { questionsv2 } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { getDocumentById, updateDocument } from "@/lib/firestore/firestore-utils";
+import { COLLECTIONS, FIELDS } from "@/lib/firestore/firestore-config";
+
+// Define types for Firestore documents
+interface Question {
+  id: string;
+  question: string;
+  answer: string;
+  gameId: string;
+  questionType: "mcq" | "open_ended";
+  options?: string;
+  userAnswer?: string;
+  isCorrect?: boolean;
+  percentageCorrect?: number;
+}
 
 export async function POST(req: Request, res: Response) {
   try {
     const body = await req.json();
     const { questionId, userInput } = checkAnswerSchema.parse(body);
-    const [question] = await db
-      .select()
-      .from(questionsv2)
-      .where(eq(questionsv2.id, questionId));
+    
+    // Get question from Firestore
+    const question = await getDocumentById<Question>(COLLECTIONS.QUESTIONS, questionId);
+    
     if (!question) {
       return NextResponse.json(
         {
@@ -24,17 +36,25 @@ export async function POST(req: Request, res: Response) {
         }
       );
     }
-    await db
-      .update(questionsv2)
-      .set({ userAnswer: userInput })
-      .where(eq(questionsv2.id, questionId));
+    
+    // Update user answer in Firestore
+    await updateDocument(
+      COLLECTIONS.QUESTIONS,
+      questionId,
+      { userAnswer: userInput }
+    );
+    
     if (question.questionType === "mcq") {
       const isCorrect =
         question.answer.toLowerCase().trim() === userInput.toLowerCase().trim();
-      await db
-        .update(questionsv2)
-        .set({ isCorrect })
-        .where(eq(questionsv2.id, questionId));
+      
+      // Update isCorrect field in Firestore
+      await updateDocument(
+        COLLECTIONS.QUESTIONS,
+        questionId,
+        { isCorrect }
+      );
+      
       return NextResponse.json({
         isCorrect,
       });
@@ -44,15 +64,29 @@ export async function POST(req: Request, res: Response) {
         userInput.toLowerCase().trim()
       );
       percentageSimilar = Math.round(percentageSimilar * 100);
-      await db
-        .update(questionsv2)
-        .set({ percentageCorrect: percentageSimilar })
-        .where(eq(questionsv2.id, questionId));
+      
+      // Update percentageCorrect field in Firestore
+      await updateDocument(
+        COLLECTIONS.QUESTIONS,
+        questionId,
+        { percentageCorrect: percentageSimilar }
+      );
+      
       return NextResponse.json({
         percentageSimilar,
       });
     }
+    
+    return NextResponse.json(
+      {
+        message: "Invalid question type",
+      },
+      {
+        status: 400,
+      }
+    );
   } catch (error) {
+    console.error("Error checking answer:", error);
     if (error instanceof ZodError) {
       return NextResponse.json(
         {
@@ -63,5 +97,14 @@ export async function POST(req: Request, res: Response) {
         }
       );
     }
+    
+    return NextResponse.json(
+      {
+        message: "An unexpected error occurred",
+      },
+      {
+        status: 500,
+      }
+    );
   }
 }

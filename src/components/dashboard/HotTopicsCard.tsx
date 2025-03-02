@@ -7,15 +7,25 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import WordCloud from "../WordCloud";
-import { db } from "@/db";
+import { getDocuments } from "@/lib/firestore/firestore-utils";
+import { COLLECTIONS } from "@/lib/firestore/firestore-config";
+import { orderBy, limit } from "firebase/firestore";
+
+// Define Firestore types
+interface TopicCount {
+  id: string;
+  topic: string;
+  count: number;
+}
 
 type Props = {};
 
 const HotTopicsCard = async (props: Props) => {
-  const topics = await db.query.topicCounts.findMany({
-    orderBy: (topicCounts, { desc }) => [desc(topicCounts.count)],
-    limit: 15,
-  });
+  // Get topics from Firestore
+  const topics = await getDocuments<TopicCount>(
+    COLLECTIONS.TOPIC_COUNTS,
+    [orderBy("count", "desc"), limit(15)]
+  );
 
   const formattedTopics = topics.map((topic) => {
     return {
@@ -23,6 +33,7 @@ const HotTopicsCard = async (props: Props) => {
       value: topic.count,
     };
   });
+  
   return (
     <Card className="col-span-4">
       <CardHeader>

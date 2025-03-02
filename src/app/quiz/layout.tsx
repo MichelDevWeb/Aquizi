@@ -1,3 +1,8 @@
+export const metadata = {
+  title: "Quiz | Aquizi",
+  description: "Quiz yourself on anything!",
+};
+
 const QuizPageLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <div className="max-w-5xl mx-auto">

@@ -1,4 +1,6 @@
-import SignInButton from "@/components/SignInButton";
+'use client';
+
+import FirebaseSignInButton from "@/components/FirebaseSignInButton";
 import {
   Card,
   CardContent,
@@ -7,15 +9,30 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { redirect } from "next/navigation";
-import { auth } from "@/auth";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/lib/firebase/firebase-auth";
+import { useEffect, useState } from "react";
 
-export default async function Home() {
-  const session = await auth();
-  if (session?.user) {
-    // redirect("/dashboard");
+export default function Home() {
+  const { user, loading } = useAuth();
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  // Show loading state while checking authentication
+  if (loading || !isClient) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <p>Loading...</p>
+      </div>
+    );
+  }
+
+  if (user) {
     return (
       <div className="flex flex-col flex-1">
         <main className="flex justify-center flex-1">
@@ -66,11 +83,11 @@ export default async function Home() {
             <CardTitle>Welcome to Aquizi 🔥!</CardTitle>
             <CardDescription>
               Aquizi is a platform for creating quizzes using AI!. Get started
-              by loggin in below!
+              by logging in below!
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <SignInButton text="Sign In with Google" />
+            <FirebaseSignInButton text="Sign In with Google" />
           </CardContent>
         </Card>
       </main>

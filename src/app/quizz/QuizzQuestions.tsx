@@ -5,18 +5,32 @@ import ProgressBar from "@/components/ProgressBar";
 import { ChevronLeft, X } from "lucide-react";
 import ResultCard from "./ResultCard";
 import QuizzSubmission from "./QuizzSubmission";
-import { InferSelectModel } from "drizzle-orm";
-import {
-  questionAnswers,
-  questions as DbQuestions,
-  quizzes,
-} from "@/db/schema";
-import { saveSubmission } from "@/actions/saveSubmissions";
+import { saveSubmission } from "@/app/actions/saveSubmissions";
 import { useRouter } from "next/navigation";
 
-type Answer = InferSelectModel<typeof questionAnswers>;
-type Question = InferSelectModel<typeof DbQuestions> & { answers: Answer[] };
-type Quizz = InferSelectModel<typeof quizzes> & { questions: Question[] };
+// Define Firestore types
+interface Answer {
+  id: string;
+  questionId: string;
+  answerText: string;
+  isCorrect: boolean;
+}
+
+interface Question {
+  id: string;
+  quizzId: string;
+  questionText: string;
+  answers: Answer[];
+}
+
+interface Quizz {
+  id: string;
+  name: string;
+  description: string;
+  userId: string;
+  createdAt: Date;
+  questions: Question[];
+}
 
 type Props = {
   quizz: Quizz;
@@ -28,7 +42,7 @@ export default function QuizzQuestions(props: Props) {
   const [currentQuestion, setCurrentQuestion] = useState<number>(0);
   const [score, setScore] = useState<number>(0);
   const [userAnswers, setUserAnswers] = useState<
-    { questionId: number; answerId: number }[]
+    { questionId: string; answerId: string }[]
   >([]);
   const [submitted, setSubmitted] = useState<boolean>(false);
   const router = useRouter();
@@ -47,7 +61,7 @@ export default function QuizzQuestions(props: Props) {
     }
   };
 
-  const handleAnswer = (answer: Answer, questionId: number) => {
+  const handleAnswer = (answer: Answer, questionId: string) => {
     const newUserAnswersArr = [
       ...userAnswers,
       {
@@ -64,7 +78,11 @@ export default function QuizzQuestions(props: Props) {
 
   const handleSubmit = async () => {
     try {
-      const subId = await saveSubmission({ score }, props.quizz.id);
+      await saveSubmission({ 
+        score, 
+        gameId: props.quizz.id,
+        userId: props.quizz.userId
+      });
     } catch (e) {
       console.log(e);
     }
@@ -85,17 +103,17 @@ export default function QuizzQuestions(props: Props) {
   };
 
   const scorePercentage: number = Math.round((score / questions.length) * 100);
-  const selectedAnswer: number | null | undefined = userAnswers.find(
+  const selectedAnswer: string | undefined = userAnswers.find(
     (item) => item.questionId === questions[currentQuestion].id
   )?.answerId;
-  const isCorrect: boolean | null | undefined =
+  const isCorrect: boolean | undefined =
     questions[currentQuestion].answers.findIndex(
       (answer) => answer.id === selectedAnswer
     ) !== -1
       ? questions[currentQuestion].answers.find(
           (answer) => answer.id === selectedAnswer
         )?.isCorrect
-      : null;
+      : undefined;
 
   if (submitted) {
     return (

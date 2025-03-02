@@ -1,8 +1,13 @@
-import { quizzes } from "@/db/schema";
-import { InferSelectModel } from "drizzle-orm";
 import Link from "next/link";
 
-export type Quizz = InferSelectModel<typeof quizzes>;
+// Define Firestore types
+export interface Quizz {
+  id: string;
+  name: string;
+  description: string;
+  userId: string;
+  createdAt: Date;
+}
 
 type Props = {
   quizzes: Quizz[];

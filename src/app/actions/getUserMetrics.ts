@@ -1,58 +1,61 @@
-import {
-  quizzes,
-  quizzSubmissions,
-  users,
-  games,
-  questionsv2,
-} from "@/db/schema";
-import { auth } from "@/auth";
-import { db } from "@/db";
-import { count, eq, avg } from "drizzle-orm";
+import { collection, query, where, getDocs, getDoc, doc, count } from 'firebase/firestore';
+import { db, COLLECTIONS } from '@/lib/firestore/firestore-config';
 
-const getUserMetrics = async () => {
-  const session = await auth();
-  const userId = session?.user?.id;
-
+const getUserMetrics = async (userId?: string) => {
   if (!userId) {
-    return;
+    return null;
   }
 
-  // get total # of user quizzes
-  const numQuizzes = await db
-    .select({ value: count() })
-    .from(games)
-    .where(eq(games.userId, userId));
+  try {
+    // Get total # of user games (quizzes)
+    const gamesQuery = query(
+      collection(db, COLLECTIONS.GAMES),
+      where('userId', '==', userId)
+    );
+    const gamesSnapshot = await getDocs(gamesQuery);
+    const numQuizzes = gamesSnapshot.size;
 
-  // get total # of questions
-  const numQuestions = await db
-    .select({ value: count() })
-    .from(questionsv2)
-    .innerJoin(games, eq(questionsv2.gameId, games.id))
-    .innerJoin(users, eq(games.userId, users.id))
-    .where(eq(users.id, userId));
+    // Get total # of questions
+    const questionsQuery = query(
+      collection(db, COLLECTIONS.QUESTIONS),
+      where('userId', '==', userId)
+    );
+    const questionsSnapshot = await getDocs(questionsQuery);
+    const numQuestions = questionsSnapshot.size;
 
-  // get total # of submissions
-  const numSubmissions = await db
-    .select({ value: count() })
-    .from(quizzSubmissions)
-    .innerJoin(quizzes, eq(quizzSubmissions.quizzId, quizzes.id))
-    .innerJoin(users, eq(quizzes.userId, users.id))
-    .where(eq(users.id, userId));
+    // Get total # of submissions
+    const submissionsQuery = query(
+      collection(db, COLLECTIONS.SUBMISSIONS),
+      where('userId', '==', userId)
+    );
+    const submissionsSnapshot = await getDocs(submissionsQuery);
+    const numSubmissions = submissionsSnapshot.size;
 
-  // get the average score
-  const avgScore = await db
-    .select({ value: avg(quizzSubmissions.score) })
-    .from(quizzSubmissions)
-    .innerJoin(quizzes, eq(quizzSubmissions.quizzId, quizzes.id))
-    .innerJoin(users, eq(quizzes.userId, users.id))
-    .where(eq(users.id, userId));
+    // Calculate average score
+    let totalScore = 0;
+    submissionsSnapshot.forEach((doc) => {
+      const data = doc.data();
+      if (data.score) {
+        totalScore += data.score;
+      }
+    });
+    const avgScore = numSubmissions > 0 ? totalScore / numSubmissions : 0;
 
-  return [
-    { label: "Quizzes", value: numQuizzes[0].value },
-    { label: "Questions", value: numQuestions[0].value },
-    { label: "Submissions", value: numSubmissions[0].value },
-    { label: "Average Score", value: avgScore[0].value },
-  ];
+    return [
+      { label: "Quizzes", value: numQuizzes },
+      { label: "Questions", value: numQuestions },
+      { label: "Submissions", value: numSubmissions },
+      { label: "Average Score", value: Math.round(avgScore * 100) / 100 },
+    ];
+  } catch (error) {
+    console.error("Error fetching user metrics:", error);
+    return [
+      { label: "Quizzes", value: 0 },
+      { label: "Questions", value: 0 },
+      { label: "Submissions", value: 0 },
+      { label: "Average Score", value: 0 },
+    ];
+  }
 };
 
 export default getUserMetrics;

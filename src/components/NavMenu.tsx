@@ -14,6 +14,8 @@ import {
   UserPlus,
   Users,
   BarChartBig,
+  Flame,
+  ListTodo,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -100,6 +102,37 @@ export function NavMenu() {
             </DropdownMenuSubContent>
           </DropdownMenuPortal>
         </DropdownMenuSub>
+      </DropdownMenuGroup>
+      <DropdownMenuSeparator />
+      <DropdownMenuLabel>Firebase</DropdownMenuLabel>
+      <DropdownMenuGroup>
+        <DropdownMenuItem>
+          <Link
+            href="/firebase-auth"
+            className="flex flexr-row"
+          >
+            <Flame className="mr-2 h-4 w-4" />
+            <span>Firebase Auth</span>
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem>
+          <Link
+            href="/firebase-dashboard"
+            className="flex flexr-row"
+          >
+            <User className="mr-2 h-4 w-4" />
+            <span>Firebase Dashboard</span>
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem>
+          <Link
+            href="/firebase-todos"
+            className="flex flexr-row"
+          >
+            <ListTodo className="mr-2 h-4 w-4" />
+            <span>Firebase Todos</span>
+          </Link>
+        </DropdownMenuItem>
       </DropdownMenuGroup>
       <DropdownMenuSeparator />
       <DropdownMenuItem>

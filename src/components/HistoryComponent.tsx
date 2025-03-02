@@ -1,8 +1,20 @@
 import { Clock, CopyCheck, Edit2 } from "lucide-react";
 import Link from "next/link";
 import React from "react";
-import { db } from "@/db";
 import { convertDateToString } from "@/lib/utils";
+import { getDocuments } from "@/lib/firestore/firestore-utils";
+import { COLLECTIONS, FIELDS } from "@/lib/firestore/firestore-config";
+import { where, orderBy, limit as firestoreLimit } from "firebase/firestore";
+
+// Define Firestore types
+interface Game {
+  id: string;
+  gameType: string;
+  timeStarted: Date;
+  timeEnded?: Date;
+  userId: string;
+  topic: string;
+}
 
 type Props = {
   limit: number;
@@ -10,15 +22,19 @@ type Props = {
 };
 
 const HistoryComponent = async ({ limit, userId }: Props) => {
-  const games = await db.query.games.findMany({
-    limit: limit,
-    where: (games, { eq }) => eq(games.userId, userId),
-    orderBy: (games, { desc }) => [desc(games.timeStarted)],
-  });
+  // Get games from Firestore
+  const games = await getDocuments<Game>(
+    COLLECTIONS.GAMES,
+    [
+      where(FIELDS.GAME.USER_ID, "==", userId),
+      orderBy(FIELDS.GAME.TIME_STARTED, "desc"),
+      firestoreLimit(limit)
+    ]
+  );
 
   return (
     <div className="space-y-8">
-      {games.map((game: any) => {
+      {games.map((game: Game) => {
         return (
           <div
             className="flex items-center justify-between"
@@ -39,7 +55,7 @@ const HistoryComponent = async ({ limit, userId }: Props) => {
                 </Link>
                 <p className="flex items-center px-2 py-1 text-xs text-white rounded-lg w-fit bg-slate-800">
                   <Clock className="w-4 h-4 mr-1" />
-                  {convertDateToString(game.timeEnded, true)}
+                  {convertDateToString(game.timeEnded || game.timeStarted, true)}
                 </p>
                 <p className="text-sm text-muted-foreground">
                   {game.gameType === "mcq" ? "Multiple Choice" : "Open-Ended"}

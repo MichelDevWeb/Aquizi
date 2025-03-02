@@ -17,7 +17,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { BookOpen, CopyCheck } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
-import axios, { AxiosError } from "axios";
+import { AxiosError } from "axios";
 import { useMutation } from "@tanstack/react-query";
 import { useToast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";
@@ -29,6 +29,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import LoadingQuestions from "@/components/LoadingQuestions";
+import apiClient from "@/lib/api-client";
 
 type Props = {
   topic: string;
@@ -43,7 +44,7 @@ const QuizCreation = ({ topic: topicParam }: Props) => {
   const { toast } = useToast();
   const { mutate: getQuestions, isPending } = useMutation({
     mutationFn: async ({ amount, topic, type }: Input) => {
-      const response = await axios.post("/api/game", { amount, topic, type });
+      const response = await apiClient.post("/api/game", { amount, topic, type });
       return response.data;
     },
   });
@@ -69,6 +70,14 @@ const QuizCreation = ({ topic: topicParam }: Props) => {
               description: "Something went wrong. Please try again later.",
               variant: "destructive",
             });
+          } else if (error.response?.status === 401) {
+            toast({
+              title: "Authentication Error",
+              description: "You must be logged in to create a quiz.",
+              variant: "destructive",
+            });
+            // Redirect to login page
+            router.push('/firebase-auth');
           }
         }
       },

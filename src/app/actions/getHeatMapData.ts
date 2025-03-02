@@ -8,11 +8,10 @@ const getHeatMapData = async (userId?: string) => {
 
   try {
     // Get all games for the user
+    // Firestore doesn't allow multiple != filters, so we'll filter in memory instead
     const gamesQuery = query(
       collection(db, COLLECTIONS.GAMES),
-      where('userId', '==', userId),
-      where('timeStarted', '!=', null),
-      where('timeEnded', '!=', null)
+      where('userId', '==', userId)
     );
     
     const gamesSnapshot = await getDocs(gamesQuery);
@@ -22,7 +21,8 @@ const getHeatMapData = async (userId?: string) => {
     
     gamesSnapshot.forEach((doc) => {
       const data = doc.data();
-      if (data.timeStarted) {
+      // Filter out entries with null timeStarted or timeEnded in memory
+      if (data.timeStarted && data.timeEnded) {
         // Convert Firestore timestamp to Date
         const date = data.timeStarted instanceof Timestamp 
           ? data.timeStarted.toDate() 

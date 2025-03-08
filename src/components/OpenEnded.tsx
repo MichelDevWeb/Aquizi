@@ -1,8 +1,8 @@
 "use client";
 import { cn, formatTimeDelta } from "@/lib/utils";
 import { differenceInSeconds } from "date-fns";
-import { BarChart, ChevronRight, Loader2, Timer } from "lucide-react";
-import React from "react";
+import { BarChart, ChevronRight, Loader2, Timer, CheckCircle, XCircle } from "lucide-react";
+import React, { useRef } from "react";
 import {
   Card,
   CardDescription,
@@ -18,6 +18,7 @@ import { checkAnswerSchema, endGameSchema } from "@/schemas/questions";
 import { useToast } from "./ui/use-toast";
 import Link from "next/link";
 import apiClient from "@/lib/api-client";
+import { useRouter } from "next/navigation";
 
 // Define Firestore types
 interface Game {
@@ -28,6 +29,7 @@ interface Game {
   userId: string;
   topic: string;
   questionsv2: Question[];
+  submissionId?: string;
 }
 
 interface Question {
@@ -47,27 +49,44 @@ type Props = {
 };
 
 const OpenEnded = ({ game }: Props) => {
-  const [hasEnded, setHasEnded] = React.useState(false);
+  const router = useRouter();
   const [questionIndex, setQuestionIndex] = React.useState(0);
   const [blankAnswer, setBlankAnswer] = React.useState("");
   const [averagePercentage, setAveragePercentage] = React.useState(0);
-  // Initialize timeStarted with the current date and time
   const [timeStarted, setTimeStarted] = React.useState(new Date());
+  const [questionResults, setQuestionResults] = React.useState<number[]>([]);
+  const [submissionId, setSubmissionId] = React.useState<string | null>(null);
+  const [hasUserInput, setHasUserInput] = React.useState(false);
+  
+  const correctSoundRef = useRef<HTMLAudioElement | null>(null);
+  const incorrectSoundRef = useRef<HTMLAudioElement | null>(null);
+  
   const currentQuestion = React.useMemo(() => {
     return game.questionsv2[questionIndex];
   }, [questionIndex, game.questionsv2]);
+  
   const { mutate: endGame } = useMutation({
     mutationFn: async () => {
       const payload: z.infer<typeof endGameSchema> = {
         gameId: game.id,
         timeStarted: timeStarted.toString(),
+        // Pass the submissionId if this is a retest
+        ...(game.submissionId && { submissionId: game.submissionId }),
       };
       const response = await apiClient.post(`/api/endGame`, payload);
       return response.data;
     },
+    onSuccess: (data) => {
+      // Store the submission ID returned from the API
+      if (data.submissionId) {
+        setSubmissionId(data.submissionId);
+      }
+    },
   });
+  
   const { toast } = useToast();
   const [now, setNow] = React.useState(new Date());
+  
   const { mutate: checkAnswer, isPending: isChecking } = useMutation({
     mutationFn: async () => {
       let filledAnswer = blankAnswer;
@@ -86,74 +105,111 @@ const OpenEnded = ({ game }: Props) => {
       return response.data;
     },
   });
+  
+  // Initialize audio elements when component mounts
   React.useEffect(() => {
-    if (!hasEnded) {
-      const interval = setInterval(() => {
-        setNow(new Date());
-      }, 1000);
-      return () => clearInterval(interval);
+    correctSoundRef.current = new Audio('/sounds/correct.mp3');
+    incorrectSoundRef.current = new Audio('/sounds/incorrect.mp3');
+  }, []);
+
+  const playSound = (percentageSimilar: number) => {
+    // Consider 70% or higher as "correct enough" to play the correct sound
+    if (percentageSimilar >= 70 && correctSoundRef.current) {
+      correctSoundRef.current.currentTime = 0;
+      correctSoundRef.current.play().catch(err => console.error("Error playing sound:", err));
+    } else if (percentageSimilar < 70 && incorrectSoundRef.current) {
+      incorrectSoundRef.current.currentTime = 0;
+      incorrectSoundRef.current.play().catch(err => console.error("Error playing sound:", err));
     }
-  }, [hasEnded]);
+  };
+  
+  React.useEffect(() => {
+    const interval = setInterval(() => {
+      setNow(new Date());
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Reset blank answer and user input flag when moving to next question
+  React.useEffect(() => {
+    setBlankAnswer("");
+    setHasUserInput(false);
+  }, [questionIndex]);
+
+  // Track when user provides input
+  const handleBlankAnswerChange = (newAnswer: string) => {
+    setBlankAnswer(newAnswer);
+    
+    // Check if there's any actual input in the answer fields
+    const hasInput = document.querySelectorAll("#user-blank-input").length === 0 || 
+      Array.from(document.querySelectorAll("#user-blank-input"))
+        .some((input) => (input as HTMLInputElement).value.trim() !== "");
+    
+    setHasUserInput(hasInput || newAnswer.trim() !== "");
+  };
 
   const handleNext = React.useCallback(() => {
+    // Prevent proceeding if no answer is provided
+    if (!hasUserInput) {
+      toast({
+        title: "Please provide an answer",
+        description: "You must enter an answer before proceeding",
+        variant: "destructive",
+      });
+      return;
+    }
+
     checkAnswer(undefined, {
       onSuccess: ({ percentageSimilar }) => {
+        // Play sound based on answer similarity
+        playSound(percentageSimilar);
+        
+        // Update question results for progress map
+        setQuestionResults(prev => [...prev, percentageSimilar]);
+        
+        setAveragePercentage((prev) => {
+          const newAverage =
+            (prev * questionIndex + percentageSimilar) / (questionIndex + 1);
+          return newAverage;
+        });
         toast({
           title: `Your answer is ${percentageSimilar}% similar to the correct answer`,
-        });
-        setAveragePercentage((prev) => {
-          return (prev + percentageSimilar) / (questionIndex + 1);
+          description: `Correct answer: ${currentQuestion.answer}`,
         });
         if (questionIndex === game.questionsv2.length - 1) {
-          endGame();
-          setHasEnded(true);
+          // Call endGame and then redirect to statistics page
+          endGame(undefined, {
+            onSuccess: (data) => {
+              if (data.submissionId) {
+                // Navigate to statistics page after a short delay to allow the user to see the toast
+                setTimeout(() => {
+                  router.push(`/statistics/${game.id}`);
+                }, 1500);
+              }
+            },
+          });
           return;
         }
+        
+        // Move to next question (blank answer will be reset by the useEffect)
         setQuestionIndex((prev) => prev + 1);
       },
-      onError: (error) => {
-        console.error(error);
-        toast({
-          title: "Something went wrong",
-          variant: "destructive",
-        });
-      },
     });
-  }, [checkAnswer, questionIndex, toast, endGame, game.questionsv2.length]);
-  React.useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      const key = event.key;
-      if (key === "Enter") {
-        handleNext();
-      }
-    };
-    document.addEventListener("keydown", handleKeyDown);
-    return () => {
-      document.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [handleNext]);
-
-  if (hasEnded) {
-    return (
-      <div className="flex flex-col justify-center">
-        <div className="px-4 py-2 mt-2 font-semibold text-white bg-green-500 rounded-md whitespace-nowrap">
-          You Completed in{" "}
-          {formatTimeDelta(differenceInSeconds(now, timeStarted))}
-        </div>
-        <Link
-          href={`/statistics/${game.id}`}
-          className={cn(buttonVariants({ size: "lg" }), "mt-2")}
-        >
-          View Statistics
-          <BarChart className="w-4 h-4 ml-2" />
-        </Link>
-      </div>
-    );
-  }
+  }, [
+    checkAnswer,
+    questionIndex,
+    game.questionsv2.length,
+    currentQuestion.answer,
+    toast,
+    endGame,
+    game.id,
+    router,
+    hasUserInput,
+  ]);
 
   return (
-    <>
-      <div className="flex flex-row justify-between">
+    <div className="flex flex-col items-center w-full max-w-4xl mx-auto px-4 sm:px-6 md:px-8">
+      <div className="flex flex-col sm:flex-row justify-between w-full">
         <div className="flex flex-col">
           {/* topic */}
           <p>
@@ -169,6 +225,53 @@ const OpenEnded = ({ game }: Props) => {
         </div>
         <OpenEndedPercentage percentage={averagePercentage} />
       </div>
+      
+      {/* Progress Map */}
+      <div className="flex flex-wrap items-center justify-center w-full mt-4 mb-2 gap-1">
+        {game.questionsv2.map((_, idx) => {
+          // Current question
+          if (idx === questionIndex) {
+            return (
+              <div 
+                key={idx} 
+                className="w-6 h-6 flex items-center justify-center rounded-full bg-blue-500 text-white text-xs font-bold"
+                title={`Question ${idx + 1} (current)`}
+              >
+                {idx + 1}
+              </div>
+            );
+          }
+          // Answered questions
+          if (idx < questionResults.length) {
+            const similarity = questionResults[idx];
+            let bgColor = "bg-red-500";
+            if (similarity >= 80) bgColor = "bg-green-500";
+            else if (similarity >= 60) bgColor = "bg-yellow-500";
+            else if (similarity >= 40) bgColor = "bg-orange-500";
+            
+            return (
+              <div 
+                key={idx} 
+                className={`w-6 h-6 flex items-center justify-center rounded-full ${bgColor} text-white text-xs font-bold`}
+                title={`Question ${idx + 1}: ${similarity.toFixed(0)}% similar`}
+              >
+                {similarity >= 70 ? <CheckCircle className="w-4 h-4" /> : <XCircle className="w-4 h-4" />}
+              </div>
+            );
+          }
+          // Unanswered questions
+          return (
+            <div 
+              key={idx} 
+              className="w-6 h-6 flex items-center justify-center rounded-full bg-gray-300 text-gray-600 text-xs font-bold"
+              title={`Question ${idx + 1} (upcoming)`}
+            >
+              {idx + 1}
+            </div>
+          );
+        })}
+      </div>
+      
       <Card className="w-full mt-4">
         <CardHeader className="flex flex-row items-center">
           <CardTitle className="mr-5 text-center divide-y divide-zinc-600/50">
@@ -178,19 +281,21 @@ const OpenEnded = ({ game }: Props) => {
             </div>
           </CardTitle>
           <CardDescription className="flex-grow text-lg">
-            {currentQuestion?.question}
+            {currentQuestion.question}
           </CardDescription>
         </CardHeader>
       </Card>
+
       <div className="flex flex-col items-center justify-center w-full mt-4">
         <BlankAnswerInput
-          setBlankAnswer={setBlankAnswer}
+          setBlankAnswer={handleBlankAnswerChange}
           answer={currentQuestion.answer}
         />
         <Button
-          variant="outline"
-          className="mt-4"
-          disabled={isChecking || hasEnded}
+          variant="default"
+          className="mt-2"
+          size="lg"
+          disabled={isChecking || !hasUserInput}
           onClick={() => {
             handleNext();
           }}
@@ -199,7 +304,7 @@ const OpenEnded = ({ game }: Props) => {
           Next <ChevronRight className="w-4 h-4 ml-2" />
         </Button>
       </div>
-    </>
+    </div>
   );
 };
 

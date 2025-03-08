@@ -58,7 +58,7 @@ export default function Home() {
                   className="flex-1 h-14"
                   asChild
                 >
-                  <Link href="quizz/new">Upload</Link>
+                  <Link href="upload-quizz/new">Upload</Link>
                 </Button>
                 <Button
                   variant="neo"

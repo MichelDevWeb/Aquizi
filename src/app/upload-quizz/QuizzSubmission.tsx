@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import Bar from "@/components/Bar";
 import Image from "next/image";
 import { useReward } from "react-rewards";
-import { ChevronLeft, X } from "lucide-react";
+import { ChevronLeft, X, RefreshCw } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 
@@ -10,10 +10,12 @@ type Props = {
   scorePercentage: number;
   score: number;
   totalQuestions: number;
+  submissionId?: string;
+  onRetest?: () => void;
 };
 
 const QuizzSubmission = (props: Props) => {
-  const { scorePercentage, score, totalQuestions } = props;
+  const { scorePercentage, score, totalQuestions, submissionId, onRetest } = props;
   const { reward } = useReward("rewardId", "confetti");
   const router = useRouter();
 
@@ -31,6 +33,16 @@ const QuizzSubmission = (props: Props) => {
     <div className="flex flex-col flex-1">
       <div className="position-sticky top-0 z-10 shadow-md py-4 w-full">
         <header className="flex items-center justify-end py-2 gap-2">
+          {onRetest && submissionId && (
+            <Button
+              onClick={onRetest}
+              size="icon"
+              variant="outline"
+              title="Retest"
+            >
+              <RefreshCw className="h-4 w-4" />
+            </Button>
+          )}
           <Button
             onClick={onHandleBack}
             size="icon"
@@ -72,6 +84,16 @@ const QuizzSubmission = (props: Props) => {
               <p>{score} Correct</p>
               <p>{totalQuestions - score} Incorrect</p>
             </div>
+            {onRetest && submissionId && (
+              <Button
+                onClick={onRetest}
+                variant="outline"
+                className="mt-4"
+              >
+                <RefreshCw className="h-4 w-4 mr-2" />
+                Retest
+              </Button>
+            )}
           </>
         )}
       </main>

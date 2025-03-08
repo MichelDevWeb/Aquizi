@@ -6,12 +6,12 @@ type Props = { accuracy: number };
 
 const ResultsCard = ({ accuracy }: Props) => {
   return (
-    <Card className="md:col-span-7">
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-7">
+    <Card className="md:col-span-3">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
         <CardTitle className="text-2xl font-bold">Results</CardTitle>
-        <Award />
+        <Award className="h-5 w-5" />
       </CardHeader>
-      <CardContent className="flex flex-col items-center justify-center h-3/5">
+      <CardContent className="flex flex-row items-center justify-center py-4">
         {accuracy > 75 ? (
           <>
             <Trophy
@@ -19,9 +19,9 @@ const ResultsCard = ({ accuracy }: Props) => {
               stroke="gold"
               size={50}
             />
-            <div className="flex flex-col text-2xl font-semibold text-yellow-400">
-              <span className="">Impressive!</span>
-              <span className="text-sm text-center text-black opacity-50">
+            <div className="flex flex-col">
+              <span className="text-2xl font-semibold text-yellow-400">Impressive!</span>
+              <span className="text-sm text-gray-500">
                 {"> 75% accuracy"}
               </span>
             </div>
@@ -33,9 +33,9 @@ const ResultsCard = ({ accuracy }: Props) => {
               stroke="silver"
               size={50}
             />
-            <div className="flex flex-col text-2xl font-semibold text-stone-400">
-              <span className="">Good job!</span>
-              <span className="text-sm text-center text-black opacity-50">
+            <div className="flex flex-col">
+              <span className="text-2xl font-semibold text-stone-400">Good job!</span>
+              <span className="text-sm text-gray-500">
                 {"> 25% accuracy"}
               </span>
             </div>
@@ -47,9 +47,9 @@ const ResultsCard = ({ accuracy }: Props) => {
               stroke="brown"
               size={50}
             />
-            <div className="flex flex-col text-2xl font-semibold text-yellow-800">
-              <span className="">Nice try!</span>
-              <span className="text-sm text-center text-black opacity-50">
+            <div className="flex flex-col">
+              <span className="text-2xl font-semibold text-yellow-800">Nice try!</span>
+              <span className="text-sm text-gray-500">
                 {"< 25% accuracy"}
               </span>
             </div>

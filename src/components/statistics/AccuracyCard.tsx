@@ -7,13 +7,13 @@ type Props = { accuracy: number };
 const AccuracyCard = ({ accuracy }: Props) => {
   accuracy = Math.round(accuracy * 100) / 100;
   return (
-    <Card className="md:col-span-3">
+    <Card className="md:col-span-2">
       <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-        <CardTitle className="text-2xl font-bold">Average Accuracy</CardTitle>
-        <Target />
+        <CardTitle className="text-2xl font-bold">Accuracy</CardTitle>
+        <Target className="h-5 w-5" />
       </CardHeader>
       <CardContent>
-        <div className="text-sm font-medium">{accuracy.toString() + "%"}</div>
+        <div className="text-2xl font-medium">{accuracy.toString() + "%"}</div>
       </CardContent>
     </Card>
   );

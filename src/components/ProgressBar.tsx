@@ -1,18 +1,17 @@
 import React from "react";
 
-type Props = {
+interface Props {
   value: number;
-};
+  className?: string;
+}
 
-const ProgressBar = (props: Props) => {
+const ProgressBar = ({ value, className }: Props) => {
   return (
-    <div className="w-full bg-secondary rounded-full h-2.5">
+    <div className={`w-full bg-muted rounded-full h-2 ${className || ''}`}>
       <div
-        className="bg-primary h-2.5 rounded-md"
-        style={{
-          width: `${props.value}%`,
-        }}
-      ></div>
+        className="bg-primary h-2 rounded-full transition-all duration-300"
+        style={{ width: `${value * 100}%` }}
+      />
     </div>
   );
 };

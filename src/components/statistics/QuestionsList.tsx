@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 
 import {
   Table,
@@ -10,6 +10,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { List, ChevronDown, ChevronUp, Check, X } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 // Define Firestore types
 interface Question {
@@ -29,61 +33,157 @@ type Props = {
 };
 
 const QuestionsList = ({ questions }: Props) => {
+  const [expandedItems, setExpandedItems] = useState<string[]>([]);
+
+  const toggleItem = (id: string) => {
+    setExpandedItems(prev => 
+      prev.includes(id) 
+        ? prev.filter(item => item !== id) 
+        : [...prev, id]
+    );
+  };
+
   return (
-    <Table className="mt-4">
-      <TableCaption>End of list.</TableCaption>
-      <TableHeader>
-        <TableRow>
-          <TableHead className="w-[10px]">No.</TableHead>
-          <TableHead>Question & Correct Answer</TableHead>
-          <TableHead>Your Answer</TableHead>
+    <Card>
+      <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+        <CardTitle className="text-xl sm:text-2xl font-bold">Questions</CardTitle>
+        <List className="h-4 w-4 sm:h-5 sm:w-5" />
+      </CardHeader>
+      <CardContent>
+        {/* Desktop view - Table */}
+        <div className="hidden md:block overflow-x-auto">
+          <Table>
+            <TableCaption>End of list.</TableCaption>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-[50px]">No.</TableHead>
+                <TableHead>Question & Correct Answer</TableHead>
+                <TableHead>Your Answer</TableHead>
 
-          {questions[0].questionType === "open_ended" && (
-            <TableHead className="w-[10px] text-right">Accuracy</TableHead>
-          )}
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        <>
-          {questions.map(
-            (
-              { answer, question, userAnswer, percentageCorrect, isCorrect },
-              index
-            ) => {
-              return (
-                <TableRow key={index}>
-                  <TableCell className="font-medium">{index + 1}</TableCell>
-                  <TableCell>
-                    {question} <br />
-                    <br />
-                    <span className="font-semibold">{answer}</span>
-                  </TableCell>
-                  {questions[0].questionType === "open_ended" ? (
-                    <TableCell className={`font-semibold`}>
-                      {userAnswer}
-                    </TableCell>
-                  ) : (
-                    <TableCell
-                      className={`${
-                        isCorrect ? "text-green-600" : "text-red-600"
-                      } font-semibold`}
+                {questions[0].questionType === "open_ended" && (
+                  <TableHead className="w-[100px] text-right">Accuracy</TableHead>
+                )}
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {questions.map(
+                (
+                  { id, answer, question, userAnswer, percentageCorrect, isCorrect },
+                  index
+                ) => {
+                  return (
+                    <TableRow key={id || index}>
+                      <TableCell className="font-medium">{index + 1}</TableCell>
+                      <TableCell>
+                        <div className="mb-2">{question}</div>
+                        <div className="font-semibold text-primary">Correct: {answer}</div>
+                      </TableCell>
+                      {questions[0].questionType === "open_ended" ? (
+                        <TableCell className="font-semibold">
+                          {userAnswer || "No answer provided"}
+                        </TableCell>
+                      ) : (
+                        <TableCell
+                          className={`${
+                            isCorrect ? "text-green-600" : "text-red-600"
+                          } font-semibold`}
+                        >
+                          {userAnswer || "No answer provided"}
+                        </TableCell>
+                      )}
+
+                      {percentageCorrect !== undefined && (
+                        <TableCell className="text-right font-medium">
+                          {percentageCorrect}%
+                        </TableCell>
+                      )}
+                    </TableRow>
+                  );
+                }
+              )}
+            </TableBody>
+          </Table>
+        </div>
+
+        {/* Mobile view - Accordion */}
+        <div className="md:hidden">
+          <Accordion type="multiple" value={expandedItems} className="w-full">
+            {questions.map(
+              (
+                { id, answer, question, userAnswer, percentageCorrect, isCorrect },
+                index
+              ) => {
+                const itemId = id || `question-${index}`;
+                return (
+                  <AccordionItem key={itemId} value={itemId} className="border-b">
+                    <AccordionTrigger 
+                      onClick={() => toggleItem(itemId)}
+                      className="py-3 px-1 hover:no-underline"
                     >
-                      {userAnswer}
-                    </TableCell>
-                  )}
-
-                  {percentageCorrect && (
-                    <TableCell className="text-right">
-                      {percentageCorrect}
-                    </TableCell>
-                  )}
-                </TableRow>
-              );
-            }
-          )}
-        </>
-      </TableBody>
-    </Table>
+                      <div className="flex items-center justify-between w-full pr-2">
+                        <div className="flex items-center gap-2">
+                          <Badge variant="outline" className="h-6 w-6 p-0 flex items-center justify-center rounded-full">
+                            {index + 1}
+                          </Badge>
+                          <span className="text-sm font-medium truncate max-w-[180px]">
+                            {question.length > 40 ? `${question.substring(0, 40)}...` : question}
+                          </span>
+                        </div>
+                        {questions[0].questionType === "mcq" && (
+                          <div className="flex-shrink-0">
+                            {isCorrect ? (
+                              <Check className="h-4 w-4 text-green-600" />
+                            ) : (
+                              <X className="h-4 w-4 text-red-600" />
+                            )}
+                          </div>
+                        )}
+                        {questions[0].questionType === "open_ended" && percentageCorrect !== undefined && (
+                          <Badge 
+                            variant={percentageCorrect >= 70 ? "default" : "destructive"}
+                            className="ml-auto text-xs"
+                          >
+                            {percentageCorrect}%
+                          </Badge>
+                        )}
+                      </div>
+                    </AccordionTrigger>
+                    <AccordionContent className="px-1 pb-3 pt-1">
+                      <div className="space-y-2 text-sm">
+                        <div>
+                          <span className="font-medium text-muted-foreground">Question:</span>
+                          <p className="mt-1">{question}</p>
+                        </div>
+                        <div>
+                          <span className="font-medium text-muted-foreground">Correct Answer:</span>
+                          <p className="mt-1 font-semibold text-primary">{answer}</p>
+                        </div>
+                        <div>
+                          <span className="font-medium text-muted-foreground">Your Answer:</span>
+                          <p className={`mt-1 font-semibold ${
+                            questions[0].questionType === "mcq"
+                              ? isCorrect ? "text-green-600" : "text-red-600"
+                              : ""
+                          }`}>
+                            {userAnswer || "No answer provided"}
+                          </p>
+                        </div>
+                        {questions[0].questionType === "open_ended" && percentageCorrect !== undefined && (
+                          <div>
+                            <span className="font-medium text-muted-foreground">Accuracy:</span>
+                            <p className="mt-1 font-semibold">{percentageCorrect}%</p>
+                          </div>
+                        )}
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                );
+              }
+            )}
+          </Accordion>
+        </div>
+      </CardContent>
+    </Card>
   );
 };
 

@@ -3,7 +3,7 @@ import keyword_extractor from "keyword-extractor";
 
 type Props = {
   answer: string;
-  setBlankAnswer: React.Dispatch<React.SetStateAction<string>>;
+  setBlankAnswer: ((value: string) => void) | React.Dispatch<React.SetStateAction<string>>;
 };
 
 const blank = "_____";
@@ -29,6 +29,24 @@ const BlankAnswerInput = ({ answer, setBlankAnswer }: Props) => {
     return answerWithBlanks;
   }, [answer, keywords, setBlankAnswer]);
 
+  // Handle input changes to detect when user has entered something
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // Trigger the parent component's handler to update state
+    const inputs = document.querySelectorAll('#user-blank-input') as NodeListOf<HTMLInputElement>;
+    let currentAnswer = answerWithBlanks;
+    
+    inputs.forEach((input, idx) => {
+      // Replace the blank with the input value if it exists
+      if (idx < answerWithBlanks.split(blank).length - 1) {
+        const parts = currentAnswer.split(blank);
+        parts[idx] = parts[idx] + input.value;
+        currentAnswer = parts.join(blank);
+      }
+    });
+    
+    setBlankAnswer(currentAnswer);
+  };
+
   return (
     <div className="flex justify-start w-full mt-4">
       <h1 className="text-xl font-semibold">
@@ -44,6 +62,7 @@ const BlankAnswerInput = ({ answer, setBlankAnswer }: Props) => {
                   id="user-blank-input"
                   className="text-center border-b-2 border-black dark:border-white w-28 focus:border-2 focus:border-b-4 focus:outline-none"
                   type="text"
+                  onChange={handleInputChange}
                 />
               )}
             </React.Fragment>

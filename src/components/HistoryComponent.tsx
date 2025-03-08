@@ -1,6 +1,6 @@
 'use client';
 
-import { Clock, CopyCheck, Edit2, Trophy, Timer, Calendar, BarChart, BookOpen, Target, Brain } from "lucide-react";
+import { Clock, CopyCheck, Edit2, Trophy, Timer, Calendar, BarChart, BookOpen, Target, Brain, RefreshCw } from "lucide-react";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { convertDateToString, formatTimeDelta } from "@/lib/utils";
@@ -24,6 +24,7 @@ interface Game {
   topic: string;
   score?: number;
   totalQuestions?: number;
+  submissionId?: string;
 }
 
 type Props = {
@@ -138,89 +139,75 @@ const HistoryComponent = ({ limit, userId, gameType }: Props) => {
             className="flex flex-col p-4 border rounded-lg hover:bg-accent/50 transition-colors"
             key={game.id}
           >
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-2">
-              <div className="flex items-center">
-                <div className="p-2 rounded-full bg-primary/10 shrink-0">
-                  {getTopicIcon(game.topic)}
-                </div>
-                <div className="ml-4 flex flex-wrap items-center gap-2">
-                  <Link
-                    className="text-lg font-medium hover:underline mr-2"
-                    href={`/statistics/${game.id}`}
-                  >
-                    {game.topic}
-                  </Link>
-                  <div className="flex flex-wrap gap-2">
-                    <Badge variant={game.gameType === "mcq" ? "default" : "secondary"}>
-                      {game.gameType === "mcq" ? "Multiple Choice" : "Open-Ended"}
-                    </Badge>
-                    
-                    {scorePercentage !== null && (
-                      <Badge 
-                        variant={scorePercentage > 70 ? "success" : scorePercentage > 40 ? "warning" : "destructive"} 
-                      >
-                        {scorePercentage}%
-                      </Badge>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <div className="flex flex-col space-y-1">
+                  <div className="flex items-center gap-2">
+                    {game.gameType === 'mcq' ? (
+                      <CopyCheck className="h-4 w-4 text-muted-foreground" />
+                    ) : (
+                      <Edit2 className="h-4 w-4 text-muted-foreground" />
                     )}
+                    <span className="text-sm font-medium">
+                      {game.gameType === 'mcq' ? 'Multiple Choice' : 'Open Ended'}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Calendar className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-xs text-muted-foreground">
+                      {startDate?.toLocaleDateString()}
+                    </span>
                   </div>
                 </div>
               </div>
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
+              <div className="flex items-center gap-2">
+                {scorePercentage !== null && (
+                  <Badge variant={scorePercentage === 100 ? "success" : "default"}>
+                    {scorePercentage}%
+                  </Badge>
+                )}
+                {duration && (
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <Badge variant="outline">
+                          <Timer className="h-3 w-3 mr-1" />
+                          {formatTimeDelta(duration)}
+                        </Badge>
+                      </TooltipTrigger>
+                      <TooltipContent>Time taken</TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                )}
+                <div className="flex gap-2">
+                  <Link
+                    href={`/statistics/${game.id}`}
+                    className={cn(
+                      buttonVariants({ variant: "outline", size: "icon" }),
+                      "h-8 w-8"
+                    )}
+                  >
+                    <BarChart className="h-4 w-4" />
+                  </Link>
+                  {game.gameType === 'mcq' && (
                     <Link
-                      href={`/statistics/${game.id}`}
-                      className={cn(buttonVariants({ variant: "outline", size: "sm" }), "mt-2 sm:mt-0 w-full sm:w-auto")}
+                      href={`/play/${game.gameType}/${game.id}?retest=true&submissionId=${game.submissionId}`}
+                      className={cn(
+                        buttonVariants({ variant: "outline", size: "icon" }),
+                        "h-8 w-8"
+                      )}
                     >
-                      <BarChart className="w-4 h-4 mr-1" /> View Results
+                      <RefreshCw className="h-4 w-4" />
                     </Link>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <span>See detailed statistics for this quiz</span>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            </div>
-            
-            <div className="flex flex-wrap items-center gap-3 mt-2 text-sm text-muted-foreground">
-              {startDate && (
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <div className="flex items-center">
-                        <Calendar className="w-4 h-4 mr-1" />
-                        {convertDateToString(startDate, true)}
-                      </div>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <span>Quiz taken on {startDate.toLocaleString()}</span>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              )}
-              
-              {duration && (
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <div className="flex items-center">
-                        <Timer className="w-4 h-4 mr-1" />
-                        {formatTimeDelta(duration)}
-                      </div>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <span>Time spent: {Math.floor(duration / 60)} minutes {duration % 60} seconds</span>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              )}
-              
-              {game.totalQuestions && (
-                <div className="flex items-center">
-                  <CopyCheck className="w-4 h-4 mr-1" />
-                  {game.totalQuestions} questions
+                  )}
                 </div>
-              )}
+              </div>
+            </div>
+            <div className="flex items-center gap-2 mt-2">
+              <Target className="h-4 w-4 text-muted-foreground" />
+              <span className="text-sm text-muted-foreground">
+                Topic: {game.topic}
+              </span>
             </div>
           </div>
         );

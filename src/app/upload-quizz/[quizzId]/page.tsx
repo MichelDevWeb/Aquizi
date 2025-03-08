@@ -2,6 +2,7 @@ import { getDocumentById, getDocuments } from "@/lib/firestore/firestore-utils";
 import { COLLECTIONS, FIELDS } from "@/lib/firestore/firestore-config";
 import { where } from "firebase/firestore";
 import QuizzQuestions from "../QuizzQuestions";
+import { Suspense } from "react";
 
 // Define Firestore types
 interface Quizz {
@@ -27,14 +28,20 @@ interface Answer {
   isCorrect: boolean;
 }
 
-const page = async ({
-  params,
-}: {
+interface PageProps {
   params: {
     quizzId: string;
   };
-}) => {
+  searchParams: {
+    retest?: string;
+    submissionId?: string;
+  };
+}
+
+const page = async ({ params, searchParams }: PageProps) => {
   const quizzId = params.quizzId;
+  const isRetest = searchParams.retest === 'true';
+  const submissionId = searchParams.submissionId;
   
   // Get quizz from Firestore
   const quizz = await getDocumentById<Quizz>(COLLECTIONS.QUIZZES, quizzId);
@@ -72,7 +79,14 @@ const page = async ({
     questions: questionsWithAnswers
   };
 
-  return <QuizzQuestions quizz={quizzWithQuestions} />;
+  return (
+    <Suspense fallback={<div>Loading quiz...</div>}>
+      <QuizzQuestions 
+        quizz={quizzWithQuestions} 
+        submissionId={submissionId}
+      />
+    </Suspense>
+  );
 };
 
 export default page;

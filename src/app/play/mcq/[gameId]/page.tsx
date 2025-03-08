@@ -18,6 +18,7 @@ interface Game {
   userId: string;
   topic: string;
   questionsv2: Question[];
+  submissionId?: string;
 }
 
 interface Question {
@@ -36,13 +37,20 @@ type Props = {
   params: {
     gameId: string;
   };
+  searchParams?: {
+    retest?: string;
+    submissionId?: string;
+  };
 };
 
-const MCQPage = ({ params: { gameId } }: Props) => {
+const MCQPage = ({ params: { gameId }, searchParams }: Props) => {
   const { user, loading } = useAuth();
   const router = useRouter();
   const [game, setGame] = useState<Game | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  
+  const isRetest = searchParams?.retest === 'true';
+  const submissionId = searchParams?.submissionId;
 
   useEffect(() => {
     if (!loading && !user) {
@@ -68,13 +76,16 @@ const MCQPage = ({ params: { gameId } }: Props) => {
             [where(FIELDS.QUESTION.GAME_ID, "==", gameId)]
           );
           
-          // Combine game and questions
-          const gameWithQuestions = {
+          // Add submissionId to game data if this is a retest
+          if (isRetest && submissionId) {
+            gameData.submissionId = submissionId;
+          }
+          
+          // Add questions to game data
+          setGame({
             ...gameData,
             questionsv2: questions,
-          };
-          
-          setGame(gameWithQuestions);
+          });
           
           if (gameData.gameType === "open_ended") {
             router.push("/quiz");
@@ -91,7 +102,7 @@ const MCQPage = ({ params: { gameId } }: Props) => {
     if (user) {
       fetchGame();
     }
-  }, [user, gameId, router]);
+  }, [user, gameId, router, isRetest, submissionId]);
 
   if (loading || isLoading) {
     return (

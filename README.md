@@ -1,60 +1,137 @@
-The project that uses AI to generate quizzes.
+# Aquizi - AI-Powered Quiz Platform
 
-<img width="1399" alt="Screenshot 2024-01-22 at 3 34 26 PM" src="https://github.com/judygab/ai-form-builder-tutorial/assets/50160672/443a69ed-e441-412a-a84e-ea820022c6dc">
+Aquizi is an intelligent quiz platform that uses AI to generate personalized quizzes on any topic. Challenge yourself, track your progress, and improve your knowledge with our interactive quizzes.
 
-## Tech Stack 
+![Aquizi Dashboard](https://github.com/judygab/ai-form-builder-tutorial/assets/50160672/443a69ed-e441-412a-a84e-ea820022c6dc)
 
-- Next-auth - Authentication
-- Shadcn ui - ui library
-- Open Al - AI Integration
-- Langchain - LLM Framework
-- Drizzle - Orm
-- PostgreSQL - Database
-- Supabase - Database hosting
-- Stripe - Payments
-- Tanstack - Table
-- Typescript - Type Checking
-- Vercel - Deployment
-- Stripe - Payments
-- Zod - Schema Validation
+## Features
+
+- **AI-Generated Quizzes**: Create custom quizzes on any topic using AI
+- **Multiple Quiz Types**: Choose between multiple-choice and open-ended questions
+- **Interactive Dashboard**: Track your progress with detailed statistics and visualizations
+- **Performance Metrics**: View your scores, accuracy, and improvement over time
+- **Activity Heatmap**: GitHub-style contribution tracking for your quiz activity
+- **Retest Functionality**: Retry quizzes to improve your scores
+- **Mobile Responsive**: Optimized experience across all device sizes
+- **User Authentication**: Secure login with Google or email
+
+## Tech Stack
+
+### Frontend
+- **Next.js** - React framework for server-side rendering and static site generation
+- **TypeScript** - Type safety and improved developer experience
+- **Tailwind CSS** - Utility-first CSS framework for rapid UI development
+- **Shadcn UI** - Component library built on Radix UI
+- **Lucide Icons** - Beautiful, consistent icon set
+- **React Query** - Data fetching and state management
+- **date-fns** - Date manipulation library
+
+### Backend
+- **Firebase** - Authentication, Firestore database, and hosting
+- **OpenAI** - AI integration for quiz generation
+- **Langchain** - LLM framework for structured AI interactions
+
+### Authentication
+- **Firebase Auth** - User authentication and management
+
+### Data Visualization
+- **React Heat Map** - Activity visualization
+- **React Tooltip** - Enhanced user interaction
+
+### Testing & Deployment
+- **Vercel** - Deployment platform
+- **GitHub Actions** - CI/CD workflows
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+- Node.js 16.x or higher
+- npm or yarn
+- Firebase account
+- OpenAI API key
 
+### Installation
+
+1. Clone the repository:
+```bash
+git clone https://github.com/MichelDevWeb/Aquizi.git
+cd Aquizi
+```
+
+2. Install dependencies:
+```bash
+npm install
+# or
+yarn install
+```
+
+3. Create a `.env.local` file in the root directory and add your environment variables:
+```
+# Firebase
+NEXT_PUBLIC_FIREBASE_API_KEY=
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=
+NEXT_PUBLIC_FIREBASE_APP_ID=
+
+# OpenAI
+OPENAI_API_KEY=
+```
+
+4. Run the development server:
 ```bash
 npm run dev
 # or
 yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+5. Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Project Structure
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
-
-## Environment Variables
-
-Create a new .env file and add your keys in the following manner:
 ```
-OPENAI_API_KEY=""
-GOOGLE_CLIENT_ID=""
-GOOGLE_CLIENT_SECRET=""
-AUTH_SECRET=""
-DATABASE_URL=""
-NEXT_PUBLIC_PUBLISHABLE_KEY=""
-STRIPE_SECRET_KEY=""
-STRIPE_WEBHOOK_SECRET=""
-STRIPE_WEBHOOK_LOCAL_SERCRET=""
+src/
+├── app/                  # Next.js app directory
+│   ├── (auth)/           # Authentication routes
+│   ├── (user)/           # User routes (dashboard, etc.)
+│   ├── api/              # API routes
+│   └── actions/          # Server actions
+├── components/           # Reusable components
+│   ├── dashboard/        # Dashboard-specific components
+│   ├── statistics/       # Statistics and visualization components
+│   └── ui/               # UI components (shadcn)
+├── lib/                  # Utility functions and configurations
+│   ├── firebase/         # Firebase configuration
+│   ├── firestore/        # Firestore utilities
+│   └── utils.ts          # General utilities
+└── schemas/              # Zod schemas for validation
 ```
 
-## Deploy on Vercel
+## Recent Improvements
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- **Enhanced Dashboard**: Improved UI/UX with tabbed interface and better organization
+- **Mobile Responsiveness**: Optimized for all device sizes with responsive layouts
+- **Quiz Experience**: Added randomized answer options and improved question flow
+- **Performance Tracking**: Enhanced statistics with detailed time tracking for retests
+- **Visual Feedback**: Added sound effects and visual indicators for correct/incorrect answers
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Contact
+
+Michel Nguyen - [LinkedIn](https://www.linkedin.com/in/michel-nguyen-407950144/)
+
+Project Link: [https://github.com/MichelDevWeb/Aquizi](https://github.com/MichelDevWeb/Aquizi)

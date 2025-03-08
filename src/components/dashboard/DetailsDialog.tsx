@@ -8,51 +8,72 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Github, HelpCircle, Linkedin } from "lucide-react";
+import { Github, HelpCircle, Linkedin, BookOpen, Brain, Sparkles } from "lucide-react";
 import Link from "next/link";
-import Image from "next/image";
+import { Button } from "@/components/ui/button";
 
 type Props = {};
 
 const DetailsDialog = (props: Props) => {
   return (
     <Dialog>
-      <DialogTrigger>
-        <span className="flex items-center px-2 py-1 text-white rounded-md bg-slate-800">
-          What is this
-          <HelpCircle className="w-5 h-5 ml-1" />
-        </span>
+      <DialogTrigger asChild>
+        <Button variant="outline" size="sm" className="flex items-center gap-1 h-9 px-3">
+          <span className="hidden sm:inline">What is this</span>
+          <HelpCircle className="w-4 h-4" />
+        </Button>
       </DialogTrigger>
-      <DialogContent className="w-[70vw] max-w-[100vw] md:w-[50vw]">
+      <DialogContent className="sm:max-w-[425px] md:max-w-[600px]">
         <DialogHeader>
-          <DialogTitle className="text-2xl">Welcome to Aquizi!</DialogTitle>
+          <DialogTitle className="text-2xl flex items-center gap-2">
+            <Brain className="h-6 w-6 text-primary" />
+            Welcome to Aquizi!
+          </DialogTitle>
           <DialogDescription>
-            <span className="my-2 mt-4 ">
-              Are you tired of mundane and repetitive quizzes? Say goodbye to
-              the ordinary and embrace the extraordinary with Aquizi! Our
-              platform is revolutionizing the quiz and trivia experience by
-              harnessing the immense potential of artificial intelligence.
-            </span>
+            <div className="mt-4 space-y-4">
+              <p>
+                Are you tired of mundane and repetitive quizzes? Say goodbye to
+                the ordinary and embrace the extraordinary with Aquizi!
+              </p>
+              
+              <div className="space-y-2">
+                <div className="flex items-start gap-2">
+                  <Sparkles className="h-5 w-5 text-yellow-500 flex-shrink-0 mt-0.5" />
+                  <p className="text-sm">
+                    Our platform is revolutionizing the quiz and trivia experience by
+                    harnessing the immense potential of artificial intelligence.
+                  </p>
+                </div>
+                
+                <div className="flex items-start gap-2">
+                  <BookOpen className="h-5 w-5 text-blue-500 flex-shrink-0 mt-0.5" />
+                  <p className="text-sm">
+                    Create custom quizzes on any topic, test your knowledge, and track your progress
+                    over time with our intuitive dashboard.
+                  </p>
+                </div>
+              </div>
+            </div>
 
-            <div className="flex items-end gap-3 mt-4 justify-end">
-              <div className="flex items-center">
-                <Github className="w-5 h-5" />
-                <Link
-                  className="ml-1 underline"
-                  href="https://github.com/MichelDevWeb/Aquizi"
-                >
-                  GitHub
-                </Link>
-              </div>
-              <div className="flex items-center">
-                <Linkedin className="w-5 h-5" />
-                <Link
-                  className="ml-1 underline"
-                  href="https://www.linkedin.com/in/michel-nguyen-407950144/"
-                >
-                  LinkedIn
-                </Link>
-              </div>
+            <div className="flex flex-wrap items-center gap-3 mt-6 justify-end">
+              <Link
+                href="https://github.com/MichelDevWeb/Aquizi"
+                className="flex items-center gap-1 text-sm hover:underline text-muted-foreground hover:text-foreground transition-colors"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Github className="w-4 h-4" />
+                GitHub
+              </Link>
+              <Link
+                href="https://www.linkedin.com/in/michel-nguyen-407950144/"
+                className="flex items-center gap-1 text-sm hover:underline text-muted-foreground hover:text-foreground transition-colors"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Linkedin className="w-4 h-4" />
+                LinkedIn
+              </Link>
             </div>
           </DialogDescription>
         </DialogHeader>

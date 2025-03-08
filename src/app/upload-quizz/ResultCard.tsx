@@ -2,13 +2,24 @@ import React from "react";
 import { clsx } from "clsx";
 import { cn } from "@/lib/utils";
 
-type Props = {
-  isCorrect: boolean | null | undefined;
-  correctAnswer: string;
-};
+interface Props {
+  question: {
+    id: string;
+    questionText: string;
+    answers: {
+      id: string;
+      questionId: string;
+      answerText: string;
+      isCorrect: boolean;
+    }[];
+  };
+  onNext: () => void;
+  onAnswer: (answer: any, questionId: string) => void;
+  selectedAnswerId?: string;
+}
 
-const ResultCard = (props: Props) => {
-  const { isCorrect } = props;
+const ResultCard = ({ question, onNext, onAnswer, selectedAnswerId }: Props) => {
+  const { isCorrect } = question.answers.find(a => a.id === selectedAnswerId) || {};
 
   if (isCorrect === null || isCorrect === undefined) {
     return null;
@@ -16,7 +27,7 @@ const ResultCard = (props: Props) => {
 
   const text = isCorrect
     ? "Correct!"
-    : "Incorrect! The correct answer is: " + props.correctAnswer;
+    : "Incorrect! The correct answer is: " + question.answers.find(a => a.isCorrect)?.answerText;
 
   const borderClasses = clsx({
     "border-green-500": isCorrect,

@@ -208,18 +208,18 @@ const OpenEnded = ({ game }: Props) => {
   ]);
 
   return (
-    <div className="flex flex-col items-center w-full max-w-4xl mx-auto px-4 sm:px-6 md:px-8">
+    <div className="flex flex-col items-center w-full max-w-4xl mx-auto px-3 sm:px-6 md:px-8">
       <div className="flex flex-col sm:flex-row justify-between w-full">
         <div className="flex flex-col">
           {/* topic */}
           <p>
-            <span className="text-slate-400">Topic</span> &nbsp;
-            <span className="px-2 py-1 text-white rounded-lg bg-slate-800">
+            <span className="text-slate-400 text-sm sm:text-base">Topic</span> &nbsp;
+            <span className="px-2 py-1 text-white rounded-lg bg-slate-800 text-sm sm:text-base">
               {game.topic}
             </span>
           </p>
-          <div className="flex self-start mt-3 text-slate-400">
-            <Timer className="mr-2" />
+          <div className="flex self-start mt-2 sm:mt-3 text-slate-400 text-sm sm:text-base">
+            <Timer className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
             {formatTimeDelta(differenceInSeconds(now, timeStarted))}
           </div>
         </div>
@@ -227,14 +227,14 @@ const OpenEnded = ({ game }: Props) => {
       </div>
       
       {/* Progress Map */}
-      <div className="flex flex-wrap items-center justify-center w-full mt-4 mb-2 gap-1">
+      <div className="flex flex-wrap items-center justify-center w-full mt-3 sm:mt-4 mb-2 gap-1">
         {game.questionsv2.map((_, idx) => {
           // Current question
           if (idx === questionIndex) {
             return (
               <div 
                 key={idx} 
-                className="w-6 h-6 flex items-center justify-center rounded-full bg-blue-500 text-white text-xs font-bold"
+                className="w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center rounded-full bg-blue-500 text-white text-xs font-bold"
                 title={`Question ${idx + 1} (current)`}
               >
                 {idx + 1}
@@ -252,10 +252,10 @@ const OpenEnded = ({ game }: Props) => {
             return (
               <div 
                 key={idx} 
-                className={`w-6 h-6 flex items-center justify-center rounded-full ${bgColor} text-white text-xs font-bold`}
+                className={`w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center rounded-full ${bgColor} text-white text-xs font-bold`}
                 title={`Question ${idx + 1}: ${similarity.toFixed(0)}% similar`}
               >
-                {similarity >= 70 ? <CheckCircle className="w-4 h-4" /> : <XCircle className="w-4 h-4" />}
+                {similarity >= 70 ? <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4" /> : <XCircle className="w-3 h-3 sm:w-4 sm:h-4" />}
               </div>
             );
           }
@@ -263,7 +263,7 @@ const OpenEnded = ({ game }: Props) => {
           return (
             <div 
               key={idx} 
-              className="w-6 h-6 flex items-center justify-center rounded-full bg-gray-300 text-gray-600 text-xs font-bold"
+              className="w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center rounded-full bg-gray-300 text-gray-600 text-xs font-bold"
               title={`Question ${idx + 1} (upcoming)`}
             >
               {idx + 1}
@@ -272,28 +272,28 @@ const OpenEnded = ({ game }: Props) => {
         })}
       </div>
       
-      <Card className="w-full mt-4">
-        <CardHeader className="flex flex-row items-center">
-          <CardTitle className="mr-5 text-center divide-y divide-zinc-600/50">
-            <div>{questionIndex + 1}</div>
-            <div className="text-base text-slate-400">
+      <Card className="w-full mt-3 sm:mt-4">
+        <CardHeader className="flex flex-row items-center p-4 sm:p-6">
+          <CardTitle className="mr-4 sm:mr-5 text-center divide-y divide-zinc-600/50">
+            <div className="text-base sm:text-lg">{questionIndex + 1}</div>
+            <div className="text-sm sm:text-base text-slate-400">
               {game.questionsv2.length}
             </div>
           </CardTitle>
-          <CardDescription className="flex-grow text-lg">
+          <CardDescription className="flex-grow text-base sm:text-lg">
             {currentQuestion.question}
           </CardDescription>
         </CardHeader>
       </Card>
 
-      <div className="flex flex-col items-center justify-center w-full mt-4">
+      <div className="flex flex-col items-center justify-center w-full mt-3 sm:mt-4">
         <BlankAnswerInput
           setBlankAnswer={handleBlankAnswerChange}
           answer={currentQuestion.answer}
         />
         <Button
           variant="default"
-          className="mt-2"
+          className="mt-2 w-full sm:w-auto"
           size="lg"
           disabled={isChecking || !hasUserInput}
           onClick={() => {
@@ -304,6 +304,10 @@ const OpenEnded = ({ game }: Props) => {
           Next <ChevronRight className="w-4 h-4 ml-2" />
         </Button>
       </div>
+      
+      {/* Audio elements for sounds */}
+      <audio ref={correctSoundRef} src="/sounds/correct.mp3" />
+      <audio ref={incorrectSoundRef} src="/sounds/incorrect.mp3" />
     </div>
   );
 };

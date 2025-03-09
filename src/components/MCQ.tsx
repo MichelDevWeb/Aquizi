@@ -9,7 +9,7 @@ import {
 import { Button, buttonVariants } from "./ui/button";
 import { differenceInSeconds } from "date-fns";
 import Link from "next/link";
-import { BarChart, ChevronRight, Loader2, Timer, CheckCircle, XCircle } from "lucide-react";
+import { BarChart, ChevronRight, Loader2, Timer, CheckCircle, XCircle, LucideLayoutDashboard } from "lucide-react";
 import { checkAnswerSchema, endGameSchema } from "@/schemas/questions";
 import { cn, formatTimeDelta } from "@/lib/utils";
 import MCQCounter from "./MCQCounter";
@@ -240,18 +240,18 @@ const MCQ = ({ game }: Props) => {
 
   return (
     <>
-      <div className="flex flex-col w-full max-w-4xl mx-auto px-4 sm:px-6 md:px-8">
-        <div className="flex flex-col sm:flex-row justify-between">
+      <div className="flex flex-col w-full max-w-4xl mx-auto px-3 sm:px-6 md:px-8">
+        <div className="flex flex-col sm:flex-row justify-between gap-2 sm:gap-0">
           <div className="flex flex-col">
             {/* topic */}
-            <p>
+            <p className="text-sm sm:text-base">
               <span className="text-slate-400">Topic</span> &nbsp;
-              <span className="px-2 py-1 text-white rounded-lg bg-slate-800">
+              <span className="px-2 py-0.5 sm:py-1 text-white rounded-lg bg-slate-800 text-xs sm:text-sm">
                 {game.topic}
               </span>
             </p>
-            <div className="flex self-start mt-3 text-slate-400">
-              <Timer className="mr-2" />
+            <div className="flex self-start mt-2 sm:mt-3 text-slate-400 text-xs sm:text-sm">
+              <Timer className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
               {formatTimeDelta(differenceInSeconds(now, timeStarted))}
             </div>
           </div>
@@ -262,14 +262,14 @@ const MCQ = ({ game }: Props) => {
         </div>
         
         {/* Progress Map */}
-        <div className="flex flex-wrap items-center justify-center w-full mt-4 mb-2 gap-1">
+        <div className="flex flex-wrap items-center justify-center w-full mt-3 sm:mt-4 mb-1 sm:mb-2 gap-1">
           {game.questionsv2.map((_, idx) => {
             // Current question
             if (idx === questionIndex) {
               return (
                 <div 
                   key={idx} 
-                  className="w-6 h-6 flex items-center justify-center rounded-full bg-blue-500 text-white text-xs font-bold"
+                  className="w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center rounded-full bg-blue-500 text-white text-[10px] sm:text-xs font-bold"
                 >
                   {idx + 1}
                 </div>
@@ -280,16 +280,16 @@ const MCQ = ({ game }: Props) => {
               return questionResults[idx] ? (
                 <div 
                   key={idx} 
-                  className="w-6 h-6 flex items-center justify-center rounded-full bg-green-500 text-white"
+                  className="w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center rounded-full bg-green-500 text-white"
                 >
-                  <CheckCircle className="w-4 h-4" />
+                  <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4" />
                 </div>
               ) : (
                 <div 
                   key={idx} 
-                  className="w-6 h-6 flex items-center justify-center rounded-full bg-red-500 text-white"
+                  className="w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center rounded-full bg-red-500 text-white"
                 >
-                  <XCircle className="w-4 h-4" />
+                  <XCircle className="w-3 h-3 sm:w-4 sm:h-4" />
                 </div>
               );
             }
@@ -297,59 +297,89 @@ const MCQ = ({ game }: Props) => {
             return (
               <div 
                 key={idx} 
-                className="w-6 h-6 flex items-center justify-center rounded-full bg-gray-300 text-gray-600 text-xs font-bold"
+                className="w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center rounded-full bg-gray-300 text-gray-600 text-[10px] sm:text-xs font-bold"
               >
                 {idx + 1}
               </div>
             );
           })}
         </div>
-        
-        <Card className="w-full mt-4">
-          <CardHeader className="flex flex-row items-center">
-            <CardTitle className="mr-5 text-center divide-y divide-zinc-600/50">
-              <div>{questionIndex + 1}</div>
-              <div className="text-base text-slate-400">
-                {game.questionsv2.length}
-              </div>
+
+        {/* Question Card */}
+        <Card className="w-full mt-4 sm:mt-6">
+          <CardHeader className="p-4 sm:p-6">
+            <CardTitle className="text-base sm:text-xl md:text-2xl">
+              {currentQuestion.question}
             </CardTitle>
-            <CardDescription className="flex-grow text-lg break-words">
-              {currentQuestion?.question}
+            <CardDescription className="text-xs sm:text-sm mt-1 sm:mt-2">
+              Choose the correct answer from the options below
             </CardDescription>
           </CardHeader>
         </Card>
-        <div className="flex flex-col items-center justify-center w-full mt-4">
+
+        {/* Answer Options */}
+        <div className="flex flex-col gap-2 sm:gap-3 mt-3 sm:mt-4">
           {options.map((option, index) => {
             return (
               <Button
-                key={option}
+                key={index}
                 variant={selectedChoice === index ? "default" : "outline"}
-                className="justify-start w-full py-4 mb-4"
+                className={cn(
+                  "justify-start h-auto py-3 sm:py-4 px-4 sm:px-6 text-left",
+                  {
+                    "border-green-500 border-2": 
+                      selectedChoice === index && isChecking,
+                  }
+                )}
                 onClick={() => setSelectedChoice(index)}
+                disabled={isChecking}
               >
-                <div className="flex items-center justify-start">
-                  <div className="p-2 px-3 mr-5 border rounded-md">
+                <div className="flex items-center">
+                  <div className="w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center rounded-full border-2 mr-2 sm:mr-3">
                     {index + 1}
                   </div>
-                  <div className="text-start break-words">{option}</div>
+                  <span className="text-sm sm:text-base">{option}</span>
                 </div>
               </Button>
             );
           })}
+        </div>
+
+        {/* Navigation Buttons */}
+        <div className="flex justify-between mt-4 sm:mt-6">
+          <div className="flex gap-2">
+            <Link
+              href="/dashboard"
+              className={cn(
+                buttonVariants({ variant: "outline", size: "sm" }),
+                "h-8 sm:h-9 px-2 sm:px-4"
+              )}
+            >
+              <LucideLayoutDashboard className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+              <span className="text-xs sm:text-sm">Dashboard</span>
+            </Link>
+          </div>
           <Button
-            variant="default"
-            className="mt-2"
-            size="lg"
-            disabled={isChecking || selectedChoice === null}
-            onClick={() => {
-              handleNext();
-            }}
+            onClick={handleNext}
+            disabled={selectedChoice === null || isChecking}
+            className="h-8 sm:h-9 px-2 sm:px-4"
+            size="sm"
           >
-            {isChecking && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-            Next <ChevronRight className="w-4 h-4 ml-2" />
+            {isChecking ? (
+              <Loader2 className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 animate-spin" />
+            ) : (
+              <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+            )}
+            <span className="text-xs sm:text-sm">
+              {questionIndex === game.questionsv2.length - 1 ? "Finish" : "Next"}
+            </span>
           </Button>
         </div>
       </div>
+
+      {/* Audio elements for correct/incorrect sounds */}
+      <audio ref={correctSoundRef} src="/correct.mp3" />
+      <audio ref={incorrectSoundRef} src="/incorrect.mp3" />
     </>
   );
 };

@@ -1,59 +1,73 @@
-import { collection, query, where, getDocs, getDoc, doc, count } from 'firebase/firestore';
+import { collection, query, where, getDocs, getDoc, doc, limit, orderBy } from 'firebase/firestore';
 import { db, COLLECTIONS } from '@/lib/firestore/firestore-config';
 
+/**
+ * Get essential user metrics for dashboard display
+ * @param userId The user ID to fetch metrics for
+ * @returns An array of key metrics or null if no user ID provided
+ */
 const getUserMetrics = async (userId?: string) => {
   if (!userId) {
     return null;
   }
 
   try {
-    // Get total # of user games (quizzes)
-    const gamesQuery = query(
-      collection(db, COLLECTIONS.GAMES),
-      where('userId', '==', userId)
-    );
-    const gamesSnapshot = await getDocs(gamesQuery);
-    const numQuizzes = gamesSnapshot.size;
+    // Use Promise.all to fetch data in parallel
+    const [quizCount, recentSubmissions] = await Promise.all([
+      // Get quiz count (most important metric)
+      getDocs(
+        query(
+          collection(db, COLLECTIONS.GAMES),
+          where('userId', '==', userId)
+        )
+      ),
+      
+      // Get only recent submissions (limited to 10) for performance
+      getDocs(
+        query(
+          collection(db, COLLECTIONS.SUBMISSIONS),
+          where('userId', '==', userId),
+          orderBy('createdAt', 'desc'),
+          limit(10)
+        )
+      )
+    ]);
 
-    // Get total # of questions
-    const questionsQuery = query(
-      collection(db, COLLECTIONS.QUESTIONS),
-      where('userId', '==', userId)
-    );
-    const questionsSnapshot = await getDocs(questionsQuery);
-    const numQuestions = questionsSnapshot.size;
-
-    // Get total # of submissions
-    const submissionsQuery = query(
-      collection(db, COLLECTIONS.SUBMISSIONS),
-      where('userId', '==', userId)
-    );
-    const submissionsSnapshot = await getDocs(submissionsQuery);
-    const numSubmissions = submissionsSnapshot.size;
-
-    // Calculate average score
+    // Calculate metrics from the results
+    const numQuizzes = quizCount.size;
+    
+    // Calculate average score from recent submissions
     let totalScore = 0;
-    submissionsSnapshot.forEach((doc) => {
+    let totalQuestions = 0;
+    
+    recentSubmissions.forEach((doc) => {
       const data = doc.data();
       if (data.score) {
         totalScore += data.score;
+        totalQuestions += data.totalQuestions || 1; // Fallback to 1 if totalQuestions is missing
       }
     });
-    const avgScore = numSubmissions > 0 ? totalScore / numSubmissions : 0;
+    
+    const submissionCount = recentSubmissions.size;
+    const avgScore = submissionCount > 0 ? totalScore / submissionCount : 0;
+    const avgQuestionsPerQuiz = numQuizzes > 0 && totalQuestions > 0 ? 
+      totalQuestions / Math.min(numQuizzes, submissionCount) : 0;
 
+    // Return only the most important metrics
     return [
       { label: "Quizzes", value: numQuizzes },
-      { label: "Questions", value: numQuestions },
-      { label: "Submissions", value: numSubmissions },
+      { label: "Recent Submissions", value: submissionCount },
       { label: "Average Score", value: Math.round(avgScore * 100) / 100 },
+      { label: "Avg Questions/Quiz", value: Math.round(avgQuestionsPerQuiz) }
     ];
   } catch (error) {
     console.error("Error fetching user metrics:", error);
+    // Return fallback data
     return [
       { label: "Quizzes", value: 0 },
-      { label: "Questions", value: 0 },
-      { label: "Submissions", value: 0 },
+      { label: "Recent Submissions", value: 0 },
       { label: "Average Score", value: 0 },
+      { label: "Avg Questions/Quiz", value: 0 }
     ];
   }
 };

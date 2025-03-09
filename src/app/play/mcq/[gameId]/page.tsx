@@ -106,11 +106,11 @@ const MCQPage = ({ params: { gameId }, searchParams }: Props) => {
 
   if (loading || isLoading) {
     return (
-      <div className="p-8 mx-auto max-w-7xl">
-        <Skeleton className="h-12 w-64 mb-6" />
-        <div className="space-y-4">
+      <div className="p-2 sm:p-4 md:p-6 mx-auto max-w-7xl">
+        <Skeleton className="h-10 sm:h-12 w-48 sm:w-64 mb-3 sm:mb-6" />
+        <div className="space-y-2 sm:space-y-4">
           {[1, 2, 3, 4].map((i) => (
-            <Skeleton key={i} className="h-24 w-full" />
+            <Skeleton key={i} className="h-16 sm:h-20 md:h-24 w-full" />
           ))}
         </div>
       </div>

@@ -198,20 +198,20 @@ const Statistics = ({ params: { gameId } }: Props) => {
 
   if (loading || isLoading) {
     return (
-      <div className="p-4 sm:p-8 mx-auto max-w-7xl">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <Skeleton className="h-10 w-64" />
-          <div className="flex flex-wrap gap-2">
-            <Skeleton className="h-10 w-40" />
-            <Skeleton className="h-10 w-40" />
+      <div className="p-2 sm:p-4 md:p-6 mx-auto max-w-7xl">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-4">
+          <Skeleton className="h-8 sm:h-10 w-48 sm:w-64" />
+          <div className="flex flex-wrap gap-2 mt-2 sm:mt-0">
+            <Skeleton className="h-8 sm:h-10 w-24 sm:w-32 md:w-40" />
+            <Skeleton className="h-8 sm:h-10 w-24 sm:w-32 md:w-40" />
           </div>
         </div>
-        <div className="grid gap-4 mt-6 md:grid-cols-7">
-          <Skeleton className="h-40 col-span-7 md:col-span-3" />
-          <Skeleton className="h-40 col-span-7 md:col-span-2" />
-          <Skeleton className="h-40 col-span-7 md:col-span-2" />
+        <div className="grid gap-2 sm:gap-4 mt-4 sm:mt-6 md:grid-cols-7">
+          <Skeleton className="h-32 sm:h-36 md:h-40 col-span-7 md:col-span-3" />
+          <Skeleton className="h-32 sm:h-36 md:h-40 col-span-7 md:col-span-2" />
+          <Skeleton className="h-32 sm:h-36 md:h-40 col-span-7 md:col-span-2" />
         </div>
-        <Skeleton className="h-96 w-full mt-6" />
+        <Skeleton className="h-64 sm:h-80 md:h-96 w-full mt-4 sm:mt-6" />
       </div>
     );
   }
@@ -227,49 +227,49 @@ const Statistics = ({ params: { gameId } }: Props) => {
     : 'N/A';
 
   return (
-    <div className="p-4 sm:p-8 mx-auto max-w-7xl">
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+    <div className="p-3 sm:p-6 md:p-8 mx-auto max-w-7xl">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 mb-4 sm:mb-6">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold">{game.topic}</h1>
-          <div className="flex flex-wrap items-center gap-2 mt-2">
-            <Badge variant={game.gameType === "mcq" ? "default" : "secondary"}>
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold">{game.topic}</h1>
+          <div className="flex flex-wrap items-center gap-2 mt-1 sm:mt-2">
+            <Badge variant={game.gameType === "mcq" ? "default" : "secondary"} className="text-xs sm:text-sm">
               {game.gameType === "mcq" ? "Multiple Choice" : "Open Ended"}
             </Badge>
-            <div className="flex items-center text-xs sm:text-sm text-muted-foreground">
+            <div className="flex items-center text-xs text-muted-foreground">
               <Calendar className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
               {formattedDate}
             </div>
-            <div className="flex items-center text-xs sm:text-sm text-muted-foreground">
+            <div className="flex items-center text-xs text-muted-foreground">
               <Clock className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
               {timeTaken}
             </div>
           </div>
         </div>
         <div className="flex flex-wrap gap-2 mt-2 sm:mt-0">
-          <Button variant="outline" size="sm" className="h-8 sm:h-10" onClick={() => router.push("/dashboard")}>
+          <Button variant="outline" size="sm" className="h-8 sm:h-10 px-2 sm:px-3" onClick={() => router.push("/dashboard")}>
             <ChevronLeft className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
             <span className="hidden sm:inline">Dashboard</span>
             <span className="sm:hidden">Back</span>
           </Button>
-          <Button variant="outline" size="sm" className="h-8 sm:h-10" onClick={handleShare}>
+          <Button variant="outline" size="sm" className="h-8 sm:h-10 px-2 sm:px-3" onClick={handleShare}>
             <Share2 className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
             <span className="hidden sm:inline">Share</span>
           </Button>
-          <Button size="sm" className="h-8 sm:h-10" onClick={handleRetest}>
+          <Button size="sm" className="h-8 sm:h-10 px-2 sm:px-3" onClick={handleRetest}>
             <RefreshCw className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
             <span className="hidden sm:inline">Retest</span>
           </Button>
         </div>
       </div>
 
-      <Tabs defaultValue="overview" className="mb-6" onValueChange={setActiveTab}>
-        <TabsList className="mb-4 w-full justify-start overflow-x-auto">
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="questions">Questions</TabsTrigger>
+      <Tabs defaultValue="overview" className="mb-4 sm:mb-6" onValueChange={setActiveTab}>
+        <TabsList className="mb-3 sm:mb-4 w-full justify-start overflow-x-auto">
+          <TabsTrigger value="overview" className="text-xs sm:text-sm">Overview</TabsTrigger>
+          <TabsTrigger value="questions" className="text-xs sm:text-sm">Questions</TabsTrigger>
         </TabsList>
         
         <TabsContent value="overview">
-          <div className="grid gap-4 md:grid-cols-7">
+          <div className="grid gap-3 sm:gap-4 md:grid-cols-7">
             <ResultsCard accuracy={accuracy} />
             <AccuracyCard accuracy={accuracy} />
             <TimeTakenCard
@@ -282,13 +282,13 @@ const Statistics = ({ params: { gameId } }: Props) => {
             />
           </div>
           
-          <div className="grid gap-4 mt-6 md:grid-cols-2">
+          <div className="grid gap-3 sm:gap-4 mt-4 sm:mt-6 md:grid-cols-2">
             <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-lg sm:text-xl">Quiz Details</CardTitle>
+              <CardHeader className="pb-1 sm:pb-2 p-3 sm:p-4 md:p-6">
+                <CardTitle className="text-base sm:text-lg md:text-xl">Quiz Details</CardTitle>
               </CardHeader>
-              <CardContent>
-                <dl className="space-y-2 sm:space-y-4 text-sm sm:text-base">
+              <CardContent className="p-3 sm:p-4 md:p-6 pt-0 sm:pt-0 md:pt-0">
+                <dl className="space-y-1 sm:space-y-2 md:space-y-4 text-xs sm:text-sm md:text-base">
                   <div className="flex justify-between">
                     <dt className="font-medium text-muted-foreground">Topic</dt>
                     <dd className="text-right">{game.topic}</dd>
@@ -314,11 +314,11 @@ const Statistics = ({ params: { gameId } }: Props) => {
             </Card>
             
             <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-lg sm:text-xl">Performance Summary</CardTitle>
+              <CardHeader className="pb-1 sm:pb-2 p-3 sm:p-4 md:p-6">
+                <CardTitle className="text-base sm:text-lg md:text-xl">Performance Summary</CardTitle>
               </CardHeader>
-              <CardContent>
-                <dl className="space-y-2 sm:space-y-4 text-sm sm:text-base">
+              <CardContent className="p-3 sm:p-4 md:p-6 pt-0 sm:pt-0 md:pt-0">
+                <dl className="space-y-1 sm:space-y-2 md:space-y-4 text-xs sm:text-sm md:text-base">
                   <div className="flex justify-between">
                     <dt className="font-medium text-muted-foreground">Score</dt>
                     <dd className="text-right">{game.score || 0} / {game.totalQuestions || questions.length}</dd>

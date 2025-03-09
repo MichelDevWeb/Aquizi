@@ -1,4 +1,5 @@
 import { getApps, initializeApp, cert } from 'firebase-admin/app';
+import { ENV } from '../env-config';
 
 /**
  * Initialize Firebase Admin SDK

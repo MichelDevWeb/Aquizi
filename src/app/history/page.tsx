@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CopyCheck, Edit2, History } from "lucide-react";
 import { useAuth } from "@/lib/firebase/firebase-auth";
 import { Skeleton } from "@/components/ui/skeleton";
+import PageLayout from "@/components/PageLayout";
 
 const HistoryPage = () => {
   const { user, loading } = useAuth();
@@ -20,7 +21,7 @@ const HistoryPage = () => {
 
   if (loading) {
     return (
-      <div className="container max-w-7xl mx-auto p-4 md:p-8">
+      <PageLayout contentWidth="wide" mobilePadding="medium" mobileStack={true}>
         <div className="flex flex-col items-start gap-4 mb-6">
           <Skeleton className="h-10 w-48" />
           <Skeleton className="h-5 w-64" />
@@ -30,7 +31,7 @@ const HistoryPage = () => {
             <Skeleton key={i} className="h-24 w-full rounded-lg" />
           ))}
         </div>
-      </div>
+      </PageLayout>
     );
   }
 
@@ -39,16 +40,16 @@ const HistoryPage = () => {
   }
 
   return (
-    <div className="container max-w-7xl mx-auto p-4 md:p-8">
+    <PageLayout contentWidth="wide" mobilePadding="medium" mobileStack={true}>
       <div className="flex flex-col items-start gap-4 mb-6">
-        <h1 className="text-3xl font-bold tracking-tight">Quiz History</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Quiz History</h1>
         <p className="text-muted-foreground">
           View your past quiz attempts and performance.
         </p>
       </div>
 
       <Tabs defaultValue="all" className="w-full">
-        <TabsList className="mb-6">
+        <TabsList className="mb-6 w-full sm:w-auto overflow-x-auto flex-nowrap">
           <TabsTrigger value="all" className="flex items-center gap-2">
             <History className="h-4 w-4" />
             <span className="hidden sm:inline">All Quizzes</span>
@@ -66,19 +67,21 @@ const HistoryPage = () => {
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="all">
-          <HistoryComponent limit={10} userId={user.uid} gameType={null} />
-        </TabsContent>
-        
-        <TabsContent value="mcq">
-          <HistoryComponent limit={10} userId={user.uid} gameType="mcq" />
-        </TabsContent>
-        
-        <TabsContent value="open-ended">
-          <HistoryComponent limit={10} userId={user.uid} gameType="open-ended" />
-        </TabsContent>
+        <div className="overflow-x-auto pb-4">
+          <TabsContent value="all">
+            <HistoryComponent limit={10} userId={user.uid} gameType={null} />
+          </TabsContent>
+          
+          <TabsContent value="mcq">
+            <HistoryComponent limit={10} userId={user.uid} gameType="mcq" />
+          </TabsContent>
+          
+          <TabsContent value="open-ended">
+            <HistoryComponent limit={10} userId={user.uid} gameType="open-ended" />
+          </TabsContent>
+        </div>
       </Tabs>
-    </div>
+    </PageLayout>
   );
 };
 

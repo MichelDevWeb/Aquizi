@@ -52,30 +52,30 @@ const TimeTakenCard = ({
 
   return (
     <Card className="md:col-span-2">
-      <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-        <CardTitle className="text-xl sm:text-2xl font-bold">Time Taken</CardTitle>
+      <CardHeader className="flex flex-row items-center justify-between pb-1 sm:pb-2 p-3 sm:p-4 md:p-6 space-y-0">
+        <CardTitle className="text-lg sm:text-xl md:text-2xl font-bold">Time Taken</CardTitle>
         <Hourglass className="h-4 w-4 sm:h-5 sm:w-5" />
       </CardHeader>
-      <CardContent>
-        <div className="text-xl sm:text-2xl font-medium">
+      <CardContent className="p-3 sm:p-4 md:p-6 pt-0 sm:pt-0 md:pt-0">
+        <div className="text-lg sm:text-xl md:text-2xl font-medium">
           {formattedTime || "0s"}
         </div>
         
         {retestCount > 0 && (
-          <div className="mt-4 space-y-3">
+          <div className="mt-2 sm:mt-4 space-y-2 sm:space-y-3">
             {bestTime !== undefined && (
               <div className="space-y-1">
-                <div className="flex items-center justify-between text-sm">
+                <div className="flex items-center justify-between text-xs sm:text-sm">
                   <div className="flex items-center">
-                    <Award className="h-4 w-4 mr-1 text-yellow-500" />
+                    <Award className="h-3 w-3 sm:h-4 sm:w-4 mr-1 text-yellow-500" />
                     <span className="text-muted-foreground">Best Time:</span>
                   </div>
                   <span className="font-medium">{formatTimeDelta(bestTime)}</span>
                 </div>
                 {hasImprovement && (
                   <div className="space-y-1">
-                    <Progress value={improvementPercentage} className="h-2" />
-                    <p className="text-xs text-muted-foreground text-right">
+                    <Progress value={improvementPercentage} className="h-1.5 sm:h-2" />
+                    <p className="text-[10px] sm:text-xs text-muted-foreground text-right">
                       {improvementPercentage}% improvement
                     </p>
                   </div>
@@ -84,9 +84,9 @@ const TimeTakenCard = ({
             )}
             
             {averageTime !== undefined && (
-              <div className="flex items-center justify-between text-sm">
+              <div className="flex items-center justify-between text-xs sm:text-sm">
                 <div className="flex items-center">
-                  <BarChart className="h-4 w-4 mr-1 text-blue-500" />
+                  <BarChart className="h-3 w-3 sm:h-4 sm:w-4 mr-1 text-blue-500" />
                   <span className="text-muted-foreground">Average Time:</span>
                 </div>
                 <span className="font-medium">{formatTimeDelta(Math.round(averageTime))}</span>
@@ -94,9 +94,9 @@ const TimeTakenCard = ({
             )}
             
             {lastRetestTime !== undefined && lastRetestTime !== timeDifferenceInSeconds && (
-              <div className="flex items-center justify-between text-sm">
+              <div className="flex items-center justify-between text-xs sm:text-sm">
                 <div className="flex items-center">
-                  <Clock className="h-4 w-4 mr-1 text-green-500" />
+                  <Clock className="h-3 w-3 sm:h-4 sm:w-4 mr-1 text-green-500" />
                   <span className="text-muted-foreground">Last Retest:</span>
                 </div>
                 <span className="font-medium">{formatTimeDelta(lastRetestTime)}</span>

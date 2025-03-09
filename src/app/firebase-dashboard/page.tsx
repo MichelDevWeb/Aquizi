@@ -6,7 +6,7 @@ import { useAuth } from '@/lib/firebase/firebase-auth';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { getDocumentById } from '@/lib/firestore/firestore-utils';
-
+import Image from 'next/image';
 interface UserData {
   displayName: string;
   email: string;
@@ -78,7 +78,7 @@ const FirebaseDashboardPage = () => {
           <CardContent className="flex flex-col gap-4">
             {user.photoURL && (
               <div className="flex justify-center">
-                <img 
+                <Image
                   src={user.photoURL} 
                   alt={user.displayName || 'User'} 
                   className="w-24 h-24 rounded-full"

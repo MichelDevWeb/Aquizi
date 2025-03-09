@@ -101,30 +101,31 @@ const QuizCreation = ({ topic: topicParam }: Props) => {
 
   return (
     <>
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-2xl font-bold">Quiz Creation</CardTitle>
+      <Card className="shadow-md">
+        <CardHeader className="pb-4 sm:pb-6">
+          <CardTitle className="text-xl sm:text-2xl font-bold">Quiz Creation</CardTitle>
           <CardDescription>Choose a topic</CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
             <form
               onSubmit={form.handleSubmit(onSubmit)}
-              className="space-y-8"
+              className="space-y-5 sm:space-y-6"
             >
               <FormField
                 control={form.control}
                 name="topic"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Topic</FormLabel>
+                  <FormItem className="space-y-2">
+                    <FormLabel className="text-sm sm:text-base">Topic</FormLabel>
                     <FormControl>
                       <Input
                         placeholder="Enter a topic"
+                        className="h-9 sm:h-10"
                         {...field}
                       />
                     </FormControl>
-                    <FormDescription>
+                    <FormDescription className="text-xs sm:text-sm">
                       Please provide any topic you would like to be quizzed on
                       here.
                     </FormDescription>
@@ -136,12 +137,13 @@ const QuizCreation = ({ topic: topicParam }: Props) => {
                 control={form.control}
                 name="amount"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Number of Questions</FormLabel>
+                  <FormItem className="space-y-2">
+                    <FormLabel className="text-sm sm:text-base">Number of Questions</FormLabel>
                     <FormControl>
                       <Input
                         placeholder="How many questions?"
                         type="number"
+                        className="h-9 sm:h-10"
                         {...field}
                         onChange={(e) => {
                           form.setValue("amount", parseInt(e.target.value));
@@ -150,7 +152,7 @@ const QuizCreation = ({ topic: topicParam }: Props) => {
                         max={10}
                       />
                     </FormControl>
-                    <FormDescription>
+                    <FormDescription className="text-xs sm:text-sm">
                       You can choose how many questions you would like to be
                       quizzed on here.
                     </FormDescription>
@@ -159,18 +161,18 @@ const QuizCreation = ({ topic: topicParam }: Props) => {
                 )}
               />
 
-              <div className="flex justify-between">
+              <div className="flex justify-between mt-4">
                 <Button
                   variant={
                     form.getValues("type") === "mcq" ? "default" : "secondary"
                   }
-                  className="w-1/2 rounded-none rounded-l-lg"
+                  className="w-1/2 rounded-none rounded-l-lg h-9 sm:h-10 text-xs sm:text-sm"
                   onClick={() => {
                     form.setValue("type", "mcq");
                   }}
                   type="button"
                 >
-                  <CopyCheck className="w-4 h-4 mr-2" /> Multiple Choice
+                  <CopyCheck className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" /> Multiple Choice
                 </Button>
                 <Separator orientation="vertical" />
                 <Button
@@ -179,16 +181,17 @@ const QuizCreation = ({ topic: topicParam }: Props) => {
                       ? "default"
                       : "secondary"
                   }
-                  className="w-1/2 rounded-none rounded-r-lg"
+                  className="w-1/2 rounded-none rounded-r-lg h-9 sm:h-10 text-xs sm:text-sm"
                   onClick={() => form.setValue("type", "open_ended")}
                   type="button"
                 >
-                  <BookOpen className="w-4 h-4 mr-2" /> Open Ended
+                  <BookOpen className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" /> Open Ended
                 </Button>
               </div>
               <Button
                 disabled={isPending}
                 type="submit"
+                className="w-full sm:w-auto mt-4 h-9 sm:h-10"
               >
                 Submit
               </Button>

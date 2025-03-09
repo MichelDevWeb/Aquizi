@@ -8,12 +8,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { redirect } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/firebase/firebase-auth";
 import { useEffect, useState } from "react";
+import PageLayout from "@/components/PageLayout";
 
 export default function Home() {
   const { user, loading } = useAuth();
@@ -26,71 +26,72 @@ export default function Home() {
   // Show loading state while checking authentication
   if (loading || !isClient) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
-        <p>Loading...</p>
-      </div>
+      <PageLayout contentWidth="full" mobilePadding="small" className="flex justify-center items-center">
+        <div className="animate-pulse flex flex-col items-center">
+          <div className="h-8 sm:h-10 md:h-12 w-36 sm:w-40 md:w-48 bg-gray-200 rounded mb-3 sm:mb-4"></div>
+          <div className="h-6 sm:h-7 md:h-8 w-48 sm:w-56 md:w-64 bg-gray-200 rounded"></div>
+        </div>
+      </PageLayout>
     );
   }
 
   if (user) {
     return (
-      <div className="flex flex-col flex-1">
-        <main className="flex justify-center flex-1">
-          <div className="items-center flex flex-col sm:flex-row gap-20 justify-end mx-auto p-10 w-full sm:py-20 sm:w-[1000px]">
-            <div>
-              <Image
-                src="/images/owl-landing-no-bg.png"
-                width="400"
-                height="400"
-                alt="owl"
-              />
-            </div>
-            <div className="text-center flex gap-6 flex-col">
-              <h1 className="text-3xl font-bold">
-                Welcome to the Aquizi page👋
-              </h1>
-              <h3 className="text-sm">
-                Upload documents, and easily generate your quizzes with AI.
-              </h3>
-              <div className="flex gap-4">
-                <Button
-                  variant="neo"
-                  className="flex-1 h-14"
-                  asChild
-                >
-                  <Link href="upload-quizz/new">Upload</Link>
-                </Button>
-                <Button
-                  variant="neo"
-                  className="flex-1 h-14"
-                  asChild
-                >
-                  <Link href="dashboard">Dashboard</Link>
-                </Button>
-              </div>
+      <PageLayout contentWidth="full" mobilePadding="small" className="py-2 sm:py-4 md:py-6">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-8 md:gap-12 w-full">
+          <div className="order-2 sm:order-1 w-full max-w-xs sm:max-w-sm">
+            <Image
+              src="/images/owl-landing-no-bg.png"
+              alt="Quiz Hero"
+              width={300}
+              height={300}
+              priority
+              className="w-full h-auto max-w-[250px] sm:max-w-[300px] mx-auto"
+            />
+          </div>
+          <div className="order-1 sm:order-2 text-center sm:text-left flex gap-3 sm:gap-4 md:gap-6 flex-col max-w-md w-full">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold">
+              Welcome to the Aquizi page👋
+            </h1>
+            <h3 className="text-sm sm:text-base">
+              Create and generate quizzes with AI to enhance your learning experience.
+            </h3>
+            <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 md:gap-4 w-full">
+              <Button
+                variant="neo"
+                className="flex-1 h-10 sm:h-12 md:h-14"
+                asChild
+              >
+                <Link href="quiz">Create Quiz</Link>
+              </Button>
+              <Button
+                variant="neo"
+                className="flex-1 h-10 sm:h-12 md:h-14"
+                asChild
+              >
+                <Link href="dashboard">Dashboard</Link>
+              </Button>
             </div>
           </div>
-        </main>
-      </div>
+        </div>
+      </PageLayout>
     );
   }
 
   return (
-    <div className="flex flex-col flex-1">
-      <main className="justify-center p-8 mx-auto max-w-7xl">
-        <Card className="w-[300px]">
-          <CardHeader>
-            <CardTitle>Welcome to Aquizi 🔥!</CardTitle>
-            <CardDescription>
-              Aquizi is a platform for creating quizzes using AI!. Get started
-              by logging in below!
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <FirebaseSignInButton text="Sign In with Google" />
-          </CardContent>
-        </Card>
-      </main>
-    </div>
+    <PageLayout contentWidth="narrow" mobilePadding="small" className="flex justify-center items-center py-3 sm:py-4 md:py-6">
+      <Card className="w-full max-w-md">
+        <CardHeader>
+          <CardTitle>Welcome to Aquizi 🔥!</CardTitle>
+          <CardDescription>
+            Aquizi is a platform for creating quizzes using AI!. Get started
+            by logging in below!
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <FirebaseSignInButton text="Sign In with Google" />
+        </CardContent>
+      </Card>
+    </PageLayout>
   );
 }

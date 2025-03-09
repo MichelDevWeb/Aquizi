@@ -70,18 +70,17 @@ const HistoryComponent = ({ limit, userId, gameType }: Props) => {
 
   if (loading) {
     return (
-      <div className="space-y-4">
-        {[1, 2, 3, 4, 5].map((i) => (
-          <div key={i} className="flex items-center justify-between p-4 border rounded-lg">
-            <div className="flex items-center gap-3">
-              <Skeleton className="h-10 w-10 rounded-full" />
-              <div className="space-y-2">
-                <Skeleton className="h-4 w-40" />
-                <Skeleton className="h-3 w-24" />
-                <Skeleton className="h-3 w-32" />
+      <div className="space-y-3 sm:space-y-4">
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 sm:p-4 border rounded-lg">
+            <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-0">
+              <Skeleton className="h-8 w-8 sm:h-10 sm:w-10 rounded-full" />
+              <div className="space-y-1 sm:space-y-2">
+                <Skeleton className="h-3 sm:h-4 w-28 sm:w-40" />
+                <Skeleton className="h-2 sm:h-3 w-20 sm:w-24" />
               </div>
             </div>
-            <Skeleton className="h-8 w-24" />
+            <Skeleton className="h-6 sm:h-8 w-20 sm:w-24" />
           </div>
         ))}
       </div>
@@ -90,15 +89,15 @@ const HistoryComponent = ({ limit, userId, gameType }: Props) => {
 
   if (games.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-10 text-center">
-        <Trophy className="w-12 h-12 mb-4 text-yellow-500" />
-        <h3 className="text-xl font-semibold mb-2">No quizzes found</h3>
-        <p className="text-muted-foreground mb-6">
+      <div className="flex flex-col items-center justify-center py-6 sm:py-10 text-center">
+        <Trophy className="w-8 h-8 sm:w-12 sm:h-12 mb-3 sm:mb-4 text-yellow-500" />
+        <h3 className="text-base sm:text-xl font-semibold mb-1 sm:mb-2">No quizzes found</h3>
+        <p className="text-xs sm:text-sm text-muted-foreground mb-4 sm:mb-6 max-w-xs sm:max-w-sm mx-auto">
           {gameType 
             ? `You haven't taken any ${gameType === 'mcq' ? 'multiple choice' : 'open-ended'} quizzes yet.` 
             : "You haven't taken any quizzes yet."}
         </p>
-        <Link href="/quiz" className={buttonVariants()}>
+        <Link href="/quiz" className={buttonVariants({ size: "sm" })}>
           Take a Quiz
         </Link>
       </div>
@@ -120,7 +119,7 @@ const HistoryComponent = ({ limit, userId, gameType }: Props) => {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3 sm:space-y-4">
       {games.map((game: Game) => {
         // Convert Firestore Timestamps to JavaScript Date objects
         const startDate = game.timeStarted?.toDate ? game.timeStarted.toDate() : null;
@@ -136,33 +135,33 @@ const HistoryComponent = ({ limit, userId, gameType }: Props) => {
           
         return (
           <div
-            className="flex flex-col p-4 border rounded-lg hover:bg-accent/50 transition-colors"
+            className="flex flex-col p-3 sm:p-4 border rounded-lg hover:bg-accent/50 transition-colors"
             key={game.id}
           >
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-4">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0">
+              <div className="flex items-center space-x-2 sm:space-x-4">
                 <div className="flex flex-col space-y-1">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1 sm:gap-2">
                     {game.gameType === 'mcq' ? (
-                      <CopyCheck className="h-4 w-4 text-muted-foreground" />
+                      <CopyCheck className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
                     ) : (
-                      <Edit2 className="h-4 w-4 text-muted-foreground" />
+                      <Edit2 className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
                     )}
-                    <span className="text-sm font-medium">
+                    <span className="text-xs sm:text-sm font-medium">
                       {game.gameType === 'mcq' ? 'Multiple Choice' : 'Open Ended'}
                     </span>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Calendar className="h-4 w-4 text-muted-foreground" />
+                  <div className="flex items-center gap-1 sm:gap-2">
+                    <Calendar className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
                     <span className="text-xs text-muted-foreground">
                       {startDate?.toLocaleDateString()}
                     </span>
                   </div>
                 </div>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 self-end sm:self-auto">
                 {scorePercentage !== null && (
-                  <Badge variant={scorePercentage === 100 ? "success" : "default"}>
+                  <Badge variant={scorePercentage === 100 ? "success" : "default"} className="text-xs">
                     {scorePercentage}%
                   </Badge>
                 )}
@@ -170,8 +169,8 @@ const HistoryComponent = ({ limit, userId, gameType }: Props) => {
                   <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger>
-                        <Badge variant="outline">
-                          <Timer className="h-3 w-3 mr-1" />
+                        <Badge variant="outline" className="text-xs">
+                          <Timer className="h-2.5 w-2.5 sm:h-3 sm:w-3 mr-1" />
                           {formatTimeDelta(duration)}
                         </Badge>
                       </TooltipTrigger>
@@ -179,33 +178,33 @@ const HistoryComponent = ({ limit, userId, gameType }: Props) => {
                     </Tooltip>
                   </TooltipProvider>
                 )}
-                <div className="flex gap-2">
+                <div className="flex gap-1 sm:gap-2">
                   <Link
                     href={`/statistics/${game.id}`}
                     className={cn(
                       buttonVariants({ variant: "outline", size: "icon" }),
-                      "h-8 w-8"
+                      "h-6 w-6 sm:h-8 sm:w-8"
                     )}
                   >
-                    <BarChart className="h-4 w-4" />
+                    <BarChart className="h-3 w-3 sm:h-4 sm:w-4" />
                   </Link>
                   {game.gameType === 'mcq' && (
                     <Link
                       href={`/play/${game.gameType}/${game.id}?retest=true&submissionId=${game.submissionId}`}
                       className={cn(
                         buttonVariants({ variant: "outline", size: "icon" }),
-                        "h-8 w-8"
+                        "h-6 w-6 sm:h-8 sm:w-8"
                       )}
                     >
-                      <RefreshCw className="h-4 w-4" />
+                      <RefreshCw className="h-3 w-3 sm:h-4 sm:w-4" />
                     </Link>
                   )}
                 </div>
               </div>
             </div>
-            <div className="flex items-center gap-2 mt-2">
-              <Target className="h-4 w-4 text-muted-foreground" />
-              <span className="text-sm text-muted-foreground">
+            <div className="flex items-center gap-1 sm:gap-2 mt-2">
+              <Target className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
+              <span className="text-xs sm:text-sm text-muted-foreground truncate">
                 Topic: {game.topic}
               </span>
             </div>

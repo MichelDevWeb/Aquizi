@@ -5,6 +5,11 @@ const withPWA = require("next-pwa")({
   skipWaiting: true,
 });
 
+// Next.js automatically loads the appropriate .env file based on NODE_ENV:
+// - In development: .env.local
+// - In production: .env.prod (if it exists)
+// - In test: .env.test (if it exists)
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
@@ -30,6 +35,11 @@ const nextConfig = {
         pathname: "/**",
       },
     ],
+  },
+  // Add environment variables to be available at build time
+  env: {
+    API_URL: process.env.API_URL,
+    // Add other environment variables as needed
   },
 };
 

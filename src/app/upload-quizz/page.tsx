@@ -5,6 +5,8 @@ import ProgressBar from "@/components/ProgressBar";
 import { ChevronLeft, X } from "lucide-react";
 import ResultCard from "./ResultCard";
 import QuizzSubmission from "./QuizzSubmission";
+import PageLayout from "@/components/PageLayout";
+import { useRouter } from "next/navigation";
 
 const questions = [
   {
@@ -59,6 +61,7 @@ export default function Home() {
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
   const [submitted, setSubmitted] = useState<boolean>(false);
+  const router = useRouter();
 
   const handleNext = () => {
     if (!started) {
@@ -90,48 +93,77 @@ export default function Home() {
 
   if (submitted) {
     return (
-      <QuizzSubmission
-        score={score}
-        scorePercentage={scorePercentage}
-        totalQuestions={questions.length}
-      />
+      <PageLayout contentWidth="narrow" mobilePadding="medium" safePaddingBottom={true}>
+        <QuizzSubmission
+          score={score}
+          scorePercentage={scorePercentage}
+          totalQuestions={questions.length}
+        />
+      </PageLayout>
     );
   }
 
   return (
-    <div className="flex flex-col flex-1">
-      <div className="position-sticky top-0 z-10 shadow-md py-4 w-full">
+    <PageLayout contentWidth="medium" mobilePadding="small" className="py-2 sm:py-4" safePaddingBottom={true}>
+      <div className="position-sticky top-0 z-10 shadow-md py-2 sm:py-4 w-full bg-background">
         <header className="grid grid-cols-[auto,1fr,auto] grid-flow-col items-center justify-between py-2 gap-2">
+          <div className="flex items-center">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => router.push("/")}
+              className="sm:mr-2"
+            >
+              <ChevronLeft className="h-5 w-5" />
+            </Button>
+            <ProgressBar
+              value={
+                !started
+                  ? 0
+                  : ((currentQuestion + 1) / questions.length) * 100
+              }
+              className="hidden sm:block w-32 sm:w-40"
+            />
+          </div>
+          <div className="sm:hidden w-full mx-2">
+            <ProgressBar
+              value={
+                !started
+                  ? 0
+                  : ((currentQuestion + 1) / questions.length) * 100
+              }
+            />
+          </div>
           <Button
+            variant="ghost"
             size="icon"
-            variant="outline"
+            onClick={() => router.push("/")}
           >
-            <ChevronLeft />
-          </Button>
-          <ProgressBar value={(currentQuestion / questions.length) * 100} />
-          <Button
-            size="icon"
-            variant="outline"
-          >
-            <X />
+            <X className="h-5 w-5" />
           </Button>
         </header>
       </div>
-      <main className="flex justify-center flex-1">
+      
+      <main className="flex-1 flex justify-center items-center py-4 sm:py-8">
         {!started ? (
-          <h1 className="text-3xl font-bold">Welcome to the aquizzi page👋</h1>
+          <div className="text-center">
+            <h1 className="text-2xl sm:text-3xl font-bold mb-6">Welcome to the Aquizi quiz</h1>
+            <p className="mb-4 text-muted-foreground">Test your knowledge with this quiz about React.</p>
+          </div>
         ) : (
-          <div>
-            <h2 className="text-3xl font-bold">
+          <div className="w-full max-w-3xl px-2 sm:px-4">
+            <h2 className="text-lg sm:text-xl font-semibold mb-4">
               {questions[currentQuestion].questionText}
             </h2>
-            <div className="grid grid-cols-1 gap-6 mt-6">
+            <div className="grid grid-cols-1 gap-3">
               {questions[currentQuestion].answers.map((answer) => {
                 const variant =
-                  selectedAnswer === answer.id
-                    ? answer.isCorrect
-                      ? "neoSuccess"
-                      : "neoDanger"
+                  selectedAnswer !== null
+                    ? selectedAnswer === answer.id
+                      ? isCorrect
+                        ? "neoSuccess"
+                        : "neoDanger"
+                      : "neoOutline"
                     : "neoOutline";
                 return (
                   <Button
@@ -139,6 +171,7 @@ export default function Home() {
                     variant={variant}
                     size="xl"
                     onClick={() => handleAnswer(answer)}
+                    className="text-left justify-start h-auto py-3 sm:py-4"
                   >
                     <p className="whitespace-normal">{answer.answerText}</p>
                   </Button>
@@ -148,19 +181,30 @@ export default function Home() {
           </div>
         )}
       </main>
-      <footer className="footer pb-9 px-6 relative mb-0">
-        <ResultCard
-          isCorrect={isCorrect}
-          correctAnswer={
-            questions[currentQuestion].answers.find(
-              (answer) => answer.isCorrect === true
-            )?.answerText || ""
-          }
-        />
+      
+      <footer className="footer pb-6 sm:pb-9 px-4 sm:px-6 mt-auto flex flex-col items-center">
+        {isCorrect !== null && (
+          <ResultCard
+            question={{
+              id: currentQuestion.toString(),
+              questionText: questions[currentQuestion].questionText,
+              answers: questions[currentQuestion].answers.map(answer => ({
+                id: answer.id.toString(),
+                questionId: currentQuestion.toString(),
+                answerText: answer.answerText,
+                isCorrect: answer.isCorrect
+              }))
+            }}
+            onNext={handleNext}
+            onAnswer={handleAnswer}
+            selectedAnswerId={selectedAnswer ? selectedAnswer.toString() : undefined}
+          />
+        )}
         <Button
           variant="neo"
           size="lg"
           onClick={handleNext}
+          className="w-full sm:w-auto mt-4"
         >
           {!started
             ? "Start"
@@ -169,6 +213,6 @@ export default function Home() {
             : "Next"}
         </Button>
       </footer>
-    </div>
+    </PageLayout>
   );
 }

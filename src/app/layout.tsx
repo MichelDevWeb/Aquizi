@@ -8,6 +8,8 @@ import Providers from "@/components/Providers";
 import NavBar from "@/components/NavBar";
 import { Toaster } from "@/components/ui/toaster";
 import Footer from "@/components/Footer";
+import ScrollToTopButton from "@/components/ScrollToTopButton";
+import MobileNav from "@/components/MobileNav";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -43,8 +45,10 @@ export const metadata: Metadata | any = {
 // Move themeColor to viewport
 export const viewport = {
   initialScale: 1,
+  maximumScale: 5,
   minimumScale: 1,
   width: "device-width",
+  userScalable: true,
   shrinkToFit: "no",
   viewportFit: "cover",
   themeColor: [{ media: "(prefers-color-scheme: dark)", color: "#fff" }],
@@ -110,14 +114,21 @@ export default function RootLayout({
           />
         ))}
       </head>
-      <body className={cn(inter.className, "antialiased min-h-screen pt-16")}>
+      <body className={cn(
+        inter.className, 
+        "antialiased min-h-screen pt-16 flex flex-col touch-manipulation overscroll-none"
+      )}>
         {/* <Header /> */}
         <Providers>
           <NavBar />
-          {children}
+          <div className="flex-grow flex flex-col z-[9]">
+            {children}
+          </div>
           <Footer />
           <Toaster />
           <LoadingSpinner />
+          <ScrollToTopButton />
+          <MobileNav />
         </Providers>
       </body>
     </html>

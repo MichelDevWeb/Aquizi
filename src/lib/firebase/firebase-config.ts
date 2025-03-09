@@ -1,7 +1,6 @@
 import { initializeApp, getApps, getApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
-import { ENV } from '../env-config';
 
 // Your web app's Firebase configuration
 const firebaseConfig = {

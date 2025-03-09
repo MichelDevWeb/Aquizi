@@ -1,56 +1,87 @@
+"use client";
+
 import React from "react";
-import { Github, Twitter, Facebook, Instagram } from "lucide-react";
+import { Github, Twitter } from "lucide-react";
 import Link from "next/link";
 
+// Social media link component
+const SocialLink = ({ 
+  href, 
+  icon: Icon, 
+  label 
+}: { 
+  href: string; 
+  icon: React.ElementType; 
+  label: string;
+}) => (
+  <a
+    href={href}
+    rel="noreferrer"
+    target="_blank"
+    className="transition text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+    aria-label={label}
+  >
+    <Icon className="h-4 w-4 sm:h-5 sm:w-5" />
+  </a>
+);
+
+// Legal link component
+const LegalLink = ({ 
+  href, 
+  children 
+}: { 
+  href: string; 
+  children: React.ReactNode;
+}) => (
+  <Link
+    href={href}
+    className="hover:text-gray-700 dark:hover:text-gray-300 transition"
+  >
+    {children}
+  </Link>
+);
+
+// Social links section
+const SocialLinks = () => (
+  <div className="flex justify-center gap-3 sm:gap-4">
+    <SocialLink 
+      href="https://github.com/micheldevweb/aquizi" 
+      icon={Github} 
+      label="GitHub" 
+    />
+    <SocialLink 
+      href="#" 
+      icon={Twitter} 
+      label="Twitter" 
+    />
+  </div>
+);
+
+// Legal links section
+const LegalLinks = () => (
+  <div className="flex items-center gap-2 sm:gap-4 text-xs sm:text-sm text-gray-500">
+    <LegalLink href="/privacy">Privacy Policy</LegalLink>
+    <span className="text-gray-400">•</span>
+    <LegalLink href="/terms">Terms of Service</LegalLink>
+  </div>
+);
+
+// Main Footer component
 const Footer = () => {
+  const currentYear = new Date().getFullYear();
+  
   return (
     <footer className="bg-white dark:bg-gray-950 mt-auto w-full pb-16 md:pb-4">
       <div className="mx-auto max-w-screen-xl px-3 sm:px-4 md:px-6 py-3 sm:py-4">
         <div className="border-t border-gray-100 dark:border-gray-800 pt-3 sm:pt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0">
           <p className="text-center text-xs sm:text-sm text-gray-500 sm:text-left">
-            Copyright &copy; {new Date().getFullYear()} Aquizi. All rights reserved.
+            Copyright &copy; {currentYear} Aquizi. All rights reserved.
           </p>
 
-          <ul className="flex justify-center gap-3 sm:gap-4 sm:justify-start">
-            <li>
-              <a
-                href="https://github.com/micheldevweb/aquizi"
-                rel="noreferrer"
-                target="_blank"
-                className="transition hover:text-blue-700/75 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
-                aria-label="GitHub"
-              >
-                <Github className="h-4 w-4 sm:h-5 sm:w-5" />
-              </a>
-            </li>
-            <li>
-              <a
-                href="#"
-                rel="noreferrer"
-                target="_blank"
-                className="transition hover:text-blue-700/75 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
-                aria-label="Twitter"
-              >
-                <Twitter className="h-4 w-4 sm:h-5 sm:w-5" />
-              </a>
-            </li>
-            <li>
-              <Link
-                href="/privacy"
-                className="text-xs sm:text-sm text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
-              >
-                Privacy
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/terms"
-                className="text-xs sm:text-sm text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
-              >
-                Terms
-              </Link>
-            </li>
-          </ul>
+          <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4">
+            <SocialLinks />
+            <LegalLinks />
+          </div>
         </div>
       </div>
     </footer>

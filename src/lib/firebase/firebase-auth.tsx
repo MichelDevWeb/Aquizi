@@ -36,6 +36,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   // Listen for auth state changes
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        // Create or update user document in Firestore when user signs in
+        await createUserDocument(user);
+      }
       setUser(user);
       setLoading(false);
     });
@@ -76,24 +80,37 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   // Sign in with Google
   const signInWithGoogle = async () => {
     try {
-      setError(null);
+      setLoading(true);
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(auth, provider);
+      
+      // Explicitly create user document after Google sign-in
       await createUserDocument(result.user);
+      
+      setError(null);
     } catch (error: any) {
-      setError(error.message);
       console.error('Error signing in with Google', error);
+      setError(error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
   // Sign in with email and password
   const signInWithEmail = async (email: string, password: string) => {
     try {
+      setLoading(true);
+      const result = await signInWithEmailAndPassword(auth, email, password);
+      
+      // Explicitly create user document after email sign-in
+      await createUserDocument(result.user);
+      
       setError(null);
-      await signInWithEmailAndPassword(auth, email, password);
     } catch (error: any) {
-      setError(error.message);
       console.error('Error signing in with email', error);
+      setError(error.message);
+    } finally {
+      setLoading(false);
     }
   };
 

@@ -13,12 +13,15 @@ import { where, query, increment } from "firebase/firestore";
 import { COLLECTIONS, FIELDS } from "@/lib/firestore/firestore-config";
 import { getAuth } from "firebase-admin/auth";
 import { initAdmin } from "@/lib/firebase/firebase-admin";
+import { getBaseUrl } from '@/lib/utils';
 
 // Initialize Firebase Admin if not already initialized
 initAdmin();
 
-// API URL from environment variables
-const API_URL = process.env.API_URL || 'http://localhost:3000';
+// Replace:
+// const API_URL = process.env.API_URL || 'http://localhost:3000';
+// With:
+const baseUrl = getBaseUrl();
 
 // Define types for Firestore documents
 interface TopicCount {
@@ -29,23 +32,47 @@ interface TopicCount {
 
 // Helper function to verify Firebase token
 async function verifyFirebaseToken(authHeader: string | null) {
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return { error: "Missing or invalid Authorization header", status: 401 };
+  if (!authHeader) {
+    console.error("Authorization header is missing");
+    return { error: "Missing Authorization header", status: 401 };
+  }
+  
+  if (!authHeader.startsWith("Bearer ")) {
+    console.error("Authorization header does not start with 'Bearer '");
+    return { error: "Invalid Authorization header format", status: 401 };
   }
   
   const token = authHeader.split("Bearer ")[1];
   
+  if (!token || token.trim() === '') {
+    console.error("Token is empty after splitting");
+    return { error: "Empty token provided", status: 401 };
+  }
+  
   try {
-    const decodedToken = await getAuth().verifyIdToken(token);
+    // Initialize Firebase Admin if not already initialized
+    initAdmin();
+    
+    // Get Firebase Auth instance
+    const auth = getAuth();
+    if (!auth) {
+      console.error("Firebase Auth instance is null");
+      return { error: "Firebase Auth not initialized", status: 500 };
+    }
+    
+    const decodedToken = await auth.verifyIdToken(token);
     return { userId: decodedToken.uid, token };
   } catch (error) {
     console.error("Error verifying Firebase token:", error);
-    return { error: "Unauthorized", status: 401 };
+    return { error: "Unauthorized: " + (error instanceof Error ? error.message : "Unknown error"), status: 401 };
   }
 }
 
 export async function POST(req: Request, res: Response) {
   try {
+    // Log request headers for debugging
+    console.log("Request headers:", Object.fromEntries(req.headers.entries()));
+    
     // Verify Firebase token
     const authResult = await verifyFirebaseToken(req.headers.get("Authorization"));
     
@@ -69,7 +96,7 @@ export async function POST(req: Request, res: Response) {
     let questionsData;
     try {
       const response = await axios.post(
-        `${API_URL}/api/questions`,
+        `${baseUrl}/api/questions`,
         {
           amount,
           topic,

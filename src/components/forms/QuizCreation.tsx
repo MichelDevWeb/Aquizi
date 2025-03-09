@@ -146,7 +146,18 @@ const QuizCreation = ({ topic: topicParam }: Props) => {
                         className="h-9 sm:h-10"
                         {...field}
                         onChange={(e) => {
-                          form.setValue("amount", parseInt(e.target.value));
+                          const value = e.target.value;
+                          // Handle empty value or non-numeric input
+                          if (value === '') {
+                            // Set to empty string which will be displayed as empty input
+                            // but convert to number type for the form value
+                            form.setValue("amount", 0);
+                          } else {
+                            const parsedValue = parseInt(value);
+                            if (!isNaN(parsedValue)) {
+                              form.setValue("amount", parsedValue);
+                            }
+                          }
                         }}
                         min={1}
                         max={10}

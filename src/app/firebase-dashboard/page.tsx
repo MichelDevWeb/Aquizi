@@ -1,87 +1,68 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { useAuth } from '@/lib/firebase/firebase-auth';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { getDocumentById } from '@/lib/firestore/firestore-utils';
-import Image from 'next/image';
-interface UserData {
-  displayName: string;
-  email: string;
-  photoURL: string;
-  createdAt: any;
-}
-
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/lib/firebase/firebase-auth";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import PageLayout from "@/components/PageLayout";
+import Image from "next/image";
 const FirebaseDashboardPage = () => {
   const { user, loading, logout } = useAuth();
   const router = useRouter();
-  const [userData, setUserData] = useState<UserData | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (!user && !loading) {
-      router.push('/firebase-auth');
+    if (!loading && !user) {
+      router.push("/firebase-auth");
     }
   }, [user, loading, router]);
-
-  useEffect(() => {
-    const fetchUserData = async () => {
-      if (user) {
-        try {
-          const data = await getDocumentById<UserData>('users', user.uid);
-          setUserData(data);
-        } catch (error) {
-          console.error('Error fetching user data:', error);
-        } finally {
-          setIsLoading(false);
-        }
-      }
-    };
-
-    if (user) {
-      fetchUserData();
-    }
-  }, [user]);
 
   const handleSignOut = async () => {
     try {
       await logout();
-      router.push('/');
+      router.push("/firebase-auth");
     } catch (error) {
-      console.error('Error signing out:', error);
+      console.error("Error signing out:", error);
     }
   };
 
-  if (loading || isLoading) {
+  if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
-        <p>Loading...</p>
-      </div>
+      <PageLayout>
+        <div className="flex justify-center items-center min-h-[60vh]">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+        </div>
+      </PageLayout>
     );
   }
 
   if (!user) {
-    return null;
+    return null; // Will redirect in useEffect
   }
 
   return (
-    <div className="flex flex-col flex-1 p-8">
-      <h1 className="text-3xl font-bold mb-6">Firebase Dashboard</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card>
+    <PageLayout>
+      <div className="container mx-auto py-8">
+        <h1 className="text-3xl font-bold mb-8">Firebase Dashboard</h1>
+        
+        <Card className="mb-8">
           <CardHeader>
             <CardTitle>User Profile</CardTitle>
-            <CardDescription>Your Firebase user information</CardDescription>
+            <CardDescription>Your Firebase Authentication details</CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col gap-4">
             {user.photoURL && (
-              <div className="flex justify-center">
+              <div className="flex justify-center mb-4">
                 <Image
-                  src={user.photoURL} 
-                  alt={user.displayName || 'User'} 
-                  className="w-24 h-24 rounded-full"
+                  src={user.photoURL}
+                  alt="Profile"
+                  className="rounded-full w-24 h-24"
                 />
               </div>
             )}
@@ -102,39 +83,8 @@ const FirebaseDashboardPage = () => {
             </Button>
           </CardContent>
         </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Firestore Data</CardTitle>
-            <CardDescription>Your data from Firestore</CardDescription>
-          </CardHeader>
-          <CardContent>
-            {userData ? (
-              <div className="flex flex-col gap-4">
-                <div>
-                  <p className="font-semibold">Display Name:</p>
-                  <p>{userData.displayName || 'N/A'}</p>
-                </div>
-                <div>
-                  <p className="font-semibold">Email:</p>
-                  <p>{userData.email || 'N/A'}</p>
-                </div>
-                <div>
-                  <p className="font-semibold">Created At:</p>
-                  <p>
-                    {userData.createdAt && userData.createdAt.toDate 
-                      ? userData.createdAt.toDate().toLocaleString() 
-                      : 'N/A'}
-                  </p>
-                </div>
-              </div>
-            ) : (
-              <p>No Firestore data available</p>
-            )}
-          </CardContent>
-        </Card>
       </div>
-    </div>
+    </PageLayout>
   );
 };
 

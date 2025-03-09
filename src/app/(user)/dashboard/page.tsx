@@ -16,7 +16,7 @@ import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/com
 import GitHubStyleHeatMap from "./GitHubStyleHeatMap";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import PageLayout from "@/components/PageLayout";
-
+import { getBaseUrl } from "@/lib/utils";
 const DashboardPage = () => {
   const { user, loading } = useAuth();
   const router = useRouter();
@@ -50,6 +50,7 @@ const DashboardPage = () => {
     if (user) {
       fetchData();
     }
+    console.log(getBaseUrl());
   }, [user]);
 
   if (loading || isLoading) {

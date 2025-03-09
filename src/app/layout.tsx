@@ -10,6 +10,13 @@ import { Toaster } from "@/components/ui/toaster";
 import Footer from "@/components/Footer";
 import ScrollToTopButton from "@/components/ScrollToTopButton";
 import MobileNav from "@/components/MobileNav";
+import dynamic from "next/dynamic";
+
+// Dynamically import UpdateNotification with no SSR to avoid hydration issues
+const UpdateNotification = dynamic(
+  () => import("@/components/UpdateNotification"),
+  { ssr: false }
+);
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -129,6 +136,7 @@ export default function RootLayout({
           <LoadingSpinner />
           <ScrollToTopButton />
           <MobileNav />
+          <UpdateNotification />
         </Providers>
       </body>
     </html>

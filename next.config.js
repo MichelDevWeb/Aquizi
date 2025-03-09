@@ -7,7 +7,7 @@ const withPWA = require("next-pwa")({
 
 // Next.js automatically loads the appropriate .env file based on NODE_ENV:
 // - In development: .env.local
-// - In production: .env.prod (if it exists)
+// - In production: .env.production (if it exists)
 // - In test: .env.test (if it exists)
 
 /** @type {import('next').NextConfig} */
@@ -36,10 +36,11 @@ const nextConfig = {
       },
     ],
   },
-  // Add environment variables to be available at build time
+  // Add environment variables to be available at build time if needed
   env: {
-    API_URL: process.env.API_URL,
-    // Add other environment variables as needed
+    // Environment variables are now loaded from .env files
+    // API_URL is determined dynamically at runtime based on the current URL
+    NEXT_PUBLIC_BUILD_TIME: Date.now().toString(), // Add build timestamp for version checking
   },
 };
 

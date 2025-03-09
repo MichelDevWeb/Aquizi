@@ -49,3 +49,21 @@ export function formatTimeDelta(seconds: number) {
   }
   return parts.join(" ");
 }
+
+/**
+ * Gets the base URL for API calls, using the current origin in the browser
+ * or a default URL based on the environment on the server
+ */
+export function getBaseUrl(): string {
+  // In the browser, use the current origin
+  if (typeof window !== 'undefined') {
+    return window.location.origin;
+  }
+  
+  // In server-side rendering, use a default URL based on the environment
+  // This is only used for server-side rendering and will be replaced with the actual URL in the browser
+  if (process.env.NODE_ENV === 'production') {
+    return 'https://mdw-aquizi.web.app'; // Production URL
+  }
+  return 'http://localhost:3000'; // Development URL
+}

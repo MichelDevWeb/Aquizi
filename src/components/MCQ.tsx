@@ -201,7 +201,7 @@ const MCQ = ({ game }: Props) => {
                 // Navigate to statistics page after a short delay to allow the user to see the toast
                 setTimeout(() => {
                   router.push(`/statistics/${game.id}`);
-                }, 1500);
+                }, 1000);
               }
             },
           });

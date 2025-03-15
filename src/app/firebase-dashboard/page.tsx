@@ -61,6 +61,8 @@ const FirebaseDashboardPage = () => {
               <div className="flex justify-center mb-4">
                 <Image
                   src={user.photoURL}
+                  width={100}
+                  height={100}
                   alt="Profile"
                   className="rounded-full w-24 h-24"
                 />

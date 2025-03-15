@@ -30,6 +30,7 @@ import {
 } from "@/components/ui/card";
 import LoadingQuestions from "@/components/LoadingQuestions";
 import apiClient from "@/lib/api-client";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 type Props = {
   topic: string;
@@ -42,6 +43,8 @@ const QuizCreation = ({ topic: topicParam }: Props) => {
   const [showLoader, setShowLoader] = React.useState(false);
   const [finishedLoading, setFinishedLoading] = React.useState(false);
   const { toast } = useToast();
+  const { t } = useLanguage();
+  
   const { mutate: getQuestions, isPending } = useMutation({
     mutationFn: async ({ amount, topic, type }: Input) => {
       const response = await apiClient.post("/api/game", { amount, topic, type });
@@ -66,14 +69,14 @@ const QuizCreation = ({ topic: topicParam }: Props) => {
         if (error instanceof AxiosError) {
           if (error.response?.status === 500) {
             toast({
-              title: "Error",
-              description: "Something went wrong. Please try again later.",
+              title: t('error'),
+              description: t('errorMessage'),
               variant: "destructive",
             });
           } else if (error.response?.status === 401) {
             toast({
-              title: "Authentication Error",
-              description: "You must be logged in to create a quiz.",
+              title: t('authError'),
+              description: t('authErrorMessage'),
               variant: "destructive",
             });
             // Redirect to login page
@@ -103,8 +106,8 @@ const QuizCreation = ({ topic: topicParam }: Props) => {
     <>
       <Card className="shadow-md">
         <CardHeader className="pb-4 sm:pb-6">
-          <CardTitle className="text-xl sm:text-2xl font-bold">Quiz Creation</CardTitle>
-          <CardDescription>Choose a topic</CardDescription>
+          <CardTitle className="text-xl sm:text-2xl font-bold">{t('quizCreation')}</CardTitle>
+          <CardDescription>{t('chooseATopic')}</CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
@@ -117,17 +120,16 @@ const QuizCreation = ({ topic: topicParam }: Props) => {
                 name="topic"
                 render={({ field }) => (
                   <FormItem className="space-y-2">
-                    <FormLabel className="text-sm sm:text-base">Topic</FormLabel>
+                    <FormLabel className="text-sm sm:text-base">{t('topic')}</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="Enter a topic"
+                        placeholder={t('enterATopic')}
                         className="h-9 sm:h-10"
                         {...field}
                       />
                     </FormControl>
                     <FormDescription className="text-xs sm:text-sm">
-                      Please provide any topic you would like to be quizzed on
-                      here.
+                      {t('topicDescription')}
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
@@ -138,10 +140,10 @@ const QuizCreation = ({ topic: topicParam }: Props) => {
                 name="amount"
                 render={({ field }) => (
                   <FormItem className="space-y-2">
-                    <FormLabel className="text-sm sm:text-base">Number of Questions</FormLabel>
+                    <FormLabel className="text-sm sm:text-base">{t('numberOfQuestions')}</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="How many questions?"
+                        placeholder={t('howManyQuestions')}
                         type="number"
                         className="h-9 sm:h-10"
                         {...field}
@@ -160,12 +162,11 @@ const QuizCreation = ({ topic: topicParam }: Props) => {
                           }
                         }}
                         min={1}
-                        max={10}
+                        max={50}
                       />
                     </FormControl>
                     <FormDescription className="text-xs sm:text-sm">
-                      You can choose how many questions you would like to be
-                      quizzed on here.
+                      {t('questionsDescription')}
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
@@ -183,7 +184,7 @@ const QuizCreation = ({ topic: topicParam }: Props) => {
                   }}
                   type="button"
                 >
-                  <CopyCheck className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" /> Multiple Choice
+                  <CopyCheck className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" /> {t('multipleChoice')}
                 </Button>
                 <Separator orientation="vertical" />
                 <Button
@@ -196,7 +197,7 @@ const QuizCreation = ({ topic: topicParam }: Props) => {
                   onClick={() => form.setValue("type", "open_ended")}
                   type="button"
                 >
-                  <BookOpen className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" /> Open Ended
+                  <BookOpen className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" /> {t('openEnded')}
                 </Button>
               </div>
               <Button
@@ -204,7 +205,7 @@ const QuizCreation = ({ topic: topicParam }: Props) => {
                 type="submit"
                 className="w-full sm:w-auto mt-4 h-9 sm:h-10"
               >
-                Submit
+                {t('submit')}
               </Button>
             </form>
           </Form>

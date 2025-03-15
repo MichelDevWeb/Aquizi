@@ -53,21 +53,21 @@ const getUserMetrics = async (userId?: string) => {
     const avgQuestionsPerQuiz = numQuizzes > 0 && totalQuestions > 0 ? 
       totalQuestions / Math.min(numQuizzes, submissionCount) : 0;
 
-    // Return only the most important metrics
+    // Return only the most important metrics with translation keys
     return [
-      { label: "Quizzes", value: numQuizzes },
-      { label: "Recent Submissions", value: submissionCount },
-      { label: "Average Score", value: Math.round(avgScore * 100) / 100 },
-      { label: "Avg Questions/Quiz", value: Math.round(avgQuestionsPerQuiz) }
+      { label: "quizzesLabel", value: numQuizzes },
+      { label: "recentSubmissionsLabel", value: submissionCount },
+      { label: "averageScoreLabel", value: Math.round(avgScore * 100) / 100 },
+      { label: "avgQuestionsPerQuizLabel", value: Math.round(avgQuestionsPerQuiz) }
     ];
   } catch (error) {
     console.error("Error fetching user metrics:", error);
-    // Return fallback data
+    // Return fallback data with translation keys
     return [
-      { label: "Quizzes", value: 0 },
-      { label: "Recent Submissions", value: 0 },
-      { label: "Average Score", value: 0 },
-      { label: "Avg Questions/Quiz", value: 0 }
+      { label: "quizzesLabel", value: 0 },
+      { label: "recentSubmissionsLabel", value: 0 },
+      { label: "averageScoreLabel", value: 0 },
+      { label: "avgQuestionsPerQuizLabel", value: 0 }
     ];
   }
 };

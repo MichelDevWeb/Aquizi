@@ -18,12 +18,12 @@ export function roundIfNumber(value: string | number | null) {
 
 export function convertDateToString(
   date: Date | string,
-  isDMY?: boolean
+  isDMY: boolean = true
 ): string {
   const timestampDate = new Date(date);
   const year = timestampDate.getFullYear();
-  const month = timestampDate.getMonth() + 1;
-  const day = timestampDate.getDate();
+  const month = String(timestampDate.getMonth() + 1).padStart(2, '0');
+  const day = String(timestampDate.getDate()).padStart(2, '0');
 
   const formattedDate = isDMY
     ? `${day}/${month}/${year}`

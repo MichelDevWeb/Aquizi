@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-
+import { useLanguage } from "@/contexts/LanguageContext";
 import {
   Table,
   TableBody,
@@ -33,6 +33,7 @@ type Props = {
 };
 
 const QuestionsList = ({ questions }: Props) => {
+  const { t } = useLanguage();
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
 
   const toggleItem = (id: string) => {
@@ -46,22 +47,22 @@ const QuestionsList = ({ questions }: Props) => {
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between pb-1 sm:pb-2 p-3 sm:p-4 md:p-6 space-y-0">
-        <CardTitle className="text-lg sm:text-xl md:text-2xl font-bold">Questions</CardTitle>
+        <CardTitle className="text-lg sm:text-xl md:text-2xl font-bold">{t('questions')}</CardTitle>
         <List className="h-4 w-4 sm:h-5 sm:w-5" />
       </CardHeader>
       <CardContent className="p-3 sm:p-4 md:p-6">
         {/* Desktop view - Table */}
         <div className="hidden md:block overflow-x-auto">
           <Table>
-            <TableCaption>End of list.</TableCaption>
+            <TableCaption>{t('endOfList')}</TableCaption>
             <TableHeader>
               <TableRow>
-                <TableHead className="w-[50px]">No.</TableHead>
-                <TableHead>Question & Correct Answer</TableHead>
-                <TableHead>Your Answer</TableHead>
+                <TableHead className="w-[50px]">{t('no')}</TableHead>
+                <TableHead>{t('questionAndCorrectAnswer')}</TableHead>
+                <TableHead>{t('yourAnswer')}</TableHead>
 
                 {questions[0].questionType === "open_ended" && (
-                  <TableHead className="w-[100px] text-right">Accuracy</TableHead>
+                  <TableHead className="w-[100px] text-right">{t('accuracy')}</TableHead>
                 )}
               </TableRow>
             </TableHeader>
@@ -76,11 +77,11 @@ const QuestionsList = ({ questions }: Props) => {
                       <TableCell className="font-medium">{index + 1}</TableCell>
                       <TableCell>
                         <div className="mb-2">{question}</div>
-                        <div className="font-semibold text-primary">Correct: {answer}</div>
+                        <div className="font-semibold text-primary">{t('correct')}: {answer}</div>
                       </TableCell>
                       {questions[0].questionType === "open_ended" ? (
                         <TableCell className="font-semibold">
-                          {userAnswer || "No answer provided"}
+                          {userAnswer || t('noAnswerProvided')}
                         </TableCell>
                       ) : (
                         <TableCell
@@ -88,7 +89,7 @@ const QuestionsList = ({ questions }: Props) => {
                             isCorrect ? "text-green-600" : "text-red-600"
                           } font-semibold`}
                         >
-                          {userAnswer || "No answer provided"}
+                          {userAnswer || t('noAnswerProvided')}
                         </TableCell>
                       )}
 
@@ -151,26 +152,26 @@ const QuestionsList = ({ questions }: Props) => {
                     <AccordionContent className="px-1 pb-2 sm:pb-3 pt-1">
                       <div className="space-y-1 sm:space-y-2 text-xs sm:text-sm">
                         <div>
-                          <span className="font-medium text-muted-foreground">Question:</span>
+                          <span className="font-medium text-muted-foreground">{t('question')}:</span>
                           <p className="mt-0.5 sm:mt-1">{question}</p>
                         </div>
                         <div>
-                          <span className="font-medium text-muted-foreground">Correct Answer:</span>
+                          <span className="font-medium text-muted-foreground">{t('correctAnswer')}:</span>
                           <p className="mt-0.5 sm:mt-1 font-semibold text-primary">{answer}</p>
                         </div>
                         <div>
-                          <span className="font-medium text-muted-foreground">Your Answer:</span>
+                          <span className="font-medium text-muted-foreground">{t('yourAnswer')}:</span>
                           <p className={`mt-0.5 sm:mt-1 font-semibold ${
                             questions[0].questionType === "mcq"
                               ? isCorrect ? "text-green-600" : "text-red-600"
                               : ""
                           }`}>
-                            {userAnswer || "No answer provided"}
+                            {userAnswer || t('noAnswerProvided')}
                           </p>
                         </div>
                         {questions[0].questionType === "open_ended" && percentageCorrect !== undefined && (
                           <div>
-                            <span className="font-medium text-muted-foreground">Accuracy:</span>
+                            <span className="font-medium text-muted-foreground">{t('accuracy')}:</span>
                             <p className="mt-0.5 sm:mt-1 font-semibold">{percentageCorrect}%</p>
                           </div>
                         )}

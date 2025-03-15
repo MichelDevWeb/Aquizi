@@ -3,6 +3,8 @@
 import React, { ReactNode } from 'react';
 import PageLayout from '@/components/PageLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { convertDateToString } from '@/lib/utils';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface LegalPageProps {
   title: string;
@@ -15,7 +17,8 @@ interface LegalPageProps {
  */
 export default function LegalPage({ title, children, lastUpdated }: LegalPageProps) {
   // Use provided date or current date
-  const formattedDate = lastUpdated || new Date().toLocaleDateString();
+  const formattedDate = lastUpdated || convertDateToString(new Date());
+  const { t } = useLanguage();
   
   return (
     <PageLayout>
@@ -23,7 +26,7 @@ export default function LegalPage({ title, children, lastUpdated }: LegalPagePro
         <Card className="mb-8">
           <CardHeader>
             <CardTitle className="text-3xl">{title}</CardTitle>
-            <CardDescription>Last updated: {formattedDate}</CardDescription>
+            <CardDescription>{t('lastUpdated')}: {formattedDate}</CardDescription>
           </CardHeader>
           <CardContent className="prose dark:prose-invert max-w-none">
             {children}

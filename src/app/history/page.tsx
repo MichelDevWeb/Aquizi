@@ -8,10 +8,12 @@ import { CopyCheck, Edit2, History } from "lucide-react";
 import { useAuth } from "@/lib/firebase/firebase-auth";
 import { Skeleton } from "@/components/ui/skeleton";
 import PageLayout from "@/components/PageLayout";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const HistoryPage = () => {
   const { user, loading } = useAuth();
   const router = useRouter();
+  const { t } = useLanguage();
 
   useEffect(() => {
     if (!loading && !user) {
@@ -42,9 +44,9 @@ const HistoryPage = () => {
   return (
     <PageLayout contentWidth="wide" mobilePadding="medium" mobileStack={true}>
       <div className="flex flex-col items-start gap-4 mb-6">
-        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Quiz History</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">{t('quizHistory')}</h1>
         <p className="text-muted-foreground">
-          View your past quiz attempts and performance.
+          {t('historyDesc')}
         </p>
       </div>
 
@@ -52,18 +54,18 @@ const HistoryPage = () => {
         <TabsList className="mb-6 w-full sm:w-auto overflow-x-auto flex-nowrap">
           <TabsTrigger value="all" className="flex items-center gap-2">
             <History className="h-4 w-4" />
-            <span className="hidden sm:inline">All Quizzes</span>
-            <span className="sm:hidden">All</span>
+            <span className="hidden sm:inline">{t('viewAll')}</span>
+            <span className="sm:hidden">{t('viewAll')}</span>
           </TabsTrigger>
           <TabsTrigger value="mcq" className="flex items-center gap-2">
             <CopyCheck className="h-4 w-4" />
-            <span className="hidden sm:inline">Multiple Choice</span>
+            <span className="hidden sm:inline">{t('multipleChoice')}</span>
             <span className="sm:hidden">MCQ</span>
           </TabsTrigger>
           <TabsTrigger value="open-ended" className="flex items-center gap-2">
             <Edit2 className="h-4 w-4" />
-            <span className="hidden sm:inline">Open-Ended</span>
-            <span className="sm:hidden">Open</span>
+            <span className="hidden sm:inline">{t('openEnded')}</span>
+            <span className="sm:hidden">{t('openEnded')}</span>
           </TabsTrigger>
         </TabsList>
 

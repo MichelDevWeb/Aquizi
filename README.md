@@ -14,6 +14,8 @@ Aquizi is an intelligent quiz platform that uses AI to generate personalized qui
 - **Retest Functionality**: Retry quizzes to improve your scores
 - **Mobile Responsive**: Optimized experience across all device sizes
 - **User Authentication**: Secure login with Google or email
+- **Multilingual Support**: Full internationalization with English and Vietnamese languages
+- **Accessibility**: ARIA-compliant components for better screen reader support
 
 ## Tech Stack
 
@@ -101,15 +103,21 @@ src/
 │   ├── dashboard/        # Dashboard-specific components
 │   ├── statistics/       # Statistics and visualization components
 │   └── ui/               # UI components (shadcn)
+├── contexts/             # React contexts (auth, language, etc.)
 ├── lib/                  # Utility functions and configurations
 │   ├── firebase/         # Firebase configuration
 │   ├── firestore/        # Firestore utilities
 │   └── utils.ts          # General utilities
+├── translations/         # Language files for internationalization
 └── schemas/              # Zod schemas for validation
 ```
 
 ## Recent Improvements
 
+- **Multilingual Support**: Added complete internationalization with English and Vietnamese languages
+- **Enhanced Mobile Navigation**: Improved mobile navigation with fixed-width icons and better touch targets
+- **Accessibility Enhancements**: Added ARIA labels and improved keyboard navigation
+- **Streamlined UI**: Cleaner interface with consistent spacing and typography
 - **Enhanced Dashboard**: Improved UI/UX with tabbed interface and better organization
 - **Mobile Responsiveness**: Optimized for all device sizes with responsive layouts
 - **Quiz Experience**: Added randomized answer options and improved question flow
@@ -132,6 +140,6 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## Contact
 
-Michel Nguyen - [LinkedIn](https://www.linkedin.com/in/michel-nguyen-407950144/)
+Michel Nguyen - [LinkedIn](https://www.linkedin.com/in/michel-nguyen-407950144/) | [Twitter](https://x.com/NguyenMich67756)
 
 Project Link: [https://github.com/MichelDevWeb/Aquizi](https://github.com/MichelDevWeb/Aquizi)

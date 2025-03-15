@@ -13,6 +13,7 @@ import { differenceInSeconds } from "date-fns";
 import { buttonVariants } from "./ui/button";
 import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 // Define Firestore types
 interface Game {
@@ -36,6 +37,7 @@ type Props = {
 const HistoryComponent = ({ limit, userId, gameType }: Props) => {
   const [games, setGames] = useState<Game[]>([]);
   const [loading, setLoading] = useState(true);
+  const { t } = useLanguage();
 
   useEffect(() => {
     const fetchGames = async () => {
@@ -71,16 +73,21 @@ const HistoryComponent = ({ limit, userId, gameType }: Props) => {
   if (loading) {
     return (
       <div className="space-y-3 sm:space-y-4">
-        {[1, 2, 3].map((i) => (
-          <div key={i} className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 sm:p-4 border rounded-lg">
-            <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-0">
-              <Skeleton className="h-8 w-8 sm:h-10 sm:w-10 rounded-full" />
-              <div className="space-y-1 sm:space-y-2">
-                <Skeleton className="h-3 sm:h-4 w-28 sm:w-40" />
-                <Skeleton className="h-2 sm:h-3 w-20 sm:w-24" />
+        {[...Array(limit)].map((_, i) => (
+          <div
+            key={i}
+            className="flex flex-col p-3 sm:p-4 border rounded-lg"
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2 sm:space-x-4">
+                <Skeleton className="h-10 w-10 rounded-full" />
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-[150px]" />
+                  <Skeleton className="h-4 w-[100px]" />
+                </div>
               </div>
+              <Skeleton className="h-8 w-24" />
             </div>
-            <Skeleton className="h-6 sm:h-8 w-20 sm:w-24" />
           </div>
         ))}
       </div>
@@ -89,16 +96,14 @@ const HistoryComponent = ({ limit, userId, gameType }: Props) => {
 
   if (games.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-6 sm:py-10 text-center">
-        <Trophy className="w-8 h-8 sm:w-12 sm:h-12 mb-3 sm:mb-4 text-yellow-500" />
-        <h3 className="text-base sm:text-xl font-semibold mb-1 sm:mb-2">No quizzes found</h3>
-        <p className="text-xs sm:text-sm text-muted-foreground mb-4 sm:mb-6 max-w-xs sm:max-w-sm mx-auto">
-          {gameType 
-            ? `You haven't taken any ${gameType === 'mcq' ? 'multiple choice' : 'open-ended'} quizzes yet.` 
-            : "You haven't taken any quizzes yet."}
-        </p>
+      <div className="flex flex-col items-center justify-center p-4 sm:p-6 border rounded-lg text-center">
+        <div className="mb-2 sm:mb-3 p-2 sm:p-3 bg-primary/10 rounded-full">
+          <BookOpen className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
+        </div>
+        <h3 className="text-base sm:text-lg font-semibold mb-1 sm:mb-2">{t('noQuizzesYet')}</h3>
+        <p className="text-sm text-muted-foreground mb-3 sm:mb-4">{t('noQuizzesDesc')}</p>
         <Link href="/quiz" className={buttonVariants({ size: "sm" })}>
-          Take a Quiz
+          {t('takeQuiz')}
         </Link>
       </div>
     );
@@ -148,13 +153,13 @@ const HistoryComponent = ({ limit, userId, gameType }: Props) => {
                       <Edit2 className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
                     )}
                     <span className="text-xs sm:text-sm font-medium">
-                      {game.gameType === 'mcq' ? 'Multiple Choice' : 'Open Ended'}
+                      {game.gameType === 'mcq' ? t('multipleChoice') : t('openEnded')}
                     </span>
                   </div>
                   <div className="flex items-center gap-1 sm:gap-2">
                     <Calendar className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
                     <span className="text-xs text-muted-foreground">
-                      {startDate?.toLocaleDateString()}
+                      {startDate ? convertDateToString(startDate) : 'N/A'}
                     </span>
                   </div>
                 </div>
@@ -174,7 +179,7 @@ const HistoryComponent = ({ limit, userId, gameType }: Props) => {
                           {formatTimeDelta(duration)}
                         </Badge>
                       </TooltipTrigger>
-                      <TooltipContent>Time taken</TooltipContent>
+                      <TooltipContent>{t('timeTaken')}</TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
                 )}

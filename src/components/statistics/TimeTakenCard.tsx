@@ -5,6 +5,7 @@ import { formatTimeDelta } from "@/lib/utils";
 import { differenceInSeconds } from "date-fns";
 import { Timestamp } from "firebase/firestore";
 import { Progress } from "@/components/ui/progress";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 type Props = {
   timeEnded: Timestamp | any;
@@ -23,6 +24,7 @@ const TimeTakenCard = ({
   lastRetestTime,
   retestCount = 0
 }: Props) => {
+  const { t } = useLanguage();
   // Calculate time difference in seconds
   let timeDifferenceInSeconds = 0;
   
@@ -53,7 +55,7 @@ const TimeTakenCard = ({
   return (
     <Card className="md:col-span-2">
       <CardHeader className="flex flex-row items-center justify-between pb-1 sm:pb-2 p-3 sm:p-4 md:p-6 space-y-0">
-        <CardTitle className="text-lg sm:text-xl md:text-2xl font-bold">Time Taken</CardTitle>
+        <CardTitle className="text-lg sm:text-xl md:text-2xl font-bold">{t('timeTaken')}</CardTitle>
         <Hourglass className="h-4 w-4 sm:h-5 sm:w-5" />
       </CardHeader>
       <CardContent className="p-3 sm:p-4 md:p-6 pt-0 sm:pt-0 md:pt-0">
@@ -68,7 +70,7 @@ const TimeTakenCard = ({
                 <div className="flex items-center justify-between text-xs sm:text-sm">
                   <div className="flex items-center">
                     <Award className="h-3 w-3 sm:h-4 sm:w-4 mr-1 text-yellow-500" />
-                    <span className="text-muted-foreground">Best Time:</span>
+                    <span className="text-muted-foreground">{t('bestTime')}:</span>
                   </div>
                   <span className="font-medium">{formatTimeDelta(bestTime)}</span>
                 </div>
@@ -76,7 +78,7 @@ const TimeTakenCard = ({
                   <div className="space-y-1">
                     <Progress value={improvementPercentage} className="h-1.5 sm:h-2" />
                     <p className="text-[10px] sm:text-xs text-muted-foreground text-right">
-                      {improvementPercentage}% improvement
+                      {improvementPercentage}% {t('improvement')}
                     </p>
                   </div>
                 )}
@@ -87,7 +89,7 @@ const TimeTakenCard = ({
               <div className="flex items-center justify-between text-xs sm:text-sm">
                 <div className="flex items-center">
                   <BarChart className="h-3 w-3 sm:h-4 sm:w-4 mr-1 text-blue-500" />
-                  <span className="text-muted-foreground">Average Time:</span>
+                  <span className="text-muted-foreground">{t('averageTime')}:</span>
                 </div>
                 <span className="font-medium">{formatTimeDelta(Math.round(averageTime))}</span>
               </div>
@@ -97,7 +99,7 @@ const TimeTakenCard = ({
               <div className="flex items-center justify-between text-xs sm:text-sm">
                 <div className="flex items-center">
                   <Clock className="h-3 w-3 sm:h-4 sm:w-4 mr-1 text-green-500" />
-                  <span className="text-muted-foreground">Last Retest:</span>
+                  <span className="text-muted-foreground">{t('lastRetest')}:</span>
                 </div>
                 <span className="font-medium">{formatTimeDelta(lastRetestTime)}</span>
               </div>

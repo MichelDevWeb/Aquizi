@@ -8,6 +8,7 @@ import { format, subMonths, getYear, isSameMonth, isSameYear, differenceInDays }
 import { Calendar, TrendingUp, ChevronLeft, ChevronRight, BarChart, Calendar as CalendarIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 type Props = {
   data: {
@@ -26,6 +27,7 @@ const panelColors = {
 };
 
 const GitHubStyleHeatMap = (props: Props) => {
+  const { t } = useLanguage();
   const [isMobile, setIsMobile] = useState(false);
   const [viewMode, setViewMode] = useState<'year' | 'quarter' | 'month'>('quarter');
   const [currentPeriodStart, setCurrentPeriodStart] = useState<Date>(new Date());
@@ -234,11 +236,11 @@ const GitHubStyleHeatMap = (props: Props) => {
     if (viewMode === 'year') {
       return getYear(dates.startDate);
     } else if (viewMode === 'quarter') {
-      const startMonth = format(dates.startDate, 'MMM');
-      const endMonth = format(new Date(dates.startDate.getFullYear(), dates.startDate.getMonth() + 2, 1), 'MMM');
-      return `${startMonth} - ${endMonth} ${getYear(dates.startDate)}`;
+      const startMonth = format(dates.startDate, 'MM');
+      const endMonth = format(new Date(dates.startDate.getFullYear(), dates.startDate.getMonth() + 2, 1), 'MM');
+      return `${startMonth}/${getYear(dates.startDate)} - ${endMonth}/${getYear(dates.startDate)}`;
     } else {
-      return format(dates.startDate, 'MMMM yyyy');
+      return format(dates.startDate, 'MM/yyyy');
     }
   };
 
@@ -249,19 +251,19 @@ const GitHubStyleHeatMap = (props: Props) => {
           <div>
             <CardTitle className="text-sm sm:text-base md:text-lg font-medium flex items-center gap-1 sm:gap-2">
               <Calendar className="h-3 w-3 sm:h-4 sm:w-4 md:h-5 md:w-5" />
-              Contribution Activity
+              {t('contributionActivityTitle')}
             </CardTitle>
             <CardDescription className="text-xs sm:text-sm flex items-center justify-between sm:justify-start">
               <span>{getPeriodTitle()}</span>
               <span className="text-xs text-muted-foreground ml-1 sm:ml-2">
-                {periodContributions} {viewMode !== 'year' ? `of ${totalContributions}` : ''} contributions
+                {periodContributions} {viewMode !== 'year' ? `${t('ofTotal')} ${totalContributions}` : ''} {t('contributionCount')}
               </span>
             </CardDescription>
           </div>
           {currentStreak > 0 && (
             <div className="mt-1 sm:mt-0 flex items-center text-xs sm:text-sm">
               <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4 mr-1 text-green-500" />
-              <span className="font-medium">{currentStreak} day{currentStreak !== 1 ? 's' : ''} streak</span>
+              <span className="font-medium">{currentStreak} {currentStreak !== 1 ? t('streaks') : t('streak')}</span>
             </div>
           )}
         </div>
@@ -279,19 +281,19 @@ const GitHubStyleHeatMap = (props: Props) => {
                 value="month" 
                 className={`h-6 px-1.5 sm:px-2 text-[10px] sm:text-xs ${isMobile ? '' : 'hidden'}`}
               >
-                Month
+                {t('month')}
               </TabsTrigger>
               <TabsTrigger 
                 value="quarter" 
                 className="h-6 px-1.5 sm:px-2 text-[10px] sm:text-xs"
               >
-                Quarter
+                {t('quarter')}
               </TabsTrigger>
               <TabsTrigger 
                 value="year" 
                 className="h-6 px-1.5 sm:px-2 text-[10px] sm:text-xs"
               >
-                Year
+                {t('year')}
               </TabsTrigger>
             </TabsList>
           </Tabs>
@@ -304,7 +306,7 @@ const GitHubStyleHeatMap = (props: Props) => {
               onClick={goToPreviousPeriod}
             >
               <ChevronLeft className="h-4 w-4" />
-              <span className="sr-only">Previous</span>
+              <span className="sr-only">{t('previous')}</span>
             </Button>
             <Button 
               variant="ghost" 
@@ -314,7 +316,7 @@ const GitHubStyleHeatMap = (props: Props) => {
               disabled={isCurrentPeriod}
             >
               <ChevronRight className="h-4 w-4" />
-              <span className="sr-only">Next</span>
+              <span className="sr-only">{t('nextPeriod')}</span>
             </Button>
           </div>
         </div>
@@ -347,12 +349,12 @@ const GitHubStyleHeatMap = (props: Props) => {
                       fontSize: '12px'
                     }}>
                       <div style={{ fontWeight: 'bold', marginBottom: '2px' }}>
-                        {format(new Date(data.date), 'EEEE, MMMM d, yyyy')}
+                        {format(new Date(data.date), 'EEEE, dd/MM/yyyy')}
                       </div>
                       <div>
                         {data.count 
-                          ? `${data.count} ${data.count === 1 ? 'quiz' : 'quizzes'}`
-                          : 'No quizzes'
+                          ? `${data.count} ${t('quizCount')}`
+                          : t('noQuizzesYet')
                         }
                       </div>
                     </div>
@@ -369,18 +371,18 @@ const GitHubStyleHeatMap = (props: Props) => {
           <div className="flex items-center gap-1 sm:gap-2">
             <div className="flex items-center">
               <CalendarIcon className="h-3 w-3 mr-1" />
-              <span>{activityStats.activeDays} active days</span>
+              <span>{activityStats.activeDays} {t('activeDays')}</span>
             </div>
             {!isMobile && (
               <div className="flex items-center">
                 <BarChart className="h-3 w-3 mr-1" />
-                <span>Avg: {activityStats.averagePerDay}/day</span>
+                <span>{t('avgPerDay', { avg: activityStats.averagePerDay })}</span>
               </div>
             )}
           </div>
           
           <div className="flex items-center">
-            <span className="mr-1">Less</span>
+            <span className="mr-1">{t('less')}</span>
             {Object.values(panelColors).map((color, i) => (
               <div 
                 key={i} 
@@ -388,7 +390,7 @@ const GitHubStyleHeatMap = (props: Props) => {
                 style={{ backgroundColor: color, borderRadius: '2px' }}
               />
             ))}
-            <span className="ml-1">More</span>
+            <span className="ml-1">{t('more')}</span>
           </div>
         </div>
       </CardContent>

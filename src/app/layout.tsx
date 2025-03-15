@@ -49,15 +49,13 @@ export const metadata: Metadata | any = {
   ],
 };
 
-// Move themeColor to viewport
+// Update viewport configuration
 export const viewport = {
+  width: 'device-width',
   initialScale: 1,
   maximumScale: 5,
   minimumScale: 1,
-  width: "device-width",
   userScalable: true,
-  shrinkToFit: "no",
-  viewportFit: "cover",
   themeColor: [{ media: "(prefers-color-scheme: dark)", color: "#fff" }],
 };
 
@@ -89,6 +87,12 @@ export default function RootLayout({
           name="keywords"
           content={metadata.keywords as string}
         />
+        {/* Explicit viewport meta tag for better mobile compatibility */}
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1.0, maximum-scale=5.0, minimum-scale=1.0, viewport-fit=cover"
+        />
+        {/* Theme color meta tags */}
         {(viewport.themeColor as Array<{ media: string; color: string }>).map(
           ({ media, color }, index) => (
             <meta
@@ -99,6 +103,7 @@ export default function RootLayout({
             />
           )
         )}
+        {/* Author meta tags */}
         {(metadata.authors as Array<{ name: string; url?: string }>).map(
           ({ name, url }, index) => (
             <meta
@@ -109,10 +114,7 @@ export default function RootLayout({
             />
           )
         )}
-        <meta
-          name="viewport"
-          content={viewport as any}
-        />
+        {/* Icon links */}
         {(metadata.icons as []).map(({ rel, url }, index) => (
           <link
             key={index}

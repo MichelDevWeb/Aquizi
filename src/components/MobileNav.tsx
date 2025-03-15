@@ -5,11 +5,13 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/lib/firebase/firebase-auth";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { useState, useEffect, useCallback } from "react";
 
 const MobileNav = () => {
   const pathname = usePathname();
   const { user } = useAuth();
+  const { t } = useLanguage();
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
 
@@ -45,48 +47,53 @@ const MobileNav = () => {
   return (
     <div
       className={cn(
-        "md:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-950 border-t border-gray-200 dark:border-gray-800 z-50 transition-transform duration-300 px-2 py-1 shadow-lg",
+        "md:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-950 border-t border-gray-200 dark:border-gray-800 z-50 transition-transform duration-300 px-2 py-2 shadow-lg",
         isVisible ? "translate-y-0" : "translate-y-full"
       )}
     >
-      <div className="flex justify-around items-center">
+      <div className="grid grid-cols-5 w-full">
         <NavItem
           href="/dashboard"
-          icon={<Home className="w-4 h-4 sm:w-5 sm:h-5" />}
-          label="Home"
+          icon={<Home className="w-5 h-5 sm:w-6 sm:h-6" />}
+          label={t('dashboard')}
           isActive={pathname === "/dashboard"}
+          showLabel={false}
         />
         <NavItem
           href="/quiz"
-          icon={<BookOpen className="w-4 h-4 sm:w-5 sm:h-5" />}
-          label="Quiz"
+          icon={<BookOpen className="w-5 h-5 sm:w-6 sm:h-6" />}
+          label={t('quiz')}
           isActive={pathname === "/quiz"}
+          showLabel={false}
         />
         
         {/* Create Quiz Button (Center) */}
         <NavItem
           href="/quiz"
           icon={
-            <div className="bg-primary text-primary-foreground rounded-full p-2 -mt-6 shadow-md border-4 border-white dark:border-gray-950">
-              <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
+            <div className="bg-primary text-primary-foreground rounded-full p-3 -mt-6 shadow-md border-4 border-white dark:border-gray-950">
+              <Plus className="w-5 h-5 sm:w-6 sm:h-6" />
             </div>
           }
-          label="Create"
+          label={t('create')}
           isActive={false}
           className="relative -mt-2"
+          showLabel={false}
         />
         
         <NavItem
           href="/history"
-          icon={<History className="w-4 h-4 sm:w-5 sm:h-5" />}
-          label="History"
+          icon={<History className="w-5 h-5 sm:w-6 sm:h-6" />}
+          label={t('history')}
           isActive={pathname === "/history"}
+          showLabel={false}
         />
         <NavItem
           href="/firebase-dashboard"
-          icon={<User className="w-4 h-4 sm:w-5 sm:h-5" />}
-          label="Profile"
+          icon={<User className="w-5 h-5 sm:w-6 sm:h-6" />}
+          label={t('profile')}
           isActive={pathname === "/firebase-dashboard"}
+          showLabel={false}
         />
       </div>
     </div>
@@ -99,22 +106,24 @@ interface NavItemProps {
   label: string;
   isActive: boolean;
   className?: string;
+  showLabel?: boolean;
 }
 
-const NavItem = ({ href, icon, label, isActive, className }: NavItemProps) => {
+const NavItem = ({ href, icon, label, isActive, className, showLabel = true }: NavItemProps) => {
   return (
     <Link
       href={href}
       className={cn(
-        "flex flex-col items-center justify-center py-1 px-2 sm:py-2 sm:px-3 rounded-lg transition-colors",
+        "flex flex-col items-center justify-center py-2 w-full transition-colors",
         isActive
           ? "text-primary"
           : "text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50",
         className
       )}
+      aria-label={label}
     >
       {icon}
-      <span className="text-[10px] sm:text-xs mt-1">{label}</span>
+      {showLabel && <span className="text-[10px] sm:text-xs mt-1">{label}</span>}
     </Link>
   );
 };

@@ -14,10 +14,12 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/firebase/firebase-auth";
 import { useEffect, useState } from "react";
 import PageLayout from "@/components/PageLayout";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function Home() {
   const { user, loading } = useAuth();
   const [isClient, setIsClient] = useState(false);
+  const { t } = useLanguage();
 
   useEffect(() => {
     setIsClient(true);
@@ -51,10 +53,10 @@ export default function Home() {
           </div>
           <div className="order-1 sm:order-2 text-center sm:text-left flex gap-3 sm:gap-4 md:gap-6 flex-col max-w-md w-full">
             <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold">
-              Welcome to the Aquizi page👋
+              {t('welcomeToAquizi')}
             </h1>
             <h3 className="text-sm sm:text-base">
-              Create and generate quizzes with AI to enhance your learning experience.
+              {t('createAndGenerateQuizzes')}
             </h3>
             <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 md:gap-4 w-full">
               <Button
@@ -62,14 +64,14 @@ export default function Home() {
                 className="flex-1 h-10 sm:h-12 md:h-14"
                 asChild
               >
-                <Link href="quiz">Create Quiz</Link>
+                <Link href="quiz">{t('createQuiz')}</Link>
               </Button>
               <Button
                 variant="neo"
                 className="flex-1 h-10 sm:h-12 md:h-14"
                 asChild
               >
-                <Link href="dashboard">Dashboard</Link>
+                <Link href="dashboard">{t('dashboard')}</Link>
               </Button>
             </div>
           </div>
@@ -82,14 +84,13 @@ export default function Home() {
     <PageLayout contentWidth="narrow" mobilePadding="small" className="flex justify-center items-center py-3 sm:py-4 md:py-6">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle>Welcome to Aquizi 🔥!</CardTitle>
+          <CardTitle>{t('welcomeCardTitle')}</CardTitle>
           <CardDescription>
-            Aquizi is a platform for creating quizzes using AI!. Get started
-            by logging in below!
+            {t('welcomeCardDescription')}
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <FirebaseSignInButton text="Sign In with Google" />
+          <FirebaseSignInButton text={t('signInWithGoogle')} />
         </CardContent>
       </Card>
     </PageLayout>

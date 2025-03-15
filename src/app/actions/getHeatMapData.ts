@@ -1,5 +1,6 @@
 import { collection, query, where, getDocs, Timestamp } from 'firebase/firestore';
 import { db, COLLECTIONS } from '@/lib/firestore/firestore-config';
+import { convertDateToString } from '@/lib/utils';
 
 const getHeatMapData = async (userId?: string) => {
   if (!userId) {
@@ -28,8 +29,8 @@ const getHeatMapData = async (userId?: string) => {
           ? data.timeStarted.toDate() 
           : new Date(data.timeStarted);
         
-        // Format date as YYYY-MM-DD
-        const dateKey = date.toISOString().split('T')[0];
+        // Format date using our standardized format
+        const dateKey = convertDateToString(date, false); // Use YYYY/MM/DD format for sorting
         
         // Increment count for this day
         const currentCount = gamesByDay.get(dateKey) || 0;

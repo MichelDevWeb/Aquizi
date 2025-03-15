@@ -11,15 +11,18 @@ import {
 import { Github, HelpCircle, Linkedin, BookOpen, Brain, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 type Props = {};
 
 const DetailsDialog = (props: Props) => {
+  const { t } = useLanguage();
+  
   return (
     <Dialog>
       <DialogTrigger asChild>
         <Button variant="outline" size="sm" className="flex items-center gap-1 h-8 sm:h-9 px-2 sm:px-3 text-xs sm:text-sm">
-          <span className="hidden sm:inline">What is this</span>
+          <span className="hidden sm:inline">{t('whatIsThis')}</span>
           <HelpCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
         </Button>
       </DialogTrigger>

@@ -12,6 +12,7 @@ import UserAvatar from "./UserAvatar";
 import Link from "next/link";
 import { LogOut, User as UserIcon, ListTodo, Settings, BookOpen, History, CreditCard, HelpCircle, Upload } from "lucide-react";
 import { useAuth } from "@/lib/firebase/firebase-auth";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { useRouter } from "next/navigation";
 
 type Props = {
@@ -24,6 +25,7 @@ type Props = {
 
 const UserAccountNav = ({ user }: Props) => {
   const { logout } = useAuth();
+  const { t } = useLanguage();
   const router = useRouter();
 
   const handleSignOut = async () => {
@@ -73,14 +75,14 @@ const UserAccountNav = ({ user }: Props) => {
           <DropdownMenuItem asChild className="text-xs sm:text-sm py-2 sm:py-2.5 px-2 sm:px-3 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer">
             <Link href="/dashboard" className="flex items-center w-full">
               <Settings className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 sm:mr-2" />
-              Dashboard
+              {t('dashboard')}
             </Link>
           </DropdownMenuItem>
 
           <DropdownMenuItem asChild className="text-xs sm:text-sm py-2 sm:py-2.5 px-2 sm:px-3 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer">
             <Link href="/firebase-dashboard" className="flex items-center w-full">
               <UserIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 sm:mr-2" />
-              Profile
+              {t('profile')}
             </Link>
           </DropdownMenuItem>
           
@@ -90,21 +92,21 @@ const UserAccountNav = ({ user }: Props) => {
           <DropdownMenuItem asChild className="text-xs sm:text-sm py-2 sm:py-2.5 px-2 sm:px-3 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer">
             <Link href="/quiz" className="flex items-center w-full">
               <BookOpen className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 sm:mr-2" />
-              Create Quiz
+              {t('createQuiz')}
             </Link>
           </DropdownMenuItem>
 
           <DropdownMenuItem asChild className="text-xs sm:text-sm py-2 sm:py-2.5 px-2 sm:px-3 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer">
             <Link href="/upload-quizz/new" className="flex items-center w-full">
               <Upload className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 sm:mr-2" />
-              Upload Quiz
+              {t('uploadQuiz')}
             </Link>
           </DropdownMenuItem>
 
           <DropdownMenuItem asChild className="text-xs sm:text-sm py-2 sm:py-2.5 px-2 sm:px-3 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer">
             <Link href="/history" className="flex items-center w-full">
               <History className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 sm:mr-2" />
-              History
+              {t('history')}
             </Link>
           </DropdownMenuItem>
           
@@ -114,21 +116,21 @@ const UserAccountNav = ({ user }: Props) => {
           <DropdownMenuItem asChild className="text-xs sm:text-sm py-2 sm:py-2.5 px-2 sm:px-3 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer">
             <Link href="/firebase-todos" className="flex items-center w-full">
               <ListTodo className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 sm:mr-2" />
-              Todos
+              {t('todos')}
             </Link>
           </DropdownMenuItem>
 
           <DropdownMenuItem asChild className="text-xs sm:text-sm py-2 sm:py-2.5 px-2 sm:px-3 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer">
             <Link href="/billing" className="flex items-center w-full">
               <CreditCard className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 sm:mr-2" />
-              Billing
+              {t('billing')}
             </Link>
           </DropdownMenuItem>
 
           <DropdownMenuItem asChild className="text-xs sm:text-sm py-2 sm:py-2.5 px-2 sm:px-3 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer">
             <a href="https://github.com/micheldevweb/aquizi" target="_blank" rel="noopener noreferrer" className="flex items-center w-full">
               <HelpCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 sm:mr-2" />
-              Help & Support
+              {t('helpAndSupport')}
             </a>
           </DropdownMenuItem>
 
@@ -140,7 +142,7 @@ const UserAccountNav = ({ user }: Props) => {
             className="text-red-600 cursor-pointer text-xs sm:text-sm py-2 sm:py-2.5 px-2 sm:px-3 rounded-md hover:bg-red-50 dark:hover:bg-red-900/20"
           >
             <LogOut className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 sm:mr-2" />
-            Sign out
+            {t('signOut')}
           </DropdownMenuItem>
         </div>
       </DropdownMenuContent>

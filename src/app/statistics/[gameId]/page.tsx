@@ -19,9 +19,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { formatTimeDelta } from "@/lib/utils";
+import { formatTimeDelta, convertDateToString } from "@/lib/utils";
 import { differenceInSeconds } from "date-fns";
 import { toast } from "@/components/ui/use-toast";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 // Define Firestore types
 interface Game {
@@ -79,6 +80,7 @@ const Statistics = ({ params: { gameId } }: Props) => {
   const [isLoading, setIsLoading] = useState(true);
   const [accuracy, setAccuracy] = useState(0);
   const [activeTab, setActiveTab] = useState("overview");
+  const { t } = useLanguage();
 
   useEffect(() => {
     if (!loading && !user) {
@@ -198,7 +200,7 @@ const Statistics = ({ params: { gameId } }: Props) => {
 
   if (loading || isLoading) {
     return (
-      <div className="p-2 sm:p-4 md:p-6 mx-auto max-w-7xl">
+      <div className="p-2 sm:p-4 md:p-6 max-w-7xl">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-4">
           <Skeleton className="h-8 sm:h-10 w-48 sm:w-64" />
           <div className="flex flex-wrap gap-2 mt-2 sm:mt-0">
@@ -220,20 +222,20 @@ const Statistics = ({ params: { gameId } }: Props) => {
     return null; // Will redirect in useEffect
   }
 
-  const formattedDate = game.timeEnded ? new Date(game.timeEnded.toDate()).toLocaleDateString() : 'N/A';
+  const formattedDate = game.timeEnded ? convertDateToString(game.timeEnded.toDate()) : 'N/A';
   const formattedTime = game.timeEnded ? new Date(game.timeEnded.toDate()).toLocaleTimeString() : 'N/A';
   const timeTaken = game.timeStarted && game.timeEnded 
     ? formatTimeDelta(differenceInSeconds(game.timeEnded.toDate(), game.timeStarted.toDate()))
     : 'N/A';
 
   return (
-    <div className="p-3 sm:p-6 md:p-8 mx-auto max-w-7xl">
+    <div className="p-3 sm:p-6 md:p-8 max-w-7xl">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 mb-4 sm:mb-6">
         <div>
           <h1 className="text-xl sm:text-2xl md:text-3xl font-bold">{game.topic}</h1>
           <div className="flex flex-wrap items-center gap-2 mt-1 sm:mt-2">
             <Badge variant={game.gameType === "mcq" ? "default" : "secondary"} className="text-xs sm:text-sm">
-              {game.gameType === "mcq" ? "Multiple Choice" : "Open Ended"}
+              {game.gameType === "mcq" ? t('multipleChoice') : t('openEnded')}
             </Badge>
             <div className="flex items-center text-xs text-muted-foreground">
               <Calendar className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
@@ -248,24 +250,23 @@ const Statistics = ({ params: { gameId } }: Props) => {
         <div className="flex flex-wrap gap-2 mt-2 sm:mt-0">
           <Button variant="outline" size="sm" className="h-8 sm:h-10 px-2 sm:px-3" onClick={() => router.push("/dashboard")}>
             <ChevronLeft className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-            <span className="hidden sm:inline">Dashboard</span>
-            <span className="sm:hidden">Back</span>
+            <span>{t('dashboard')}</span>
           </Button>
           <Button variant="outline" size="sm" className="h-8 sm:h-10 px-2 sm:px-3" onClick={handleShare}>
             <Share2 className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-            <span className="hidden sm:inline">Share</span>
+            <span>{t('share')}</span>
           </Button>
           <Button size="sm" className="h-8 sm:h-10 px-2 sm:px-3" onClick={handleRetest}>
             <RefreshCw className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-            <span className="hidden sm:inline">Retest</span>
+            <span>{t('retryQuizzes')}</span>
           </Button>
         </div>
       </div>
 
       <Tabs defaultValue="overview" className="mb-4 sm:mb-6" onValueChange={setActiveTab}>
         <TabsList className="mb-3 sm:mb-4 w-full justify-start overflow-x-auto">
-          <TabsTrigger value="overview" className="text-xs sm:text-sm">Overview</TabsTrigger>
-          <TabsTrigger value="questions" className="text-xs sm:text-sm">Questions</TabsTrigger>
+          <TabsTrigger value="overview" className="text-xs sm:text-sm">{t('overview')}</TabsTrigger>
+          <TabsTrigger value="questions" className="text-xs sm:text-sm">{t('questions')}</TabsTrigger>
         </TabsList>
         
         <TabsContent value="overview">
@@ -285,28 +286,28 @@ const Statistics = ({ params: { gameId } }: Props) => {
           <div className="grid gap-3 sm:gap-4 mt-4 sm:mt-6 md:grid-cols-2">
             <Card>
               <CardHeader className="pb-1 sm:pb-2 p-3 sm:p-4 md:p-6">
-                <CardTitle className="text-base sm:text-lg md:text-xl">Quiz Details</CardTitle>
+                <CardTitle className="text-base sm:text-lg md:text-xl">{t('quizDetails')}</CardTitle>
               </CardHeader>
               <CardContent className="p-3 sm:p-4 md:p-6 pt-0 sm:pt-0 md:pt-0">
                 <dl className="space-y-1 sm:space-y-2 md:space-y-4 text-xs sm:text-sm md:text-base">
                   <div className="flex justify-between">
-                    <dt className="font-medium text-muted-foreground">Topic</dt>
+                    <dt className="font-medium text-muted-foreground">{t('topic')}</dt>
                     <dd className="text-right">{game.topic}</dd>
                   </div>
                   <div className="flex justify-between">
-                    <dt className="font-medium text-muted-foreground">Type</dt>
-                    <dd className="text-right">{game.gameType === "mcq" ? "Multiple Choice" : "Open Ended"}</dd>
+                    <dt className="font-medium text-muted-foreground">{t('quizType')}</dt>
+                    <dd className="text-right">{game.gameType === "mcq" ? t('multipleChoice') : t('openEnded')}</dd>
                   </div>
                   <div className="flex justify-between">
-                    <dt className="font-medium text-muted-foreground">Questions</dt>
+                    <dt className="font-medium text-muted-foreground">{t('questions')}</dt>
                     <dd className="text-right">{questions.length}</dd>
                   </div>
                   <div className="flex justify-between">
-                    <dt className="font-medium text-muted-foreground">Date Completed</dt>
+                    <dt className="font-medium text-muted-foreground">{t('dateCompleted')}</dt>
                     <dd className="text-right">{formattedDate}</dd>
                   </div>
                   <div className="flex justify-between">
-                    <dt className="font-medium text-muted-foreground">Time Completed</dt>
+                    <dt className="font-medium text-muted-foreground">{t('timeCompleted')}</dt>
                     <dd className="text-right">{formattedTime}</dd>
                   </div>
                 </dl>
@@ -315,20 +316,20 @@ const Statistics = ({ params: { gameId } }: Props) => {
             
             <Card>
               <CardHeader className="pb-1 sm:pb-2 p-3 sm:p-4 md:p-6">
-                <CardTitle className="text-base sm:text-lg md:text-xl">Performance Summary</CardTitle>
+                <CardTitle className="text-base sm:text-lg md:text-xl">{t('performanceSummary')}</CardTitle>
               </CardHeader>
               <CardContent className="p-3 sm:p-4 md:p-6 pt-0 sm:pt-0 md:pt-0">
                 <dl className="space-y-1 sm:space-y-2 md:space-y-4 text-xs sm:text-sm md:text-base">
                   <div className="flex justify-between">
-                    <dt className="font-medium text-muted-foreground">Score</dt>
+                    <dt className="font-medium text-muted-foreground">{t('score')}</dt>
                     <dd className="text-right">{game.score || 0} / {game.totalQuestions || questions.length}</dd>
                   </div>
                   <div className="flex justify-between">
-                    <dt className="font-medium text-muted-foreground">Accuracy</dt>
+                    <dt className="font-medium text-muted-foreground">{t('accuracy')}</dt>
                     <dd className="text-right">{accuracy}%</dd>
                   </div>
                   <div className="flex justify-between">
-                    <dt className="font-medium text-muted-foreground">Time Taken</dt>
+                    <dt className="font-medium text-muted-foreground">{t('timeTaken')}</dt>
                     <dd className="text-right">{timeTaken}</dd>
                   </div>
                   {submission?.timeSpent && (
@@ -345,19 +346,19 @@ const Statistics = ({ params: { gameId } }: Props) => {
                       </div>
                       {submission.bestTime && (
                         <div className="flex justify-between">
-                          <dt className="font-medium text-muted-foreground">Best Time</dt>
+                          <dt className="font-medium text-muted-foreground">{t('bestTime')}</dt>
                           <dd className="text-right">{formatTimeDelta(submission.bestTime)}</dd>
                         </div>
                       )}
                       {submission.averageTime && (
                         <div className="flex justify-between">
-                          <dt className="font-medium text-muted-foreground">Average Time</dt>
+                          <dt className="font-medium text-muted-foreground">{t('averageTime')}</dt>
                           <dd className="text-right">{formatTimeDelta(Math.round(submission.averageTime))}</dd>
                         </div>
                       )}
                       {submission.lastRetestTime && (
                         <div className="flex justify-between">
-                          <dt className="font-medium text-muted-foreground">Last Retest Time</dt>
+                          <dt className="font-medium text-muted-foreground">{t('lastRetest')}</dt>
                           <dd className="text-right">{formatTimeDelta(submission.lastRetestTime)}</dd>
                         </div>
                       )}
@@ -366,7 +367,7 @@ const Statistics = ({ params: { gameId } }: Props) => {
                   {submission?.updatedAt && (
                     <div className="flex justify-between">
                       <dt className="font-medium text-muted-foreground">Last Retested</dt>
-                      <dd className="text-right">{new Date(submission.updatedAt.toDate()).toLocaleDateString()}</dd>
+                      <dd className="text-right">{convertDateToString(submission.updatedAt.toDate())}</dd>
                     </div>
                   )}
                 </dl>

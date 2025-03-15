@@ -5,11 +5,14 @@ import React, { useEffect, useState } from "react";
 
 import UserAccountNav from "./UserAccountNav";
 import { ThemeToggle } from "./ThemeToggle";
+import { LanguageSelector } from "./LanguageSelector";
 import { useAuth } from "@/lib/firebase/firebase-auth";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { Button } from "./ui/button";
 
 const Navbar = () => {
   const { user, loading } = useAuth();
+  const { t } = useLanguage();
   const [isUserValid, setIsUserValid] = useState(false);
   
   useEffect(() => {
@@ -45,17 +48,20 @@ const Navbar = () => {
         </Link>
 
         <div className="flex items-center">
+          <LanguageSelector className="mr-2 sm:mr-3" />
           <ThemeToggle className="mr-2 sm:mr-4" />
           {loading ? (
             // Show loading state while checking authentication
             <Button size="sm" className="text-xs sm:text-sm h-8 sm:h-10 px-2 sm:px-3" disabled>
-              <span className="animate-pulse">Loading...</span>
+              <span className="animate-pulse">{t('loading')}</span>
             </Button>
           ) : isUserValid && adaptedUser ? (
             <UserAccountNav user={adaptedUser} />
           ) : (
             <Link href="/firebase-auth">
-              <Button size="sm" className="text-xs sm:text-sm h-8 sm:h-10 px-2 sm:px-3 font-medium">Sign In</Button>
+              <Button size="sm" className="text-xs sm:text-sm h-8 sm:h-10 px-2 sm:px-3 font-medium">
+                {t('signIn')}
+              </Button>
             </Link>
           )}
         </div>

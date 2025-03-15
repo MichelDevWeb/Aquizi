@@ -1,8 +1,10 @@
 "use client";
 
 import React from "react";
-import { Github, Twitter } from "lucide-react";
+import { Github, Twitter, Linkedin } from "lucide-react";
 import Link from "next/link";
+import { convertDateToString } from "@/lib/utils";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 // Social media link component
 const SocialLink = ({ 
@@ -50,32 +52,42 @@ const SocialLinks = () => (
       label="GitHub" 
     />
     <SocialLink 
-      href="#" 
+      href="https://x.com/NguyenMich67756" 
       icon={Twitter} 
       label="Twitter" 
+    />
+    <SocialLink 
+      href="https://www.linkedin.com/in/michel-nguyen-407950144/" 
+      icon={Linkedin} 
+      label="LinkedIn" 
     />
   </div>
 );
 
 // Legal links section
-const LegalLinks = () => (
-  <div className="flex items-center gap-2 sm:gap-4 text-xs sm:text-sm text-gray-500">
-    <LegalLink href="/privacy">Privacy Policy</LegalLink>
-    <span className="text-gray-400">•</span>
-    <LegalLink href="/terms">Terms of Service</LegalLink>
-  </div>
-);
+const LegalLinks = () => {
+  const { t } = useLanguage();
+  
+  return (
+    <div className="flex items-center gap-2 sm:gap-4 text-xs sm:text-sm text-gray-500">
+      <LegalLink href="/privacy">{t('privacyPolicy')}</LegalLink>
+      <span className="text-gray-400">•</span>
+      <LegalLink href="/terms">{t('termsOfService')}</LegalLink>
+    </div>
+  );
+};
 
 // Main Footer component
 const Footer = () => {
   const currentYear = new Date().getFullYear();
+  const { t } = useLanguage();
   
   return (
     <footer className="bg-white dark:bg-gray-950 mt-auto w-full pb-16 md:pb-4">
       <div className="mx-auto max-w-screen-xl px-3 sm:px-4 md:px-6 py-3 sm:py-4">
         <div className="border-t border-gray-100 dark:border-gray-800 pt-3 sm:pt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0">
           <p className="text-center text-xs sm:text-sm text-gray-500 sm:text-left">
-            Copyright &copy; {currentYear} Aquizi. All rights reserved.
+            {t('copyright', { year: currentYear })}
           </p>
 
           <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4">

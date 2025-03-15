@@ -378,8 +378,8 @@ const MCQ = ({ game }: Props) => {
       </div>
 
       {/* Audio elements for correct/incorrect sounds */}
-      <audio ref={correctSoundRef} src="/correct.mp3" />
-      <audio ref={incorrectSoundRef} src="/incorrect.mp3" />
+      <audio ref={correctSoundRef} />
+      <audio ref={incorrectSoundRef} />
     </>
   );
 };

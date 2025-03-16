@@ -12,6 +12,9 @@ Aquizi is an intelligent quiz platform that uses AI to generate personalized qui
 - **Performance Metrics**: View your scores, accuracy, and improvement over time
 - **Activity Heatmap**: GitHub-style contribution tracking for your quiz activity
 - **Retest Functionality**: Retry quizzes to improve your scores
+- **Vocabulary Learning**: Practice and improve your vocabulary with interactive word games
+- **Pronunciation Practice**: Listen to word pronunciations and test your understanding
+- **Leaderboards**: Compete with other users on vocabulary scores
 - **Mobile Responsive**: Optimized experience across all device sizes
 - **User Authentication**: Secure login with Google or email
 - **Multilingual Support**: Full internationalization with English and Vietnamese languages
@@ -27,10 +30,11 @@ Aquizi is an intelligent quiz platform that uses AI to generate personalized qui
 - **Lucide Icons** - Beautiful, consistent icon set
 - **React Query** - Data fetching and state management
 - **date-fns** - Date manipulation library
+- **Canvas Confetti** - Visual effects for achievements
 
 ### Backend
 - **Firebase** - Authentication, Firestore database, and hosting
-- **OpenAI** - AI integration for quiz generation
+- **OpenAI** - AI integration for quiz generation and text-to-speech
 - **Langchain** - LLM framework for structured AI interactions
 
 ### Authentication
@@ -39,6 +43,7 @@ Aquizi is an intelligent quiz platform that uses AI to generate personalized qui
 ### Data Visualization
 - **React Heat Map** - Activity visualization
 - **React Tooltip** - Enhanced user interaction
+- **Progress Bars** - Visual representation of performance metrics
 
 ### Testing & Deployment
 - **Vercel** - Deployment platform
@@ -98,6 +103,8 @@ src/
 │   ├── (auth)/           # Authentication routes
 │   ├── (user)/           # User routes (dashboard, etc.)
 │   ├── api/              # API routes
+│   │   ├── quiz/         # Quiz-related API endpoints
+│   │   └── vocabulary/   # Vocabulary-related API endpoints
 │   └── actions/          # Server actions
 ├── components/           # Reusable components
 │   ├── dashboard/        # Dashboard-specific components
@@ -114,6 +121,10 @@ src/
 
 ## Recent Improvements
 
+- **Vocabulary Learning Feature**: Added interactive vocabulary practice with definitions, examples, and translations
+- **Text-to-Speech Integration**: Added pronunciation support for vocabulary words
+- **Vocabulary Dashboard**: Track vocabulary learning progress with detailed metrics
+- **Leaderboard System**: Compete with other users on vocabulary scores
 - **Multilingual Support**: Added complete internationalization with English and Vietnamese languages
 - **Enhanced Mobile Navigation**: Improved mobile navigation with fixed-width icons and better touch targets
 - **Accessibility Enhancements**: Added ARIA labels and improved keyboard navigation

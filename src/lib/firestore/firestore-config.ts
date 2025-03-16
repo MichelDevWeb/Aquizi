@@ -14,6 +14,8 @@ export const COLLECTIONS = {
   QUIZZES: 'quizzes',
   QUIZ_QUESTIONS: 'quiz_questions',
   QUIZ_ANSWERS: 'quiz_answers',
+  VOCABULARY: 'vocabulary',
+  VOCABULARY_SCORES: 'vocabulary_scores',
 };
 
 // Document field names
@@ -89,5 +91,32 @@ export const FIELDS = {
     QUESTION_ID: 'questionId',
     ANSWER_TEXT: 'answerText',
     IS_CORRECT: 'isCorrect',
+  },
+  
+  // Vocabulary fields
+  VOCABULARY: {
+    ID: 'id',
+    WORD: 'word',
+    DEFINITION: 'definition',
+    EXAMPLE: 'example',
+    PRONUNCIATION: 'pronunciation',
+    VIETNAMESE_TRANSLATION: 'vietnameseTranslation',
+    DIFFICULTY: 'difficulty',
+    CREATED_AT: 'createdAt',
+    AUDIO_URL: 'audioUrl',
+    SYNONYMS: 'synonyms',
+    ANTONYMS: 'antonyms',
+    USAGE_NOTES: 'usageNotes',
+    PART_OF_SPEECH: 'partOfSpeech',
+  },
+  
+  // Vocabulary score fields
+  VOCABULARY_SCORE: {
+    ID: 'id',
+    USER_ID: 'userId',
+    SCORE: 'score',
+    CREATED_AT: 'createdAt',
+    WORDS_CORRECT: 'wordsCorrect',
+    WORDS_INCORRECT: 'wordsIncorrect',
   },
 }; 

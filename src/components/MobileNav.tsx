@@ -1,6 +1,6 @@
 "use client";
 
-import { Home, BookOpen, History, User, Menu, Plus } from "lucide-react";
+import { Home, BookOpen, History, User, Menu, Plus, BookA } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
@@ -42,7 +42,7 @@ const MobileNav = () => {
   if (!user) return null;
 
   // Check if current path is one of our main navigation items
-  const isMainPath = ['/dashboard', '/quiz', '/history', '/firebase-dashboard'].includes(pathname);
+  const isMainPath = ['/dashboard', '/quiz', '/history', '/vocabulary', '/firebase-dashboard'].includes(pathname);
 
   return (
     <div
@@ -60,10 +60,10 @@ const MobileNav = () => {
           showLabel={false}
         />
         <NavItem
-          href="/quiz"
-          icon={<BookOpen className="w-5 h-5 sm:w-6 sm:h-6" />}
-          label={t('quiz')}
-          isActive={pathname === "/quiz"}
+          href="/vocabulary"
+          icon={<BookA className="w-5 h-5 sm:w-6 sm:h-6" />}
+          label="Vocabulary"
+          isActive={pathname === "/vocabulary"}
           showLabel={false}
         />
         

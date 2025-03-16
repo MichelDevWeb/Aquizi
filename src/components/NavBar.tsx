@@ -2,18 +2,21 @@
 
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
-
+import { usePathname } from "next/navigation";
 import UserAccountNav from "./UserAccountNav";
 import { ThemeToggle } from "./ThemeToggle";
 import { LanguageSelector } from "./LanguageSelector";
 import { useAuth } from "@/lib/firebase/firebase-auth";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Button } from "./ui/button";
+import { BookA, Home, BookOpen, History, User } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 const Navbar = () => {
   const { user, loading } = useAuth();
   const { t } = useLanguage();
   const [isUserValid, setIsUserValid] = useState(false);
+  const pathname = usePathname();
   
   useEffect(() => {
     // Check if user is valid (authenticated and email verified if required)
@@ -33,6 +36,15 @@ const Navbar = () => {
     image: user.photoURL || '',
   } : null;
 
+  // Navigation links
+  const navLinks = [
+    { href: "/dashboard", label: "Dashboard", icon: <Home className="h-4 w-4 mr-1" /> },
+    { href: "/quiz", label: "Quizzes", icon: <BookOpen className="h-4 w-4 mr-1" /> },
+    { href: "/vocabulary", label: "Vocabulary", icon: <BookA className="h-4 w-4 mr-1" /> },
+    { href: "/history", label: "History", icon: <History className="h-4 w-4 mr-1" /> },
+    { href: "/firebase-dashboard", label: "Profile", icon: <User className="h-4 w-4 mr-1" /> },
+  ];
+
   return (
     <div className="fixed inset-x-0 top-0 bg-white dark:bg-gray-950 z-[10] h-fit border-b border-zinc-300 py-1.5 sm:py-2 shadow-sm">
       <div className="flex items-center justify-between h-full gap-1 sm:gap-2 px-3 sm:px-4 md:px-8 mx-auto max-w-7xl">
@@ -46,6 +58,25 @@ const Navbar = () => {
             Aquizi
           </p>
         </Link>
+
+        {/* Navigation Links (visible on larger screens) */}
+        <div className="hidden md:flex items-center space-x-1">
+          {isUserValid && navLinks.map((link) => (
+            <Link 
+              key={link.href} 
+              href={link.href} 
+              className={cn(
+                "flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors",
+                pathname === link.href 
+                  ? "bg-primary/10 text-primary" 
+                  : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-primary"
+              )}
+            >
+              {link.icon}
+              {link.label}
+            </Link>
+          ))}
+        </div>
 
         <div className="flex items-center">
           <LanguageSelector className="mr-2 sm:mr-3" />

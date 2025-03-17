@@ -3,7 +3,16 @@ import { ChatOpenAI } from "@langchain/openai";
 import { HumanMessage } from "@langchain/core/messages";
 import { JsonOutputFunctionsParser } from "langchain/output_parsers";
 import { db } from "@/lib/firebase/firebase-config";
-import { collection, addDoc, serverTimestamp, query, where, getDocs, limit, DocumentData } from "firebase/firestore";
+import { 
+  collection, 
+  addDoc, 
+  serverTimestamp, 
+  query, 
+  where, 
+  getDocs, 
+  limit, 
+  orderBy
+} from "firebase/firestore";
 import { COLLECTIONS, FIELDS } from "@/lib/firestore/firestore-config";
 import { v4 as uuidv4 } from "uuid";
 
@@ -30,21 +39,53 @@ export async function GET(req: NextRequest) {
     const url = new URL(req.url);
     const difficultyParam = url.searchParams.get("difficulty");
     const count = parseInt(url.searchParams.get("count") || "5", 10);
+    const userId = url.searchParams.get("userId");
     
     // Check if we should get from cache first
     const useCache = url.searchParams.get("useCache") !== "false";
     
-    if (useCache) {
-      // Try to get vocabulary from Firestore first
-      const vocabularyCollection = collection(db, COLLECTIONS.VOCABULARY);
-      let vocabularyQuery = query(vocabularyCollection, limit(count));
+    // Array to store the final vocabulary words
+    let finalVocabulary: VocabularyWord[] = [];
+    
+    if (useCache && userId) {
+      // Get words the user has seen before (both correct and incorrect)
+      const scoresCollection = collection(db, COLLECTIONS.VOCABULARY_SCORES);
+      const scoresQuery = query(
+        scoresCollection,
+        where(FIELDS.VOCABULARY_SCORE.USER_ID, "==", userId)
+      );
       
-      // Add difficulty filter if provided
-      if (difficultyParam) {
+      const scoresSnapshot = await getDocs(scoresQuery);
+      
+      // Collect all words the user has seen
+      const seenWords: Set<string> = new Set();
+      
+      scoresSnapshot.forEach((doc) => {
+        const data = doc.data();
+        const correctWords: string[] = data[FIELDS.VOCABULARY_SCORE.WORDS_CORRECT] || [];
+        const incorrectWords: string[] = data[FIELDS.VOCABULARY_SCORE.WORDS_INCORRECT] || [];
+        
+        // Add all words to the set
+        correctWords.forEach(word => seenWords.add(word.toLowerCase()));
+        incorrectWords.forEach(word => seenWords.add(word.toLowerCase()));
+      });
+      
+      // Get vocabulary from Firestore that the user hasn't seen before
+      const vocabularyCollection = collection(db, COLLECTIONS.VOCABULARY);
+      let vocabularyQuery;
+      
+      if (difficultyParam && difficultyParam !== "all") {
         vocabularyQuery = query(
-          vocabularyCollection, 
+          vocabularyCollection,
           where(FIELDS.VOCABULARY.DIFFICULTY, "==", difficultyParam),
-          limit(count)
+          orderBy(FIELDS.VOCABULARY.CREATED_AT, "desc"),
+          limit(count * 2) // Get more than needed to filter out seen words
+        );
+      } else {
+        vocabularyQuery = query(
+          vocabularyCollection,
+          orderBy(FIELDS.VOCABULARY.CREATED_AT, "desc"),
+          limit(count * 2) // Get more than needed to filter out seen words
         );
       }
       
@@ -52,9 +93,59 @@ export async function GET(req: NextRequest) {
       
       if (!querySnapshot.empty) {
         const cachedVocabulary: VocabularyWord[] = [];
+        
         querySnapshot.forEach((doc) => {
           const data = doc.data();
-          cachedVocabulary.push({
+          const word = data[FIELDS.VOCABULARY.WORD] || "";
+          
+          // Only add words the user hasn't seen before
+          if (!seenWords.has(word.toLowerCase())) {
+            cachedVocabulary.push({
+              id: doc.id,
+              word: word,
+              definition: data[FIELDS.VOCABULARY.DEFINITION] || "",
+              example: data[FIELDS.VOCABULARY.EXAMPLE] || "",
+              pronunciation: data[FIELDS.VOCABULARY.PRONUNCIATION] || "",
+              vietnameseTranslation: data[FIELDS.VOCABULARY.VIETNAMESE_TRANSLATION] || "",
+              difficulty: data[FIELDS.VOCABULARY.DIFFICULTY] || "beginner",
+              audioUrl: data[FIELDS.VOCABULARY.AUDIO_URL],
+              synonyms: data.synonyms || [],
+              antonyms: data.antonyms || [],
+              usageNotes: data.usageNotes || "",
+              partOfSpeech: data.partOfSpeech || "",
+              createdAt: data[FIELDS.VOCABULARY.CREATED_AT],
+            });
+          }
+        });
+        
+        // Take only the required number of words
+        finalVocabulary = cachedVocabulary.slice(0, count);
+      }
+    } else if (useCache) {
+      // If no userId provided, just get random words from cache
+      const vocabularyCollection = collection(db, COLLECTIONS.VOCABULARY);
+      let vocabularyQuery = query(
+        vocabularyCollection, 
+        orderBy(FIELDS.VOCABULARY.CREATED_AT, "desc"),
+        limit(count)
+      );
+      
+      // Add difficulty filter if provided
+      if (difficultyParam && difficultyParam !== "all") {
+        vocabularyQuery = query(
+          vocabularyCollection, 
+          where(FIELDS.VOCABULARY.DIFFICULTY, "==", difficultyParam),
+          orderBy(FIELDS.VOCABULARY.CREATED_AT, "desc"),
+          limit(count)
+        );
+      }
+      
+      const querySnapshot = await getDocs(vocabularyQuery);
+      
+      if (!querySnapshot.empty) {
+        querySnapshot.forEach((doc) => {
+          const data = doc.data();
+          finalVocabulary.push({
             id: doc.id,
             word: data[FIELDS.VOCABULARY.WORD] || "",
             definition: data[FIELDS.VOCABULARY.DEFINITION] || "",
@@ -70,12 +161,18 @@ export async function GET(req: NextRequest) {
             createdAt: data[FIELDS.VOCABULARY.CREATED_AT],
           });
         });
-        
-        return NextResponse.json({ vocabulary: cachedVocabulary, source: "cache" }, { status: 200 });
       }
     }
     
-    // If no cached data or cache disabled, generate new vocabulary
+    // If we have enough words from cache, return them
+    if (finalVocabulary.length >= count) {
+      return NextResponse.json({ 
+        vocabulary: finalVocabulary.slice(0, count), 
+        source: "cache" 
+      }, { status: 200 });
+    }
+    
+    // If we don't have enough words or cache is disabled, generate new vocabulary
     if (!process.env.OPENAI_API_KEY) {
       return NextResponse.json(
         { error: "OpenAI API key not provided" },
@@ -83,9 +180,12 @@ export async function GET(req: NextRequest) {
       );
     }
 
+    // Calculate how many more words we need to generate
+    const wordsToGenerate = count - finalVocabulary.length;
+
     const model = new ChatOpenAI({
       openAIApiKey: process.env.OPENAI_API_KEY,
-      modelName: "gpt-4o-mini",
+      modelName: process.env.GPT_MODEL || "gpt-4o-mini",
     });
 
     const parser = new JsonOutputFunctionsParser();
@@ -137,7 +237,7 @@ export async function GET(req: NextRequest) {
 
     const difficultyFilter = difficultyParam ? `Focus on ${difficultyParam} level words.` : "Include a mix of difficulty levels.";
     
-    const prompt = `Generate ${count} English vocabulary words for Vietnamese students to learn. 
+    const prompt = `Generate ${wordsToGenerate} English vocabulary words for Vietnamese students to learn. 
     For each word, provide:
     1. The word itself
     2. A clear definition
@@ -170,7 +270,7 @@ export async function GET(req: NextRequest) {
     
     // Save vocabulary to Firestore
     const vocabularyCollection = collection(db, COLLECTIONS.VOCABULARY);
-    const savedVocabulary: VocabularyWord[] = [];
+    const generatedVocabulary: VocabularyWord[] = [];
     
     for (const word of result.vocabulary) {
       const docRef = await addDoc(vocabularyCollection, {
@@ -189,7 +289,7 @@ export async function GET(req: NextRequest) {
         partOfSpeech: word.partOfSpeech || "",
       });
       
-      savedVocabulary.push({
+      generatedVocabulary.push({
         id: docRef.id,
         word: word.word,
         definition: word.definition,
@@ -205,9 +305,15 @@ export async function GET(req: NextRequest) {
       });
     }
 
-    return NextResponse.json({ vocabulary: savedVocabulary, source: "generated" }, { status: 200 });
+    // Combine cached and generated vocabulary
+    const combinedVocabulary = [...finalVocabulary, ...generatedVocabulary];
+    
+    return NextResponse.json({ 
+      vocabulary: combinedVocabulary, 
+      source: finalVocabulary.length > 0 ? "mixed" : "generated" 
+    }, { status: 200 });
   } catch (e: any) {
     console.error("Error generating vocabulary:", e);
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
-} 
+}

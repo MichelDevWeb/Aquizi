@@ -114,6 +114,7 @@ export const FIELDS = {
   VOCABULARY_SCORE: {
     ID: 'id',
     USER_ID: 'userId',
+    USERNAME: 'username',
     SCORE: 'score',
     CREATED_AT: 'createdAt',
     WORDS_CORRECT: 'wordsCorrect',

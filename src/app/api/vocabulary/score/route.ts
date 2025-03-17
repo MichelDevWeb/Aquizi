@@ -8,6 +8,7 @@ import { v4 as uuidv4 } from "uuid";
 interface VocabularyScore {
   id: string;
   userId: string;
+  username?: string;
   score: number;
   wordsCorrect: string[];
   wordsIncorrect: string[];
@@ -16,7 +17,7 @@ interface VocabularyScore {
 
 export async function POST(req: NextRequest) {
   try {
-    const { userId, score, wordsCorrect, wordsIncorrect } = await req.json();
+    const { userId, username, score, wordsCorrect, wordsIncorrect } = await req.json();
 
     if (!userId) {
       return NextResponse.json(
@@ -30,6 +31,7 @@ export async function POST(req: NextRequest) {
     const docRef = await addDoc(scoreCollection, {
       [FIELDS.VOCABULARY_SCORE.ID]: uuidv4(),
       [FIELDS.VOCABULARY_SCORE.USER_ID]: userId,
+      [FIELDS.VOCABULARY_SCORE.USERNAME]: username || `User-${userId.substring(0, 5)}`, // Store username
       [FIELDS.VOCABULARY_SCORE.SCORE]: score,
       [FIELDS.VOCABULARY_SCORE.WORDS_CORRECT]: wordsCorrect || [],
       [FIELDS.VOCABULARY_SCORE.WORDS_INCORRECT]: wordsIncorrect || [],
@@ -83,6 +85,7 @@ export async function GET(req: NextRequest) {
       scores.push({
         id: doc.id,
         userId: data[FIELDS.VOCABULARY_SCORE.USER_ID],
+        username: data[FIELDS.VOCABULARY_SCORE.USERNAME] || `User-${data[FIELDS.VOCABULARY_SCORE.USER_ID].substring(0, 5)}`,
         score: data[FIELDS.VOCABULARY_SCORE.SCORE],
         wordsCorrect: data[FIELDS.VOCABULARY_SCORE.WORDS_CORRECT] || [],
         wordsIncorrect: data[FIELDS.VOCABULARY_SCORE.WORDS_INCORRECT] || [],

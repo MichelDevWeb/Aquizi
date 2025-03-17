@@ -11,7 +11,7 @@ import RecentActivityCard from "@/components/dashboard/RecentActivityCard";
 import { useAuth } from "@/lib/firebase/firebase-auth";
 import { useEffect, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Info, Calendar, LayoutDashboard, TrendingUp, Award, Send, ListChecks, Zap, BookOpen, Trophy, Brain, Star } from "lucide-react";
+import { Info, Calendar, LayoutDashboard, TrendingUp, Award, Send, ListChecks, Zap, BookOpen, Trophy, Brain, Star, Medal, BarChart3, Crown } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent, CardDescription, CardFooter } from "@/components/ui/card";
 import GitHubStyleHeatMap from "./GitHubStyleHeatMap";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -152,6 +152,9 @@ const DashboardPage = () => {
       (vocabularyScores.reduce((sum, s) => sum + s.wordsCorrect.length + s.wordsIncorrect.length, 0) || 1)) * 100)
     : 0;
   
+  // Find user's rank in leaderboard
+  const userRank = user ? vocabularyLeaderboard.findIndex(score => score.userId === user.uid) + 1 : 0;
+  
   // Format date to dd/MM/yyyy
   const formatDate = (date: Date | null): string => {
     if (!date) return "Unknown date";
@@ -244,158 +247,396 @@ const DashboardPage = () => {
             <QuizMeCard />
             <HistoryCard />
           </div>
+          
+          {/* Vocabulary Practice Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3 md:gap-4">
+            <Card className="overflow-hidden border hover:border-primary/50 transition-all group">
+              <CardHeader className="p-3 pb-0">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <BookOpen className="h-4 w-4 text-primary" />
+                  {"Vocabulary Practice"}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-3 pt-2">
+                <p className="text-xs text-muted-foreground mb-3">
+                  {"Practice your vocabulary with interactive exercises"}
+                </p>
+                <Button asChild size="sm" className="w-full">
+                  <Link href="/vocabulary">
+                    <Zap className="mr-2 h-3.5 w-3.5" />
+                    {"Start Practice"}
+                  </Link>
+                </Button>
+              </CardContent>
+            </Card>
+            
+            <Card className="overflow-hidden border hover:border-primary/50 transition-all group">
+              <CardHeader className="p-3 pb-0">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <TrendingUp className="h-4 w-4 text-green-500" />
+                  {"Daily Challenge"}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-3 pt-2">
+                <p className="text-xs text-muted-foreground mb-3">
+                  {"Complete today's vocabulary challenge to earn bonus points"}
+                </p>
+                <Button asChild size="sm" variant="outline" className="w-full">
+                  <Link href="/vocabulary?mode=challenge">
+                    <Star className="mr-2 h-3.5 w-3.5 text-amber-500" />
+                    {"Start Challenge"}
+                  </Link>
+                </Button>
+              </CardContent>
+            </Card>
+            
+            <Card className="overflow-hidden border hover:border-primary/50 transition-all group">
+              <CardHeader className="p-3 pb-0">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <Trophy className="h-4 w-4 text-amber-500" />
+                  {t('leaderboard') || "Leaderboard"}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-3 pt-2">
+                <p className="text-xs text-muted-foreground mb-3">
+                  {"See how you rank against other players"}
+                </p>
+                <Button asChild size="sm" variant="secondary" className="w-full">
+                  <Link href="/vocabulary?tab=leaderboard">
+                    <Medal className="mr-2 h-3.5 w-3.5" />
+                    {"View Leaderboard"}
+                  </Link>
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
         </TabsContent>
         
         <TabsContent value="vocabulary" className="space-y-3 sm:space-y-4 md:space-y-5">
           {/* Vocabulary Metrics */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3 md:gap-4">
-            <MetricCard
-              label="Total Games"
-              value={totalVocabularyGames}
-              icon={<BookOpen className="h-5 w-5 text-blue-500" />}
-            />
-            <MetricCard
-              label="Words Learned"
-              value={totalWordsLearned}
-              icon={<Brain className="h-5 w-5 text-green-500" />}
-            />
-            <MetricCard
-              label="Best Score"
-              value={bestScore}
-              icon={<Trophy className="h-5 w-5 text-yellow-500" />}
-            />
-            <MetricCard
-              label="Accuracy"
-              value={`${averageAccuracy}%`}
-              icon={<Star className="h-5 w-5 text-purple-500" />}
-            />
-          </div>
-          
-          {/* Vocabulary Leaderboard */}
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base sm:text-lg flex items-center gap-2">
-                <Trophy className="h-4 w-4 text-yellow-500" />
-                <span>Vocabulary Leaderboard</span>
-              </CardTitle>
-              <CardDescription>Top scores from all players</CardDescription>
-            </CardHeader>
-            <CardContent>
-              {vocabularyLoading ? (
-                <div className="space-y-2">
-                  {[...Array(3)].map((_, i) => (
-                    <Skeleton key={i} className="h-12 w-full" />
-                  ))}
+            <Card className="overflow-hidden border-none shadow-sm hover:shadow-md transition-all duration-300 bg-gradient-to-br from-blue-50 to-blue-100/50 dark:from-blue-900/20 dark:to-blue-800/10">
+              <CardContent className="p-3 sm:p-4">
+                <div className="flex items-center justify-between">
+                  <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/40 flex items-center justify-center">
+                    <BookOpen className="h-5 w-5 text-blue-500" />
+                  </div>
+                  <div className="text-right">
+                    <p className="text-xs text-muted-foreground">{t('totalGames')}</p>
+                    <p className="text-2xl font-bold">{totalVocabularyGames}</p>
+                  </div>
                 </div>
-              ) : vocabularyLeaderboard.length > 0 ? (
-                <div className="space-y-2">
-                  {vocabularyLeaderboard.slice(0, 5).map((score, index) => (
-                    <div 
-                      key={score.id} 
-                      className={`flex items-center p-2 rounded-md ${
-                        score.userId === user?.uid ? "bg-primary/5 border border-primary/20" : "hover:bg-muted/10"
-                      }`}
-                    >
-                      <div className={`w-6 h-6 rounded-full flex items-center justify-center mr-3 text-xs font-medium ${
-                        index === 0 ? "bg-amber-100 text-amber-600 dark:bg-amber-900/40 dark:text-amber-400" :
-                        index === 1 ? "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400" :
-                        index === 2 ? "bg-orange-100 text-orange-600 dark:bg-orange-900/40 dark:text-orange-400" :
-                        "bg-primary/10 text-primary"
-                      }`}>
-                        {index + 1}
-                      </div>
-                      <div className="flex-1">
-                        <div className="flex items-center">
-                          <p className="font-medium text-sm">
-                            {score.userId === user?.uid ? "You" : `Player ${score.userId.substring(0, 6)}`}
-                          </p>
-                          {score.userId === user?.uid && (
-                            <Badge variant="outline" className="ml-2 text-xs px-1 py-0 h-4">You</Badge>
-                          )}
-                        </div>
-                        <div className="flex items-center text-xs text-muted-foreground">
-                          <span className="mr-2">{score.wordsCorrect.length} correct</span>
-                          <span>{score.wordsIncorrect.length} incorrect</span>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <p className="font-bold">{score.score}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {score.createdAt ? formatDate(new Date(score.createdAt)) : "Unknown date"}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
+              </CardContent>
+            </Card>
+            
+            <Card className="overflow-hidden border-none shadow-sm hover:shadow-md transition-all duration-300 bg-gradient-to-br from-green-50 to-green-100/50 dark:from-green-900/20 dark:to-green-800/10">
+              <CardContent className="p-3 sm:p-4">
+                <div className="flex items-center justify-between">
+                  <div className="w-10 h-10 rounded-full bg-green-100 dark:bg-green-900/40 flex items-center justify-center">
+                    <Brain className="h-5 w-5 text-green-500" />
+                  </div>
+                  <div className="text-right">
+                    <p className="text-xs text-muted-foreground">{t('wordsLearned')}</p>
+                    <p className="text-2xl font-bold">{totalWordsLearned}</p>
+                  </div>
                 </div>
-              ) : (
-                <div className="flex flex-col items-center justify-center py-6 text-center">
-                  <Info className="h-8 w-8 mb-2 text-muted-foreground" />
-                  <h3 className="text-lg font-semibold mb-1">No leaderboard data yet</h3>
-                  <p className="text-sm text-muted-foreground mb-4">Be the first to play and set a high score!</p>
+              </CardContent>
+            </Card>
+            
+            <Card className="overflow-hidden border-none shadow-sm hover:shadow-md transition-all duration-300 bg-gradient-to-br from-amber-50 to-amber-100/50 dark:from-amber-900/20 dark:to-amber-800/10">
+              <CardContent className="p-3 sm:p-4">
+                <div className="flex items-center justify-between">
+                  <div className="w-10 h-10 rounded-full bg-amber-100 dark:bg-amber-900/40 flex items-center justify-center">
+                    <Trophy className="h-5 w-5 text-amber-500" />
+                  </div>
+                  <div className="text-right">
+                    <p className="text-xs text-muted-foreground">{"Best Score"}</p>
+                    <p className="text-2xl font-bold">{bestScore}</p>
+                  </div>
                 </div>
-              )}
-            </CardContent>
-            <CardFooter>
-              <Button asChild className="w-full">
-                <Link href="/vocabulary">
-                  <BookOpen className="mr-2 h-4 w-4" />
-                  Practice Vocabulary
-                </Link>
-              </Button>
-            </CardFooter>
-          </Card>
-          
-          {/* Recent Vocabulary Games */}
-          {vocabularyScores.length > 0 && (
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-base sm:text-lg flex items-center gap-2">
-                  <Calendar className="h-4 w-4 text-blue-500" />
-                  <span>Your Recent Games</span>
-                </CardTitle>
-                <CardDescription>Your vocabulary practice history</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {vocabularyScores.slice(0, 3).map((score, index) => (
-                    <div key={score.id} className="border rounded-lg p-3 hover:bg-muted/10 transition-colors">
-                      <div className="flex justify-between items-center">
-                        <div className="flex items-center gap-2">
-                          <div className="w-7 h-7 rounded-full bg-primary/10 text-primary flex items-center justify-center text-sm font-medium">
-                            {index + 1}
-                          </div>
-                          <h3 className="font-medium">{score.score} points</h3>
-                        </div>
-                        <p className="text-xs text-muted-foreground">
-                          {score.createdAt ? formatDate(new Date(score.createdAt)) : "Unknown date"}
-                        </p>
-                      </div>
-                      <div className="mt-2">
-                        <div className="flex justify-between text-xs text-muted-foreground mb-1">
-                          <span>Accuracy</span>
-                          <span>
-                            {Math.round((score.wordsCorrect.length / (score.wordsCorrect.length + score.wordsIncorrect.length)) * 100)}%
-                          </span>
-                        </div>
-                        <Progress 
-                          value={Math.round((score.wordsCorrect.length / (score.wordsCorrect.length + score.wordsIncorrect.length)) * 100)} 
-                          className="h-1" 
+              </CardContent>
+            </Card>
+            
+            <Card className="overflow-hidden border-none shadow-sm hover:shadow-md transition-all duration-300 bg-gradient-to-br from-purple-50 to-purple-100/50 dark:from-purple-900/20 dark:to-purple-800/10">
+              <CardContent className="p-3 sm:p-4">
+                <div className="flex items-center justify-between">
+                  <div className="w-10 h-10 rounded-full bg-purple-100 dark:bg-purple-900/40 flex items-center justify-center">
+                    <Star className="h-5 w-5 text-purple-500" />
+                  </div>
+                  <div className="text-right">
+                    <p className="text-xs text-muted-foreground">{t('accuracy')}</p>
+                    <div className="flex items-center justify-end gap-1">
+                      <p className="text-2xl font-bold">{averageAccuracy}%</p>
+                      <div className="w-1.5 h-8 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                        <div 
+                          className={`h-full rounded-full ${
+                            averageAccuracy >= 80 ? "bg-green-500" :
+                            averageAccuracy >= 60 ? "bg-amber-500" :
+                            "bg-red-500"
+                          }`}
+                          style={{ height: `${averageAccuracy}%` }}
                         />
                       </div>
                     </div>
-                  ))}
+                  </div>
                 </div>
               </CardContent>
-              <CardFooter>
-                <Button asChild variant="outline" className="w-full">
-                  <Link href="/vocabulary">
-                    <BookOpen className="mr-2 h-4 w-4" />
-                    View All Games
+            </Card>
+          </div>
+          
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 md:gap-5">
+            {/* Vocabulary Leaderboard */}
+            <Card className="overflow-hidden border shadow-sm hover:shadow-md transition-all duration-300">
+              <CardHeader className="pb-2 bg-gradient-to-r from-primary/5 to-transparent">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-base sm:text-lg flex items-center gap-2">
+                    <Trophy className="h-4 w-4 text-yellow-500" />
+                    <span>{t('leaderboard')}</span>
+                  </CardTitle>
+                  {userRank > 0 && (
+                    <Badge variant="outline" className="px-2 py-1 flex items-center gap-1">
+                      <Star className="h-3 w-3 text-amber-500" />
+                      {t('yourRanking')}: #{userRank}
+                    </Badge>
+                  )}
+                </div>
+                <CardDescription>{t('topPlayers')}</CardDescription>
+              </CardHeader>
+              <CardContent className="p-0">
+                {vocabularyLoading ? (
+                  <div className="space-y-2 p-3 sm:p-4">
+                    {[...Array(3)].map((_, i) => (
+                      <Skeleton key={i} className="h-12 w-full" />
+                    ))}
+                  </div>
+                ) : vocabularyLeaderboard.length > 0 ? (
+                  <div className="divide-y">
+                    {vocabularyLeaderboard.slice(0, 5).map((score, index) => (
+                      <div 
+                        key={score.id} 
+                        className={`flex items-center p-3 ${
+                          score.userId === user?.uid ? "bg-primary/5" : index % 2 === 0 ? "bg-muted/5" : ""
+                        }`}
+                      >
+                        <div className={`w-7 h-7 rounded-full flex items-center justify-center mr-3 text-xs font-medium shadow-sm ${
+                          index === 0 ? "bg-gradient-to-br from-amber-100 to-amber-200 text-amber-600 dark:bg-amber-900/40 dark:text-amber-400" :
+                          index === 1 ? "bg-gradient-to-br from-gray-100 to-gray-200 text-gray-600 dark:bg-gray-800 dark:text-gray-400" :
+                          index === 2 ? "bg-gradient-to-br from-orange-100 to-orange-200 text-orange-600 dark:bg-orange-900/40 dark:text-orange-400" :
+                          "bg-primary/10 text-primary"
+                        }`}>
+                          {index === 0 ? <Crown className="h-3.5 w-3.5" /> : index + 1}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center flex-wrap">
+                            <p className="font-medium text-sm truncate max-w-[120px] sm:max-w-none">
+                              {score.userId === user?.uid ? (
+                                <span className="text-primary">{t('you')}</span>
+                              ) : (
+                                `${t('player')} ${score.userId.substring(0, 6)}`
+                              )}
+                            </p>
+                            {score.userId === user?.uid && (
+                              <Badge variant="outline" className="ml-2 text-xs px-1.5 py-0 h-4">
+                                <Star className="h-3 w-3 text-amber-500 mr-0.5" />
+                                {t('you')}
+                              </Badge>
+                            )}
+                          </div>
+                          <div className="flex items-center text-xs text-muted-foreground">
+                            <span className="mr-2 flex items-center gap-1">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-green-600"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                              {score.wordsCorrect.length}
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-red-600"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                              {score.wordsIncorrect.length}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <p className="font-bold">{score.score}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {score.createdAt ? formatDate(new Date(score.createdAt)).split(' ')[0] : t('completed')}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center justify-center py-6 text-center p-3 sm:p-4">
+                    <Trophy className="h-8 w-8 mb-2 text-muted-foreground/40" />
+                    <h3 className="text-base font-semibold mb-1">{"No leaderboard data yet"}</h3>
+                    <p className="text-sm text-muted-foreground mb-4">{"Be the first to play and set a high score!"}</p>
+                  </div>
+                )}
+              </CardContent>
+              <CardFooter className="p-3 sm:p-4 pt-0 sm:pt-0">
+                <Button asChild variant="outline" size="sm" className="w-full">
+                  <Link href="/vocabulary?tab=leaderboard">
+                    <Trophy className="mr-2 h-4 w-4" />
+                    {"View Full Leaderboard"}
                   </Link>
                 </Button>
               </CardFooter>
             </Card>
-          )}
+            
+            {/* Recent Vocabulary Games */}
+            <Card className="overflow-hidden border shadow-sm hover:shadow-md transition-all duration-300">
+              <CardHeader className="pb-2 bg-gradient-to-r from-primary/5 to-transparent">
+                <CardTitle className="text-base sm:text-lg flex items-center gap-2">
+                  <Calendar className="h-4 w-4 text-blue-500" />
+                  <span>{t('recentGames')}</span>
+                </CardTitle>
+                <CardDescription>{"Your vocabulary practice history"}</CardDescription>
+              </CardHeader>
+              <CardContent className="p-0">
+                {vocabularyLoading ? (
+                  <div className="space-y-2 p-3 sm:p-4">
+                    {[...Array(3)].map((_, i) => (
+                      <Skeleton key={i} className="h-16 w-full" />
+                    ))}
+                  </div>
+                ) : vocabularyScores.length > 0 ? (
+                  <div className="divide-y">
+                    {vocabularyScores.slice(0, 3).map((score, index) => {
+                      const correctPercentage = Math.round(
+                        (score.wordsCorrect.length / (score.wordsCorrect.length + score.wordsIncorrect.length)) * 100
+                      );
+                      
+                      return (
+                        <div key={score.id} className={`p-3 ${index % 2 === 0 ? "bg-muted/5" : ""}`}>
+                          <div className="flex justify-between items-center">
+                            <div className="flex items-center gap-2">
+                              <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-medium shadow-sm ${
+                                index === 0 ? "bg-gradient-to-br from-amber-100 to-amber-200 text-amber-600 dark:bg-amber-900/40 dark:text-amber-400" :
+                                "bg-primary/10 text-primary"
+                              }`}>
+                                {index === 0 ? <Star className="h-3.5 w-3.5" /> : index + 1}
+                              </div>
+                              <div>
+                                <h3 className="font-medium text-sm flex items-center gap-1">
+                                  {score.score} {t('points')}
+                                  {index === 0 && <Award className="h-3.5 w-3.5 text-amber-500" />}
+                                </h3>
+                                <p className="text-xs text-muted-foreground">
+                                  {score.createdAt ? formatDate(new Date(score.createdAt)) : t('dateCompleted')}
+                                </p>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Badge variant="secondary" className="px-1.5 py-0 h-5 text-xs flex items-center gap-1 bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-green-600"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                {score.wordsCorrect.length}
+                              </Badge>
+                              <Badge variant="outline" className="px-1.5 py-0 h-5 text-xs flex items-center gap-1 bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-400 border-0">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-red-600"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                                {score.wordsIncorrect.length}
+                              </Badge>
+                            </div>
+                          </div>
+                          <div className="mt-2">
+                            <div className="flex justify-between text-xs text-muted-foreground mb-1">
+                              <span>{t('accuracy')}</span>
+                              <span>{correctPercentage}%</span>
+                            </div>
+                            <div className="w-full h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                              <div 
+                                className={`h-full rounded-full ${
+                                  correctPercentage >= 80 ? "bg-gradient-to-r from-green-400 to-green-600" :
+                                  correctPercentage >= 60 ? "bg-gradient-to-r from-amber-400 to-amber-600" :
+                                  "bg-gradient-to-r from-red-400 to-red-600"
+                                }`}
+                                style={{ width: `${correctPercentage}%` }}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center justify-center py-6 text-center p-3 sm:p-4">
+                    <Calendar className="h-8 w-8 mb-2 text-muted-foreground/40" />
+                    <h3 className="text-base font-semibold mb-1">{t('noQuizzesYet')}</h3>
+                    <p className="text-sm text-muted-foreground mb-4">{t('noQuizzesDesc')}</p>
+                  </div>
+                )}
+              </CardContent>
+              <CardFooter className="p-3 sm:p-4 pt-0 sm:pt-0">
+                <div className="grid grid-cols-2 gap-2 w-full">
+                  <Button asChild variant="outline" size="sm">
+                    <Link href="/vocabulary?tab=scores">
+                      <BarChart3 className="mr-2 h-4 w-4" />
+                      {"View All Scores"}
+                    </Link>
+                  </Button>
+                  <Button asChild size="sm">
+                    <Link href="/vocabulary">
+                      <Zap className="mr-2 h-4 w-4" />
+                      {"Start Practice"}
+                    </Link>
+                  </Button>
+                </div>
+              </CardFooter>
+            </Card>
+          </div>
+          
+          {/* Practice Options */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3 md:gap-4">
+            <Card className="overflow-hidden border hover:border-primary/50 transition-all group">
+              <CardContent className="p-3 sm:p-4 flex flex-col h-full">
+                <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/40 flex items-center justify-center mb-3">
+                  <BookOpen className="h-5 w-5 text-blue-500" />
+                </div>
+                <h3 className="font-medium mb-1">{"Standard Practice"}</h3>
+                <p className="text-xs text-muted-foreground mb-3 flex-grow">
+                  {"Practice vocabulary with standard difficulty"}
+                </p>
+                <Button asChild size="sm" className="w-full">
+                  <Link href="/vocabulary">
+                    <Zap className="mr-2 h-3.5 w-3.5" />
+                    {"Start Practice"}
+                  </Link>
+                </Button>
+              </CardContent>
+            </Card>
+            
+            <Card className="overflow-hidden border hover:border-primary/50 transition-all group">
+              <CardContent className="p-3 sm:p-4 flex flex-col h-full">
+                <div className="w-10 h-10 rounded-full bg-amber-100 dark:bg-amber-900/40 flex items-center justify-center mb-3">
+                  <Star className="h-5 w-5 text-amber-500" />
+                </div>
+                <h3 className="font-medium mb-1">{"Daily Challenge"}</h3>
+                <p className="text-xs text-muted-foreground mb-3 flex-grow">
+                  {"Complete today's vocabulary challenge to earn bonus points"}
+                </p>
+                <Button asChild size="sm" variant="outline" className="w-full">
+                  <Link href="/vocabulary?mode=challenge">
+                    <Trophy className="mr-2 h-3.5 w-3.5 text-amber-500" />
+                    {"Start Challenge"}
+                  </Link>
+                </Button>
+              </CardContent>
+            </Card>
+            
+            <Card className="overflow-hidden border hover:border-primary/50 transition-all group">
+              <CardContent className="p-3 sm:p-4 flex flex-col h-full">
+                <div className="w-10 h-10 rounded-full bg-green-100 dark:bg-green-900/40 flex items-center justify-center mb-3">
+                  <Brain className="h-5 w-5 text-green-500" />
+                </div>
+                <h3 className="font-medium mb-1">{"Advanced Mode"}</h3>
+                <p className="text-xs text-muted-foreground mb-3 flex-grow">
+                  {"Challenge yourself with advanced vocabulary"}
+                </p>
+                <Button asChild size="sm" variant="secondary" className="w-full">
+                  <Link href="/vocabulary?difficulty=hard">
+                    <Zap className="mr-2 h-3.5 w-3.5" />
+                    {"Start Advanced"}
+                  </Link>
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
         </TabsContent>
       </Tabs>
     </PageLayout>

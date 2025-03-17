@@ -12,7 +12,8 @@ Aquizi is an intelligent quiz platform that uses AI to generate personalized qui
 - **Performance Metrics**: View your scores, accuracy, and improvement over time
 - **Activity Heatmap**: GitHub-style contribution tracking for your quiz activity
 - **Retest Functionality**: Retry quizzes to improve your scores
-- **Vocabulary Learning**: Practice and improve your vocabulary with interactive word games
+- **Smart Vocabulary Learning**: Adaptive system that prioritizes words you haven't seen before
+- **Vocabulary Practice**: Interactive word games with definitions, examples, and translations
 - **Pronunciation Practice**: Listen to word pronunciations and test your understanding
 - **Leaderboards**: Compete with other users on vocabulary scores
 - **Mobile Responsive**: Optimized experience across all device sizes
@@ -34,7 +35,7 @@ Aquizi is an intelligent quiz platform that uses AI to generate personalized qui
 
 ### Backend
 - **Firebase** - Authentication, Firestore database, and hosting
-- **OpenAI** - AI integration for quiz generation and text-to-speech
+- **OpenAI** - AI integration for quiz generation and text-to-speech functionality
 - **Langchain** - LLM framework for structured AI interactions
 
 ### Authentication
@@ -121,6 +122,7 @@ src/
 
 ## Recent Improvements
 
+- **Smart Vocabulary Learning**: Added adaptive learning system that prioritizes words users haven't seen before
 - **Vocabulary Learning Feature**: Added interactive vocabulary practice with definitions, examples, and translations
 - **Text-to-Speech Integration**: Added pronunciation support for vocabulary words
 - **Vocabulary Dashboard**: Track vocabulary learning progress with detailed metrics
@@ -134,6 +136,12 @@ src/
 - **Quiz Experience**: Added randomized answer options and improved question flow
 - **Performance Tracking**: Enhanced statistics with detailed time tracking for retests
 - **Visual Feedback**: Added sound effects and visual indicators for correct/incorrect answers
+- **Enhanced Data Visualization**: Added intuitive icons for better data representation in the vocabulary section, including checkmarks for correct answers, X marks for incorrect answers, and streak indicators for consecutive correct answers
+- **Interactive UI Elements**: Implemented tooltips, popovers, and keyboard shortcut indicators to improve user experience
+- **Translation System**: Added on-demand translation functionality for definitions and examples with Vietnamese translations, allowing users to toggle between languages
+- **Visual Progress Tracking**: Implemented progress bars and visual indicators to show completion status and performance metrics
+- **Streak Rewards System**: Added a streak counter with visual feedback and bonus points for consecutive correct answers
+- **Keyboard Navigation**: Enhanced accessibility with keyboard shortcuts for all major actions (Enter, P for pronunciation, H for hints)
 
 ## Contributing
 

@@ -27,18 +27,14 @@ import { motion } from "framer-motion";
 
 interface GameCompletedScreenProps {
   score: Score;
-  vocabulary: string[];
   onPlayAgain: () => void;
   onNewGame: () => void;
-  onViewScores: () => void;
 }
 
 export function GameCompletedScreen({
   score,
-  vocabulary,
   onPlayAgain,
-  onNewGame,
-  onViewScores
+  onNewGame
 }: GameCompletedScreenProps) {
   const { t } = useLanguage();
 

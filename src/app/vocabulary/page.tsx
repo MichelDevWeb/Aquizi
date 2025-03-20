@@ -18,6 +18,107 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { useLanguage } from "@/contexts/LanguageContext";
 import { BookOpen, Info } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { Skeleton } from "@/components/ui/skeleton";
+
+// Game tab skeleton
+const GameTabSkeleton = () => (
+  <div className="space-y-4 animate-pulse">
+    <div className="flex items-center justify-between mb-3">
+      <div className="flex items-center gap-2">
+        <Skeleton className="h-7 w-24 rounded-md" />
+        <Skeleton className="h-7 w-24 rounded-md" />
+        <Skeleton className="h-7 w-24 rounded-md" />
+      </div>
+      <Skeleton className="h-7 w-28 rounded-md" />
+    </div>
+    
+    <div className="rounded-lg border overflow-hidden">
+      <Skeleton className="h-16 w-full rounded-t-lg" />
+      <div className="p-4 space-y-4">
+        <div className="flex justify-between items-center">
+          <div className="flex items-center gap-4">
+            <Skeleton className="h-8 w-20 rounded-full" />
+            <Skeleton className="h-8 w-20 rounded-full" />
+          </div>
+          <Skeleton className="h-6 w-16 rounded-full" />
+        </div>
+        <Skeleton className="h-2 w-full rounded-full" />
+        <div className="space-y-4 mt-4">
+          <div className="space-y-2">
+            <Skeleton className="h-6 w-32" />
+            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-4 w-24 mt-2" />
+          </div>
+          <div className="space-y-2">
+            <Skeleton className="h-6 w-32" />
+            <Skeleton className="h-20 w-full" />
+          </div>
+          <div className="space-y-2">
+            <Skeleton className="h-6 w-32" />
+            <Skeleton className="h-16 w-full" />
+          </div>
+          <Skeleton className="h-12 w-full mt-4" />
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
+// Scores tab skeleton
+const ScoresTabSkeleton = () => (
+  <div className="space-y-4 animate-pulse">
+    <div className="rounded-lg border">
+      <Skeleton className="h-14 w-full rounded-t-lg" />
+      <div className="p-4 space-y-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          {[1, 2, 3, 4].map(i => (
+            <Skeleton key={i} className="h-24 w-full rounded-lg" />
+          ))}
+        </div>
+        <Skeleton className="h-8 w-40 my-2" />
+        <div className="space-y-2">
+          {[1, 2, 3].map(i => (
+            <Skeleton key={i} className="h-16 w-full rounded-lg" />
+          ))}
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
+// Leaderboard tab skeleton
+const LeaderboardTabSkeleton = () => (
+  <div className="space-y-4 animate-pulse">
+    <div className="rounded-lg border">
+      <Skeleton className="h-14 w-full rounded-t-lg" />
+      <div className="p-4 space-y-4">
+        <div className="flex justify-center items-end h-28 mb-6 mt-2">
+          {/* Second place */}
+          <div className="flex flex-col items-center mx-2">
+            <Skeleton className="h-14 w-14 rounded-full mb-2" />
+            <Skeleton className="h-20 w-16 rounded-t-md" />
+          </div>
+          {/* First place */}
+          <div className="flex flex-col items-center mx-2">
+            <Skeleton className="h-16 w-16 rounded-full mb-2" />
+            <Skeleton className="h-24 w-20 rounded-t-md" />
+          </div>
+          {/* Third place */}
+          <div className="flex flex-col items-center mx-2">
+            <Skeleton className="h-12 w-12 rounded-full mb-2" />
+            <Skeleton className="h-16 w-14 rounded-t-md" />
+          </div>
+        </div>
+        <Skeleton className="h-8 w-40 mb-2" />
+        <div className="space-y-2">
+          {[1, 2, 3, 4].map(i => (
+            <Skeleton key={i} className="h-14 w-full rounded-lg" />
+          ))}
+        </div>
+      </div>
+    </div>
+  </div>
+);
 
 export default function VocabularyPage() {
   const { user } = useAuth();
@@ -46,11 +147,16 @@ export default function VocabularyPage() {
 
   // Fetch data on user change
   useEffect(() => {
+    // Initial data loading based on current tab
     if (user) {
-      fetchScores();
-      fetchLeaderboard();
+      const currentTab = tabParam || "game";
+      if (currentTab === "scores") {
+        fetchScores();
+      } else if (currentTab === "leaderboard") {
+        fetchLeaderboard();
+      }
     }
-  }, [user]);
+  }, [user, tabParam]);
 
   // Format date to dd/MM/yyyy
   const formatDate = (date: Date | null): string => {
@@ -96,20 +202,38 @@ export default function VocabularyPage() {
       if (data.vocabulary) {
         setVocabulary(data.vocabulary);
         
-        // Check if we're getting mixed or generated words
-        if (data.source === "mixed" && useCache) {
+        // Show appropriate toast based on source of vocabulary
+        if (data.source === "database") {
+          // Using stored words from database
+          toast({
+            title: "Using Existing Words",
+            description: "Using vocabulary words already in our database",
+            variant: "default",
+            className: "bg-primary text-primary-foreground border-primary shadow-lg font-medium",
+          });
+        } else if (data.source === "mixed") {
+          // Mixed source - cached and generated
           toast({
             title: t('smartLearning'),
             description: t('smartLearningActiveMessage'),
             variant: "default",
-            className: "bg-primary/10 border-primary/20"
+            className: "bg-indigo-600 text-white border-indigo-700 shadow-lg font-medium",
           });
-        } else if (data.source === "generated" && useCache) {
+        } else if (data.source === "generated") {
+          // All words are newly generated
           toast({
-            title: t('allWordsCompleted'),
-            description: t('allWordsCompletedDesc'),
+            title: "New Words Generated",
+            description: "We've generated new words for you to learn",
             variant: "default",
-            className: "bg-amber-50 border-amber-200 dark:bg-amber-900/20 dark:border-amber-800"
+            className: "bg-amber-500 text-amber-950 border-amber-600 shadow-lg font-medium",
+          });
+        } else if (data.source === "played_before") {
+          // Words user has seen before
+          toast({
+            title: "Practice Words",
+            description: "We've selected words you've practiced before",
+            variant: "default",
+            className: "bg-blue-600 text-white border-blue-700 shadow-lg font-medium",
           });
         }
         
@@ -132,7 +256,7 @@ export default function VocabularyPage() {
         title: "Error",
         description: "Failed to fetch vocabulary",
         variant: "destructive",
-        className: "bg-red-50 border-red-200 dark:bg-red-900/20 dark:border-red-800 dark:text-red-100 text-red-800"
+        className: "bg-red-600 text-white border-red-700 shadow-lg font-medium",
       });
     } finally {
       setLoading(false);
@@ -160,12 +284,8 @@ export default function VocabularyPage() {
       }
     } catch (error) {
       console.error("Error generating speech:", error);
-      toast({
-        title: "Error",
-        description: "Failed to generate speech",
-        variant: "destructive",
-        className: "bg-red-50 border-red-200 dark:bg-red-900/20 dark:border-red-800 dark:text-red-100 text-red-800"
-      });
+      // Silent fail - don't show error to user for speech generation
+      // as it's not critical to gameplay
     }
   };
 
@@ -173,6 +293,7 @@ export default function VocabularyPage() {
     if (!user) return;
     
     try {
+      setLoading(true);
       const response = await fetch(`/api/vocabulary/score?userId=${user.uid}`);
       const data = await response.json();
       
@@ -181,11 +302,14 @@ export default function VocabularyPage() {
       }
     } catch (error) {
       console.error("Error fetching scores:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
   const fetchLeaderboard = async () => {
     try {
+      setLoading(true);
       const response = await fetch("/api/vocabulary/score?leaderboard=true");
       const data = await response.json();
       
@@ -194,6 +318,8 @@ export default function VocabularyPage() {
       }
     } catch (error) {
       console.error("Error fetching leaderboard:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -219,33 +345,30 @@ export default function VocabularyPage() {
       
       if (data.id) {
         toast({
-          title: "Success",
-          description: "Score saved successfully!",
+          title: "Score Saved",
+          description: "Your vocabulary practice results have been saved",
           variant: "default",
-          className: "bg-green-50 border-green-200 dark:bg-green-900 dark:border-green-800 dark:text-green-100"
+          className: "bg-green-600 text-white border-green-700 shadow-lg font-medium",
         });
-        fetchScores();
-        fetchLeaderboard();
       }
     } catch (error) {
       console.error("Error saving score:", error);
       toast({
-        title: "Error",
-        description: "Failed to save score",
+        title: t('error'),
+        description: "Failed to save your score",
         variant: "destructive",
-        className: "bg-red-50 border-red-200 dark:bg-red-900/20 dark:border-red-800 dark:text-red-100 text-red-800"
+        className: "bg-red-600 text-white border-red-700 shadow-lg font-medium",
       });
     }
   };
 
-  // Game actions
-  const resetGame = () => {
-    // Use cached vocabulary when resetting the game
-    fetchVocabulary(true);
-  };
-
   const generateNewGame = async (): Promise<void> => {
-    // Generate fresh vocabulary for a new game
+    // Generate fresh vocabulary for a new game, prioritizing unseen words
+    return await fetchVocabulary(true);
+  };
+  
+  const practiceSeenWords = async (): Promise<void> => {
+    // Specifically practice words the user has seen before
     return await fetchVocabulary(false);
   };
 
@@ -258,12 +381,8 @@ export default function VocabularyPage() {
 
   // Render game content based on state
   const renderGameContent = () => {
-    if (loading) {
-      return (
-        <div className="flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-        </div>
-      );
+    if (loading && vocabulary.length === 0) {
+      return <GameTabSkeleton />;
     }
     
     if (gameCompleted) {
@@ -278,9 +397,10 @@ export default function VocabularyPage() {
             wordsIncorrect: incorrectWords,
             createdAt: new Date()
           }}
-          vocabulary={vocabulary.map(v => v.word)}
-          onPlayAgain={resetGame}
-          onViewScores={navigateToScoresTab}
+          onPlayAgain={() => {
+            setGameCompleted(false);
+            practiceSeenWords();
+          }}
           onNewGame={() => {
             setGameCompleted(false);
             generateNewGame();
@@ -330,6 +450,15 @@ export default function VocabularyPage() {
             const params = new URLSearchParams(searchParams.toString());
             params.set("tab", value);
             router.push(`/vocabulary?${params.toString()}`, { scroll: false });
+            
+            // Fetch data when tab changes
+            if (user) {
+              if (value === "scores") {
+                fetchScores();
+              } else if (value === "leaderboard") {
+                fetchLeaderboard();
+              }
+            }
           }} className="w-full">
             <TabsList className="grid w-full grid-cols-3 mb-4">
               <TabsTrigger value="game" ref={gameTabRef}>{t('game')}</TabsTrigger>
@@ -338,7 +467,7 @@ export default function VocabularyPage() {
             </TabsList>
             
             <TabsContent value="game" className="mt-0">
-              {!gameCompleted && vocabulary.length > 0 && (
+              {!gameCompleted && vocabulary.length > 0 && !loading && (
                 <GameControls 
                   difficulty={difficulty}
                   setDifficulty={setDifficulty}
@@ -353,20 +482,28 @@ export default function VocabularyPage() {
             </TabsContent>
             
             <TabsContent value="scores" className="mt-0">
-              <ScoresTab 
-                scores={scores}
-                formatDate={formatDate}
-                userId={user?.uid}
-              />
+              {loading ? (
+                <ScoresTabSkeleton />
+              ) : (
+                <ScoresTab 
+                  scores={scores}
+                  formatDate={formatDate}
+                  userId={user?.uid}
+                />
+              )}
             </TabsContent>
             
             <TabsContent value="leaderboard" className="mt-0">
-              <LeaderboardTab 
-                leaderboard={leaderboard}
-                userId={user?.uid}
-                formatDate={formatDate}
-                navigateToGameTab={navigateToGameTab}
-              />
+              {loading ? (
+                <LeaderboardTabSkeleton />
+              ) : (
+                <LeaderboardTab 
+                  leaderboard={leaderboard}
+                  userId={user?.uid}
+                  formatDate={formatDate}
+                  navigateToGameTab={navigateToGameTab}
+                />
+              )}
             </TabsContent>
           </Tabs>
         </div>

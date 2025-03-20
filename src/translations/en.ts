@@ -304,4 +304,13 @@ export const en = {
   spaceNextWord: "Next word",
   arrowPrevWord: "Previous word",
   arrowNextWord: "Next word",
+  
+  // Vocabulary words
+  similar: "Synonyms",
+  opposite: "Antonyms",
+  
+  // Vocabulary learning
+  wordDetails: "Word Details",
+  synonyms: "Synonyms",
+  antonyms: "Antonyms",
 }; 

@@ -9,6 +9,7 @@ import { WordQuestion } from "./WordQuestion";
 import { WordAnswer } from "./WordAnswer";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { BookOpen, Trophy, Flame } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface VocabularyGameProps {
   vocabulary: Vocabulary[];
@@ -82,14 +83,6 @@ export function VocabularyGame({
     const handleKeyDown = (e: KeyboardEvent) => {
       // Prevent handling if user is typing in an input field
       if (e.target instanceof HTMLInputElement) {
-        if (e.key === 'Enter') {
-          e.preventDefault();
-          if (showAnswer) {
-            nextWord();
-          } else {
-            checkAnswer();
-          }
-        }
         return;
       }
 
@@ -140,7 +133,7 @@ export function VocabularyGame({
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [showAnswer, showHint, currentWord, showDefinitionTranslation, showExampleTranslation, definitionTranslation, exampleTranslation]);
+  }, [showAnswer, showHint, currentWord, showDefinitionTranslation, showExampleTranslation, definitionTranslation, exampleTranslation, userAnswer]);
 
   const playAudio = (audioUrl: string) => {
     const audio = new Audio(audioUrl);
@@ -185,7 +178,6 @@ export function VocabularyGame({
       });
       
       const data = await response.json();
-      console.log("Translation API response:", data);
       
       if (data.translatedText) {
         if (type === 'definition') {
@@ -317,40 +309,84 @@ export function VocabularyGame({
     return example;
   };
 
-  if (!currentWord) return null;
+  // Skeleton loading component
+  const LoadingSkeleton = () => (
+    <div className="space-y-4 animate-pulse">
+      <div className="flex justify-between items-center">
+        <div className="flex items-center gap-4">
+          <Skeleton className="h-8 w-20 rounded-full" />
+          <Skeleton className="h-8 w-20 rounded-full" />
+        </div>
+        <Skeleton className="h-6 w-16 rounded-full" />
+      </div>
+      <Skeleton className="h-2 w-full rounded-full" />
+      <div className="space-y-4 mt-4">
+        <div className="space-y-2">
+          <Skeleton className="h-6 w-32" />
+          <Skeleton className="h-10 w-full" />
+          <Skeleton className="h-4 w-24 mt-2" />
+        </div>
+        <div className="space-y-2">
+          <Skeleton className="h-6 w-32" />
+          <Skeleton className="h-20 w-full" />
+        </div>
+        <div className="space-y-2">
+          <Skeleton className="h-6 w-32" />
+          <Skeleton className="h-16 w-full" />
+        </div>
+        <Skeleton className="h-12 w-full mt-4" />
+      </div>
+    </div>
+  );
 
   return (
     <Card className="border-none shadow-md">
       <CardHeader className="pb-3 bg-gradient-to-r from-primary/5 to-primary/10 rounded-t-lg">
-        <div className="flex justify-between items-center">
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-1.5 bg-white/80 dark:bg-black/20 px-3 py-1.5 rounded-full shadow-sm">
-              <BookOpen className="h-4 w-4 text-primary" />
-              <span className="font-medium">{currentIndex + 1}</span>
-              <span className="text-muted-foreground">/</span>
-              <span>{vocabulary.length}</span>
+        {loading ? (
+          <div className="flex justify-between items-center">
+            <div className="flex items-center gap-4">
+              <Skeleton className="h-8 w-20 rounded-full" />
+              <Skeleton className="h-8 w-20 rounded-full" />
+            </div>
+            <Skeleton className="h-6 w-16 rounded-full" />
+          </div>
+        ) : (
+          <div className="flex justify-between items-center">
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-1.5 bg-white/80 dark:bg-black/20 px-3 py-1.5 rounded-full shadow-sm">
+                <BookOpen className="h-4 w-4 text-primary" />
+                <span className="font-medium">{currentIndex + 1}</span>
+                <span className="text-muted-foreground">/</span>
+                <span>{vocabulary.length}</span>
+              </div>
+              
+              <div className="flex items-center gap-1.5 bg-white/80 dark:bg-black/20 px-3 py-1.5 rounded-full shadow-sm">
+                <Trophy className="h-4 w-4 text-amber-500" />
+                <span className="font-medium">{score}</span>
+              </div>
             </div>
             
-            <div className="flex items-center gap-1.5 bg-white/80 dark:bg-black/20 px-3 py-1.5 rounded-full shadow-sm">
-              <Trophy className="h-4 w-4 text-amber-500" />
-              <span className="font-medium">{score}</span>
-            </div>
+            {streak >= 3 && (
+              <Badge variant="secondary" className="animate-pulse flex items-center gap-1 bg-amber-100 dark:bg-amber-900/40 border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-300 px-3 py-1">
+                <Flame className="h-3.5 w-3.5 text-amber-500" />
+                <span>{streak}</span>
+              </Badge>
+            )}
           </div>
-          
-          {streak >= 3 && (
-            <Badge variant="secondary" className="animate-pulse flex items-center gap-1 bg-amber-100 dark:bg-amber-900/40 border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-300 px-3 py-1">
-              <Flame className="h-3.5 w-3.5 text-amber-500" />
-              <span>{streak}</span>
-            </Badge>
-          )}
-        </div>
-        <Progress 
-          value={(currentIndex / vocabulary.length) * 100} 
-          className="mt-2 h-1.5 bg-primary/10"
-        />
+        )}
+        {loading ? (
+          <Skeleton className="h-2 w-full mt-2" />
+        ) : (
+          <Progress 
+            value={(currentIndex / vocabulary.length) * 100} 
+            className="mt-2 h-1.5 bg-primary/10"
+          />
+        )}
       </CardHeader>
       <CardContent>
-        {showAnswer ? (
+        {loading ? (
+          <LoadingSkeleton />
+        ) : showAnswer ? (
           <WordAnswer 
             currentWord={currentWord}
             answerStatus={answerStatus}

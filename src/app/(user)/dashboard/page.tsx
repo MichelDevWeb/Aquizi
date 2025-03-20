@@ -11,15 +11,13 @@ import RecentActivityCard from "@/components/dashboard/RecentActivityCard";
 import { useAuth } from "@/lib/firebase/firebase-auth";
 import { useEffect, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Info, Calendar, LayoutDashboard, TrendingUp, Award, Send, ListChecks, Zap, BookOpen, Trophy, Brain, Star, Medal, BarChart3, Crown } from "lucide-react";
+import { Info, Calendar, LayoutDashboard, TrendingUp, Award, Send, ListChecks, Zap, BookOpen, Trophy, Brain, Star, Medal, BarChart3, Crown, CheckCircle2, X } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent, CardDescription, CardFooter } from "@/components/ui/card";
 import GitHubStyleHeatMap from "./GitHubStyleHeatMap";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import PageLayout from "@/components/PageLayout";
-import { getBaseUrl } from "@/lib/utils";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
@@ -27,6 +25,7 @@ import { Button } from "@/components/ui/button";
 interface VocabularyScore {
   id: string;
   userId: string;
+  username?: string;
   score: number;
   wordsCorrect: string[];
   wordsIncorrect: string[];
@@ -160,6 +159,19 @@ const DashboardPage = () => {
     if (!date) return "Unknown date";
     const d = new Date(date);
     return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
+  };
+
+  // Get display name for a user
+  const getDisplayName = (score: VocabularyScore): string => {
+    if (score.userId === user?.uid) {
+      return t('you');
+    }
+    
+    if (score.username) {
+      return score.username;
+    }
+    
+    return `${t('player')} ${score.userId.substring(0, 6)}`;
   };
 
   return (
@@ -429,11 +441,7 @@ const DashboardPage = () => {
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center flex-wrap">
                             <p className="font-medium text-sm truncate max-w-[120px] sm:max-w-none">
-                              {score.userId === user?.uid ? (
-                                <span className="text-primary">{t('you')}</span>
-                              ) : (
-                                `${t('player')} ${score.userId.substring(0, 6)}`
-                              )}
+                              {getDisplayName(score)}
                             </p>
                             {score.userId === user?.uid && (
                               <Badge variant="outline" className="ml-2 text-xs px-1.5 py-0 h-4">
@@ -444,11 +452,11 @@ const DashboardPage = () => {
                           </div>
                           <div className="flex items-center text-xs text-muted-foreground">
                             <span className="mr-2 flex items-center gap-1">
-                              <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-green-600"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                              <CheckCircle2 className="h-3 w-3 text-green-600" />
                               {score.wordsCorrect.length}
                             </span>
                             <span className="flex items-center gap-1">
-                              <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-red-600"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                              <X className="h-3 w-3 text-red-600" />
                               {score.wordsIncorrect.length}
                             </span>
                           </div>
@@ -456,7 +464,7 @@ const DashboardPage = () => {
                         <div className="text-right">
                           <p className="font-bold">{score.score}</p>
                           <p className="text-xs text-muted-foreground">
-                            {score.createdAt ? formatDate(new Date(score.createdAt)).split(' ')[0] : t('completed')}
+                            {score.createdAt ? formatDate(new Date(score.createdAt)).split('/')[0] : t('completed')}
                           </p>
                         </div>
                       </div>
@@ -525,11 +533,11 @@ const DashboardPage = () => {
                             </div>
                             <div className="flex items-center gap-2">
                               <Badge variant="secondary" className="px-1.5 py-0 h-5 text-xs flex items-center gap-1 bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-green-600"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                <CheckCircle2 className="h-3 w-3 text-green-600" />
                                 {score.wordsCorrect.length}
                               </Badge>
                               <Badge variant="outline" className="px-1.5 py-0 h-5 text-xs flex items-center gap-1 bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-400 border-0">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-red-600"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                                <X className="h-3 w-3 text-red-600" />
                                 {score.wordsIncorrect.length}
                               </Badge>
                             </div>
@@ -557,8 +565,8 @@ const DashboardPage = () => {
                 ) : (
                   <div className="flex flex-col items-center justify-center py-6 text-center p-3 sm:p-4">
                     <Calendar className="h-8 w-8 mb-2 text-muted-foreground/40" />
-                    <h3 className="text-base font-semibold mb-1">{t('noQuizzesYet')}</h3>
-                    <p className="text-sm text-muted-foreground mb-4">{t('noQuizzesDesc')}</p>
+                    <h3 className="text-base font-semibold mb-1">{"No quizzes yet"}</h3>
+                    <p className="text-sm text-muted-foreground mb-4">{"No quizzes have been completed yet"}</p>
                   </div>
                 )}
               </CardContent>
@@ -629,7 +637,7 @@ const DashboardPage = () => {
                   {"Challenge yourself with advanced vocabulary"}
                 </p>
                 <Button asChild size="sm" variant="secondary" className="w-full">
-                  <Link href="/vocabulary?difficulty=hard">
+                  <Link href="/vocabulary?difficulty=advanced">
                     <Zap className="mr-2 h-3.5 w-3.5" />
                     {"Start Advanced"}
                   </Link>

@@ -149,9 +149,26 @@ export function WordQuestion({
                       <Globe className="h-3 w-3 text-primary/70" />
                       <p className="text-xs text-muted-foreground">{t('translation')}</p>
                     </div>
-                    <p className="text-sm italic text-foreground/80">
-                      {definitionTranslation || currentWord.vietnameseTranslation}
-                    </p>
+                    
+                    {/* Word translation */}
+                    <div className="mb-2 pb-2 border-b border-primary/10">
+                      <div className="flex items-center gap-1.5">
+                        <Badge variant="outline" className="text-xs bg-primary/5 border-primary/20 text-primary">
+                          {t('word')}
+                        </Badge>
+                        <p className="text-sm font-medium">{currentWord.vietnameseTranslation}</p>
+                      </div>
+                    </div>
+                    
+                    {/* Definition translation */}
+                    <div className="flex items-center gap-1.5">
+                      <Badge variant="outline" className="text-xs bg-primary/5 border-primary/20 text-primary">
+                        {t('definition')}
+                      </Badge>
+                      <p className="text-sm italic text-foreground/80">
+                        {definitionTranslation}
+                      </p>
+                    </div>
                   </div>
                 </motion.div>
               )}
@@ -223,7 +240,7 @@ export function WordQuestion({
                       <p className="text-xs text-muted-foreground">{t('translation')}</p>
                     </div>
                     <p className="text-sm italic text-foreground/80">
-                      {exampleTranslation || `Ví dụ: ${currentWord.vietnameseTranslation.split(' ').slice(0, 5).join(' ')}...`}
+                      {exampleTranslation}
                     </p>
                   </div>
                 </motion.div>

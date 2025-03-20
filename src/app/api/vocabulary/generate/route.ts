@@ -47,8 +47,11 @@ export async function GET(req: NextRequest) {
     // Array to store the final vocabulary words
     let finalVocabulary: VocabularyWord[] = [];
     
-    if (useCache && userId) {
-      // Get words the user has seen before (both correct and incorrect)
+    // Initialize seenWords set to track words the user has seen
+    const seenWords: Set<string> = new Set();
+    
+    // Step 1: If we have a userId, get the words they've already seen
+    if (userId) {
       const scoresCollection = collection(db, COLLECTIONS.VOCABULARY_SCORES);
       const scoresQuery = query(
         scoresCollection,
@@ -56,9 +59,6 @@ export async function GET(req: NextRequest) {
       );
       
       const scoresSnapshot = await getDocs(scoresQuery);
-      
-      // Collect all words the user has seen
-      const seenWords: Set<string> = new Set();
       
       scoresSnapshot.forEach((doc) => {
         const data = doc.data();
@@ -69,8 +69,72 @@ export async function GET(req: NextRequest) {
         correctWords.forEach(word => seenWords.add(word.toLowerCase()));
         incorrectWords.forEach(word => seenWords.add(word.toLowerCase()));
       });
+    }
+    
+    // Step 2: For 'Play Again' scenario (useCache=false), return words immediately
+    if (!useCache && userId && seenWords.size > 0) {
+      // Prepare query to get words the user has seen before
+      const vocabularyCollection = collection(db, COLLECTIONS.VOCABULARY);
+      const wordsList = Array.from(seenWords).slice(0, count * 2);
       
-      // Get vocabulary from Firestore that the user hasn't seen before
+      // Get a subset of previously seen words
+      const cachedVocabulary: VocabularyWord[] = [];
+      
+      // Use batch processing to get words efficiently
+      // We'll process in chunks of 10 words to avoid query limitations
+      const chunkSize = 10;
+      for (let i = 0; i < wordsList.length; i += chunkSize) {
+        const chunk = wordsList.slice(i, i + chunkSize);
+        
+        let vocabularyQuery;
+        if (difficultyParam && difficultyParam !== "all") {
+          vocabularyQuery = query(
+            vocabularyCollection,
+            where(FIELDS.VOCABULARY.WORD, "in", chunk),
+            where(FIELDS.VOCABULARY.DIFFICULTY, "==", difficultyParam),
+            limit(chunkSize)
+          );
+        } else {
+          vocabularyQuery = query(
+            vocabularyCollection,
+            where(FIELDS.VOCABULARY.WORD, "in", chunk),
+            limit(chunkSize)
+          );
+        }
+        
+        const querySnapshot = await getDocs(vocabularyQuery);
+        querySnapshot.forEach((doc) => {
+          const data = doc.data();
+          cachedVocabulary.push({
+            id: doc.id,
+            word: data[FIELDS.VOCABULARY.WORD] || "",
+            definition: data[FIELDS.VOCABULARY.DEFINITION] || "",
+            example: data[FIELDS.VOCABULARY.EXAMPLE] || "",
+            pronunciation: data[FIELDS.VOCABULARY.PRONUNCIATION] || "",
+            vietnameseTranslation: data[FIELDS.VOCABULARY.VIETNAMESE_TRANSLATION] || "",
+            difficulty: data[FIELDS.VOCABULARY.DIFFICULTY] || "beginner",
+            audioUrl: data[FIELDS.VOCABULARY.AUDIO_URL],
+            synonyms: data.synonyms || [],
+            antonyms: data.antonyms || [],
+            usageNotes: data.usageNotes || "",
+            partOfSpeech: data.partOfSpeech || "",
+            createdAt: data[FIELDS.VOCABULARY.CREATED_AT],
+          });
+        });
+        
+        if (cachedVocabulary.length >= count) break;
+      }
+      
+      if (cachedVocabulary.length > 0) {
+        return NextResponse.json({ 
+          vocabulary: cachedVocabulary.slice(0, count), 
+          source: "played_before" 
+        }, { status: 200 });
+      }
+    }
+    
+    // Step 3: Try to find unused vocabulary based on the user's history and difficulty
+    if (useCache) {
       const vocabularyCollection = collection(db, COLLECTIONS.VOCABULARY);
       let vocabularyQuery;
       
@@ -79,13 +143,13 @@ export async function GET(req: NextRequest) {
           vocabularyCollection,
           where(FIELDS.VOCABULARY.DIFFICULTY, "==", difficultyParam),
           orderBy(FIELDS.VOCABULARY.CREATED_AT, "desc"),
-          limit(count * 2) // Get more than needed to filter out seen words
+          limit(count * 3) // Get more than needed to filter out seen words
         );
       } else {
         vocabularyQuery = query(
           vocabularyCollection,
           orderBy(FIELDS.VOCABULARY.CREATED_AT, "desc"),
-          limit(count * 2) // Get more than needed to filter out seen words
+          limit(count * 3) // Get more than needed to filter out seen words
         );
       }
       
@@ -98,8 +162,9 @@ export async function GET(req: NextRequest) {
           const data = doc.data();
           const word = data[FIELDS.VOCABULARY.WORD] || "";
           
-          // Only add words the user hasn't seen before
-          if (!seenWords.has(word.toLowerCase())) {
+          // For users with ID, only add words they haven't seen
+          // For users without ID, add all words
+          if (!userId || !seenWords.has(word.toLowerCase())) {
             cachedVocabulary.push({
               id: doc.id,
               word: word,
@@ -121,58 +186,71 @@ export async function GET(req: NextRequest) {
         // Take only the required number of words
         finalVocabulary = cachedVocabulary.slice(0, count);
       }
-    } else if (useCache) {
-      // If no userId provided, just get random words from cache
-      const vocabularyCollection = collection(db, COLLECTIONS.VOCABULARY);
-      let vocabularyQuery = query(
-        vocabularyCollection, 
-        orderBy(FIELDS.VOCABULARY.CREATED_AT, "desc"),
-        limit(count)
-      );
       
-      // Add difficulty filter if provided
-      if (difficultyParam && difficultyParam !== "all") {
-        vocabularyQuery = query(
-          vocabularyCollection, 
-          where(FIELDS.VOCABULARY.DIFFICULTY, "==", difficultyParam),
-          orderBy(FIELDS.VOCABULARY.CREATED_AT, "desc"),
-          limit(count)
-        );
-      }
-      
-      const querySnapshot = await getDocs(vocabularyQuery);
-      
-      if (!querySnapshot.empty) {
-        querySnapshot.forEach((doc) => {
-          const data = doc.data();
-          finalVocabulary.push({
-            id: doc.id,
-            word: data[FIELDS.VOCABULARY.WORD] || "",
-            definition: data[FIELDS.VOCABULARY.DEFINITION] || "",
-            example: data[FIELDS.VOCABULARY.EXAMPLE] || "",
-            pronunciation: data[FIELDS.VOCABULARY.PRONUNCIATION] || "",
-            vietnameseTranslation: data[FIELDS.VOCABULARY.VIETNAMESE_TRANSLATION] || "",
-            difficulty: data[FIELDS.VOCABULARY.DIFFICULTY] || "beginner",
-            audioUrl: data[FIELDS.VOCABULARY.AUDIO_URL],
-            synonyms: data.synonyms || [],
-            antonyms: data.antonyms || [],
-            usageNotes: data.usageNotes || "",
-            partOfSpeech: data.partOfSpeech || "",
-            createdAt: data[FIELDS.VOCABULARY.CREATED_AT],
+      // If we don't have enough words, try a broader search
+      if (finalVocabulary.length < count) {
+        // Prepare a wider query to find more unused words
+        let expandedQuery;
+        
+        if (difficultyParam && difficultyParam !== "all") {
+          expandedQuery = query(
+            vocabularyCollection,
+            where(FIELDS.VOCABULARY.DIFFICULTY, "==", difficultyParam),
+            limit(200) // A much larger limit to find all available words
+          );
+        } else {
+          expandedQuery = query(
+            vocabularyCollection,
+            limit(200) // A much larger limit to find all available words
+          );
+        }
+        
+        const expandedSnapshot = await getDocs(expandedQuery);
+        
+        if (!expandedSnapshot.empty) {
+          // Keep track of words we already have to avoid duplicates
+          const currentWords = new Set(finalVocabulary.map(v => v.word.toLowerCase()));
+          
+          expandedSnapshot.forEach((doc) => {
+            const data = doc.data();
+            const word = data[FIELDS.VOCABULARY.WORD] || "";
+            
+            // Only add new words that aren't in our current list and haven't been seen by user
+            if (!currentWords.has(word.toLowerCase()) && 
+                (!userId || !seenWords.has(word.toLowerCase()))) {
+              if (finalVocabulary.length < count) {
+                finalVocabulary.push({
+                  id: doc.id,
+                  word: word,
+                  definition: data[FIELDS.VOCABULARY.DEFINITION] || "",
+                  example: data[FIELDS.VOCABULARY.EXAMPLE] || "",
+                  pronunciation: data[FIELDS.VOCABULARY.PRONUNCIATION] || "",
+                  vietnameseTranslation: data[FIELDS.VOCABULARY.VIETNAMESE_TRANSLATION] || "",
+                  difficulty: data[FIELDS.VOCABULARY.DIFFICULTY] || "beginner",
+                  audioUrl: data[FIELDS.VOCABULARY.AUDIO_URL],
+                  synonyms: data.synonyms || [],
+                  antonyms: data.antonyms || [],
+                  usageNotes: data.usageNotes || "",
+                  partOfSpeech: data.partOfSpeech || "",
+                  createdAt: data[FIELDS.VOCABULARY.CREATED_AT],
+                });
+                currentWords.add(word.toLowerCase());
+              }
+            }
           });
-        });
+        }
       }
     }
     
-    // If we have enough words from cache, return them
+    // If we have enough words from cache/database, return them
     if (finalVocabulary.length >= count) {
       return NextResponse.json({ 
         vocabulary: finalVocabulary.slice(0, count), 
-        source: "cache" 
+        source: "database" 
       }, { status: 200 });
     }
     
-    // If we don't have enough words or cache is disabled, generate new vocabulary
+    // Step 4: Only if we still don't have enough words, generate new ones
     if (!process.env.OPENAI_API_KEY) {
       return NextResponse.json(
         { error: "OpenAI API key not provided" },

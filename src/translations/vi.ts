@@ -287,13 +287,13 @@ export const vi = {
   showHideHint: "Hiện/ẩn gợi ý",
   
   // Additional translation keys for WordQuestion component
-  show: "Hiện",
+  show: "Hiển thị",
   hide: "Ẩn",
-  translation: "Bản dịch",
-  letters: "Chữ cái",
+  translation: "Bản dịch tiếng Việt",
+  letters: "Số chữ cái",
   clear: "Xóa",
-  answer: "Trả lời",
-  pressHKey: "Nhấn phím H để xem gợi ý",
+  answer: "Đáp án",
+  pressHKey: "Nhấn H để hiển thị gợi ý",
   play: "Phát",
   
   // Timeline options for leaderboard

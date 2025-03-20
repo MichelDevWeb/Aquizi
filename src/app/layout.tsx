@@ -2,8 +2,6 @@ import { cn } from "@/lib/utils";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import Header from "@/components/ui/header";
-import LoadingSpinner from "@/components/LoadingSpinner";
 import Providers from "@/components/Providers";
 import NavBar from "@/components/NavBar";
 import { Toaster } from "@/components/ui/toaster";
@@ -135,7 +133,6 @@ export default function RootLayout({
           </div>
           <Footer />
           <Toaster />
-          <LoadingSpinner />
           <ScrollToTopButton />
           <MobileNav />
           <UpdateNotification />

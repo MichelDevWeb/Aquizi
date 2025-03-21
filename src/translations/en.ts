@@ -256,7 +256,7 @@ export const en = {
   // Vocabulary Progress
   yourProgress: "Progress",
   totalWordsLearned: "Words Learned",
-  averageAccuracy: "Avg Accuracy",
+  averageAccuracy: "Average Accuracy",
   learningProgress: "Learning Progress",
   words: "words",
   
@@ -313,4 +313,11 @@ export const en = {
   wordDetails: "Word Details",
   synonyms: "Synonyms",
   antonyms: "Antonyms",
+  
+  // PWA Installation
+  addToHomescreen: "Add to Homescreen",
+  addToHomescreenDesc: "For a better vocabulary learning experience",
+  install: "Install App",
+  installApp: "Install Aquizi",
+  installAppDesc: "Use Aquizi even when offline"
 }; 

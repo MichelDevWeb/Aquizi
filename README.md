@@ -21,6 +21,7 @@ Aquizi is an intelligent quiz platform that uses AI to generate personalized qui
 - **Multilingual Support**: Full internationalization with English and Vietnamese languages
 - **Accessibility**: ARIA-compliant components for better screen reader support
 - **User-Friendly Profiles**: Display usernames instead of IDs for better social interaction
+- **Progressive Web App (PWA)**: Install Aquizi on your device for offline access and app-like experience
 
 ## Tech Stack
 
@@ -33,6 +34,7 @@ Aquizi is an intelligent quiz platform that uses AI to generate personalized qui
 - **React Query** - Data fetching and state management
 - **date-fns** - Date manipulation library
 - **Canvas Confetti** - Visual effects for achievements
+- **PWA Support** - Service worker and web manifest for app installation
 
 ### Backend
 - **Firebase** - Authentication, Firestore database, and hosting
@@ -123,9 +125,11 @@ src/
 
 ## Recent Improvements
 
+- **Progressive Web App (PWA)**: Added install banner for mobile users and offline capabilities
 - **Enhanced User Profiles**: Improved leaderboards to display actual usernames instead of cryptic user IDs
 - **Tab-Specific Data Loading**: Optimized data fetching to only load scores and leaderboard data when the user switches to those tabs
 - **Loading States**: Added dedicated loading states for different sections of the application
+- **No-Reload Tab Navigation**: Implemented client-side tab switching that updates content without reloading the page
 - **Smart Vocabulary Learning**: Added adaptive learning system that prioritizes words users haven't seen before
 - **Vocabulary Learning Feature**: Added interactive vocabulary practice with definitions, examples, and translations
 - **Text-to-Speech Integration**: Added pronunciation support for vocabulary words

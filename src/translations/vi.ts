@@ -305,4 +305,16 @@ export const vi = {
   noQuizzesToday: "Không có bài tập hôm nay",
   noQuizzesThisWeek: "Không có bài tập tuần này",
   noQuizzesThisMonth: "Không có bài tập tháng này",
+  
+  // Vocabulary learning
+  wordDetails: "Chi tiết từ",
+  synonyms: "Từ đồng nghĩa",
+  antonyms: "Từ trái nghĩa",
+  
+  // PWA Installation
+  addToHomescreen: "Thêm vào màn hình chính",
+  addToHomescreenDesc: "Để có trải nghiệm học từ vựng tốt hơn",
+  install: "Cài đặt ứng dụng",
+  installApp: "Cài đặt Aquizi",
+  installAppDesc: "Sử dụng Aquizi ngay cả khi không có mạng"
 };

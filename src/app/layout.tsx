@@ -9,6 +9,7 @@ import Footer from "@/components/Footer";
 import ScrollToTopButton from "@/components/ScrollToTopButton";
 import MobileNav from "@/components/MobileNav";
 import dynamic from "next/dynamic";
+import { PWAInstallBanner } from '@/components/PWAInstallBanner';
 
 // Dynamically import UpdateNotification with no SSR to avoid hydration issues
 const UpdateNotification = dynamic(
@@ -66,6 +67,8 @@ export default function RootLayout({
     <html
       suppressHydrationWarning
       lang="en"
+      className="light"
+      style={{ colorScheme: 'light' }}
     >
       <head>
         <title>{metadata.title as string}</title>
@@ -120,6 +123,11 @@ export default function RootLayout({
             href={url}
           />
         ))}
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="Aquizi" />
+        <meta name="format-detection" content="telephone=no" />
+        <meta name="mobile-web-app-capable" content="yes" />
       </head>
       <body className={cn(
         inter.className, 
@@ -136,6 +144,7 @@ export default function RootLayout({
           <ScrollToTopButton />
           <MobileNav />
           <UpdateNotification />
+          <PWAInstallBanner />
         </Providers>
       </body>
     </html>

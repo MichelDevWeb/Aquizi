@@ -15,6 +15,7 @@ import { useAuth } from "@/lib/firebase/firebase-auth";
 import { useEffect, useState } from "react";
 import PageLayout from "@/components/PageLayout";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { registerServiceWorker } from '@/lib/serviceWorker';
 
 export default function Home() {
   const { user, loading } = useAuth();
@@ -23,6 +24,8 @@ export default function Home() {
 
   useEffect(() => {
     setIsClient(true);
+    // Register service worker on client side
+    registerServiceWorker();
   }, []);
 
   // Show loading state while checking authentication

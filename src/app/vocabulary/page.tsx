@@ -17,8 +17,9 @@ import { ProgressTracker } from "@/components/vocabulary/ProgressTracker";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { BookOpen, Info } from "lucide-react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
 
 // Game tab skeleton
 const GameTabSkeleton = () => (
@@ -125,8 +126,6 @@ export default function VocabularyPage() {
   const { toast } = useToast();
   const { t } = useLanguage();
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const tabParam = searchParams.get("tab");
   
   // State management
   const [vocabulary, setVocabulary] = useState<Vocabulary[]>([]);
@@ -139,24 +138,27 @@ export default function VocabularyPage() {
   const [gameCompleted, setGameCompleted] = useState(false);
   const [difficulty, setDifficulty] = useState<string>("all");
   const [wordCount, setWordCount] = useState<number>(5);
+  const [activeTab, setActiveTab] = useState<string>("game");
   
   // Refs
   const gameTabRef = useRef<HTMLButtonElement>(null);
   const scoresTabRef = useRef<HTMLButtonElement>(null);
   const leaderboardTabRef = useRef<HTMLButtonElement>(null);
 
-  // Fetch data on user change
+  // Fetch data on initial load and user change
   useEffect(() => {
     // Initial data loading based on current tab
     if (user) {
-      const currentTab = tabParam || "game";
+      const currentTab = activeTab;
       if (currentTab === "scores") {
         fetchScores();
       } else if (currentTab === "leaderboard") {
         fetchLeaderboard();
       }
     }
-  }, [user, tabParam]);
+    // Only run this effect on initial load
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
 
   // Format date to dd/MM/yyyy
   const formatDate = (date: Date | null): string => {
@@ -167,15 +169,23 @@ export default function VocabularyPage() {
 
   // Navigation helper
   const navigateToGameTab = () => {
-    if (gameTabRef.current) {
-      gameTabRef.current.click();
-    }
+    setActiveTab("game");
+    setLoading(true);
   };
 
   // Navigate to scores tab
   const navigateToScoresTab = () => {
-    if (scoresTabRef.current) {
-      scoresTabRef.current.click();
+    setActiveTab("scores");
+    if (user) {
+      fetchScores();
+    }
+  };
+  
+  // Navigate to leaderboard tab
+  const navigateToLeaderboardTab = () => {
+    setActiveTab("leaderboard");
+    if (user) {
+      fetchLeaderboard();
     }
   };
 
@@ -184,19 +194,19 @@ export default function VocabularyPage() {
     try {
       setLoading(true);
       
-      const params = new URLSearchParams();
+      // Build query string directly
+      let queryString = "";
       if (difficulty && difficulty !== "all") {
-        params.append("difficulty", difficulty);
+        queryString += `difficulty=${difficulty}&`;
       }
-      params.append("count", wordCount.toString());
-      params.append("useCache", useCache.toString());
+      queryString += `count=${wordCount}&useCache=${useCache}`;
       
       // Add userId parameter if user is logged in
       if (user) {
-        params.append("userId", user.uid);
+        queryString += `&userId=${user.uid}`;
       }
       
-      const response = await fetch(`/api/vocabulary/generate?${params.toString()}`);
+      const response = await fetch(`/api/vocabulary/generate?${queryString}`);
       const data = await response.json();
       
       if (data.vocabulary) {
@@ -446,20 +456,22 @@ export default function VocabularyPage() {
       {/* Main content */}
       <div className="grid gap-4 md:grid-cols-[1fr_280px]">
         <div>
-          <Tabs value={tabParam || "game"} onValueChange={(value) => {
-            const params = new URLSearchParams(searchParams.toString());
-            params.set("tab", value);
-            router.push(`/vocabulary?${params.toString()}`, { scroll: false });
-            
-            // Fetch data when tab changes
-            if (user) {
-              if (value === "scores") {
-                fetchScores();
-              } else if (value === "leaderboard") {
-                fetchLeaderboard();
+          <Tabs 
+            value={activeTab} 
+            onValueChange={(value) => {
+              setActiveTab(value);
+              
+              // Fetch data when tab changes
+              if (user) {
+                if (value === "scores") {
+                  fetchScores();
+                } else if (value === "leaderboard") {
+                  fetchLeaderboard();
+                }
               }
-            }
-          }} className="w-full">
+            }} 
+            className="w-full"
+          >
             <TabsList className="grid w-full grid-cols-3 mb-4">
               <TabsTrigger value="game" ref={gameTabRef}>{t('game')}</TabsTrigger>
               <TabsTrigger value="scores" ref={scoresTabRef}>{t('yourScores')}</TabsTrigger>
@@ -535,34 +547,6 @@ export default function VocabularyPage() {
             )}
           </Accordion>
         </div>
-      </div>
-      
-      {/* Mobile sidebar - Show as accordion at the bottom on mobile */}
-      <div className="md:hidden mt-6 border-t pt-4">
-        <Accordion type="multiple" defaultValue={["guide"]}>
-          <AccordionItem value="guide">
-            <AccordionTrigger className="text-base font-medium">{t('howToPlay')}</AccordionTrigger>
-            <AccordionContent>
-              <QuickGuide />
-            </AccordionContent>
-          </AccordionItem>
-          
-          <AccordionItem value="tips">
-            <AccordionTrigger className="text-base font-medium">{t('learningTips')}</AccordionTrigger>
-            <AccordionContent>
-              <LearningTips />
-            </AccordionContent>
-          </AccordionItem>
-          
-          {user && scores.length > 0 && (
-            <AccordionItem value="progress">
-              <AccordionTrigger className="text-base font-medium">{t('yourProgress')}</AccordionTrigger>
-              <AccordionContent>
-                <ProgressTracker scores={scores} />
-              </AccordionContent>
-            </AccordionItem>
-          )}
-        </Accordion>
       </div>
     </div>
   );

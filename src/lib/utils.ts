@@ -67,3 +67,22 @@ export function getBaseUrl(): string {
   }
   return 'http://localhost:3000'; // Development URL
 }
+
+/**
+ * Detects if the application is currently running as a PWA
+ * Checks for standalone mode, iOS standalone, or Android app referrer
+ */
+export function isPWA(): boolean {
+  if (typeof window === 'undefined') return false;
+  
+  // Check for display-mode: standalone
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+  
+  // Check for iOS standalone mode
+  const isIOSStandalone = (window.navigator as any).standalone === true;
+  
+  // Check for Android app referrer
+  const isAndroidApp = document.referrer.includes('android-app://');
+  
+  return isStandalone || isIOSStandalone || isAndroidApp;
+}

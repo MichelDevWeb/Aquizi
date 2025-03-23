@@ -7,6 +7,7 @@ export const vi = {
   history: "Lịch sử",
   profile: "Hồ sơ",
   signIn: "Đăng nhập",
+  signUp: "Đăng ký",
   signOut: "Đăng xuất",
   loading: "Đang tải...",
   
@@ -25,6 +26,27 @@ export const vi = {
   createQuiz: "Tạo mới",
   dashboard: "Bảng điều khiển",
   settings: "Cài đặt",
+  success: "Thành công",
+  
+  // Authentication
+  login: "Đăng nhập",
+  signup: "Đăng ký",
+  email: "Email",
+  password: "Mật khẩu",
+  name: "Tên",
+  yourName: "Tên của bạn",
+  signingIn: "Đang đăng nhập...",
+  signingUp: "Đang đăng ký...",
+  orContinueWith: "hoặc tiếp tục với",
+  or: "hoặc",
+  signInWithGoogle: "Đăng nhập với Google",
+  signUpWithGoogle: "Đăng ký với Google",
+  loginFailed: "Đăng nhập thất bại",
+  signupFailed: "Đăng ký thất bại",
+  accountCreated: "Tạo tài khoản thành công",
+  accountCreatedMessage: "Tài khoản của bạn đã được tạo thành công!",
+  privacyNotice: "Bằng cách đăng ký, bạn đồng ý với",
+  termsAndPrivacy: "Bằng cách đăng ký, bạn đồng ý với Điều khoản và Chính sách bảo mật của chúng tôi",
   
   // Quiz
   uploadQuiz: "Tải lên",
@@ -130,7 +152,6 @@ export const vi = {
   createAndGenerateQuizzes: "Tạo trắc nghiệm với AI để nâng cao học tập",
   welcomeCardTitle: "Chào mừng đến Aquizi 🔥!",
   welcomeCardDescription: "Tạo trắc nghiệm với AI. Đăng nhập để bắt đầu!",
-  signInWithGoogle: "Đăng nhập với Google",
   
   // Quiz Creation
   quizCreation: "Tạo trắc nghiệm",

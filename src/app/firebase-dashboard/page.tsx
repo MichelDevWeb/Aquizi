@@ -14,19 +14,19 @@ import { Button } from "@/components/ui/button";
 import PageLayout from "@/components/PageLayout";
 import Image from "next/image";
 const FirebaseDashboardPage = () => {
-  const { user, loading, logout } = useAuth();
+  const { user, loading, signOut } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
     if (!loading && !user) {
-      router.push("/firebase-auth");
+      router.push("/");
     }
   }, [user, loading, router]);
 
   const handleSignOut = async () => {
     try {
-      await logout();
-      router.push("/firebase-auth");
+      await signOut();
+      router.push("/");
     } catch (error) {
       console.error("Error signing out:", error);
     }

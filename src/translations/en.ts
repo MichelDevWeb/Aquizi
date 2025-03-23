@@ -7,6 +7,7 @@ export const en = {
   history: "History",
   profile: "Profile",
   signIn: "Sign In",
+  signUp: "Sign Up",
   signOut: "Sign Out",
   loading: "Loading...",
   
@@ -25,6 +26,27 @@ export const en = {
   createQuiz: "Create Quiz",
   dashboard: "Dashboard",
   settings: "Settings",
+  success: "Success",
+  
+  // Authentication
+  login: "Login",
+  signup: "Sign Up",
+  email: "Email",
+  password: "Password",
+  name: "Name",
+  yourName: "Your Name",
+  signingIn: "Signing in...",
+  signingUp: "Signing up...",
+  orContinueWith: "or continue with",
+  or: "or",
+  signInWithGoogle: "Sign In with Google",
+  signUpWithGoogle: "Sign Up with Google",
+  loginFailed: "Login Failed",
+  signupFailed: "Sign Up Failed",
+  accountCreated: "Account Created",
+  accountCreatedMessage: "Your account has been created successfully!",
+  privacyNotice: "By signing up, you agree to our",
+  termsAndPrivacy: "By signing up, you agree to our Terms and Privacy Policy",
   
   // Quiz
   uploadQuiz: "Upload Quiz",
@@ -130,7 +152,6 @@ export const en = {
   createAndGenerateQuizzes: "Create AI quizzes to enhance learning",
   welcomeCardTitle: "Welcome to Aquizi 🔥!",
   welcomeCardDescription: "Create quizzes with AI. Log in to start!",
-  signInWithGoogle: "Sign In with Google",
   
   // Quiz Creation
   quizCreation: "Create Quiz",

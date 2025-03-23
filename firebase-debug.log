@@ -1,0 +1,42 @@
+[debug] [2025-03-23T05:26:22.848Z] ----------------------------------------------------------------------
+[debug] [2025-03-23T05:26:22.850Z] Command:       /opt/homebrew/Cellar/node/23.3.0/bin/node /opt/homebrew/bin/firebase deploy
+[debug] [2025-03-23T05:26:22.850Z] CLI Version:   13.33.0
+[debug] [2025-03-23T05:26:22.850Z] Platform:      darwin
+[debug] [2025-03-23T05:26:22.850Z] Node Version:  v23.3.0
+[debug] [2025-03-23T05:26:22.850Z] Time:          Sun Mar 23 2025 12:26:22 GMT+0700 (Indochina Time)
+[debug] [2025-03-23T05:26:22.850Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2025-03-23T05:26:22.851Z] >>> [apiv2][query] GET https://firebase-public.firebaseio.com/cli.json [none]
+[debug] [2025-03-23T05:26:22.925Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-03-23T05:26:22.925Z] > authorizing via signed-in user (micheldevweb2020@gmail.com)
+[debug] [2025-03-23T05:26:22.925Z] [iam] checking project mdw-aquizi for permissions ["firebase.projects.get","firebasehosting.sites.update"]
+[debug] [2025-03-23T05:26:22.925Z] Checked if tokens are valid: false, expires at: 1742569732307
+[debug] [2025-03-23T05:26:22.925Z] Checked if tokens are valid: false, expires at: 1742569732307
+[debug] [2025-03-23T05:26:22.925Z] > refreshing access token with scopes: []
+[debug] [2025-03-23T05:26:22.925Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-03-23T05:26:22.925Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-03-23T05:26:23.131Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-03-23T05:26:23.132Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-03-23T05:26:23.140Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/mdw-aquizi:testIamPermissions [none]
+[debug] [2025-03-23T05:26:23.141Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/mdw-aquizi:testIamPermissions x-goog-quota-user=projects/mdw-aquizi
+[debug] [2025-03-23T05:26:23.141Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/mdw-aquizi:testIamPermissions {"permissions":["firebase.projects.get","firebasehosting.sites.update"]}
+[debug] [2025-03-23T05:26:23.489Z] <<< [apiv2][status] GET https://firebase-public.firebaseio.com/cli.json 200
+[debug] [2025-03-23T05:26:23.489Z] <<< [apiv2][body] GET https://firebase-public.firebaseio.com/cli.json {"cloudBuildErrorAfter":1594252800000,"cloudBuildWarnAfter":1590019200000,"defaultNode10After":1594252800000,"minVersion":"3.0.5","node8DeploysDisabledAfter":1613390400000,"node8RuntimeDisabledAfter":1615809600000,"node8WarnAfter":1600128000000}
+[debug] [2025-03-23T05:26:24.282Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/mdw-aquizi:testIamPermissions 200
+[debug] [2025-03-23T05:26:24.282Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/mdw-aquizi:testIamPermissions {"permissions":["firebase.projects.get","firebasehosting.sites.update"]}
+[debug] [2025-03-23T05:26:24.283Z] Checked if tokens are valid: true, expires at: 1742711182132
+[debug] [2025-03-23T05:26:24.283Z] Checked if tokens are valid: true, expires at: 1742711182132
+[debug] [2025-03-23T05:26:24.283Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/mdw-aquizi [none]
+[debug] [2025-03-23T05:26:24.712Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/mdw-aquizi 200
+[debug] [2025-03-23T05:26:24.712Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/mdw-aquizi {"projectId":"mdw-aquizi","projectNumber":"703974827588","displayName":"aquizi","name":"projects/mdw-aquizi","resources":{"hostingSite":"mdw-aquizi","realtimeDatabaseInstance":"mdw-aquizi-default-rtdb"},"state":"ACTIVE","etag":"1_7d32d134-19f1-4e18-aaba-53d3bd07732c"}
+[debug] [2025-03-23T05:26:25.682Z] defaultcredentials: writing to file /Users/michelnguyen/.config/firebase/micheldevweb2020_gmail_com_application_default_credentials.json
+[debug] [2025-03-23T05:26:25.683Z] Checked if tokens are valid: true, expires at: 1742711182132
+[debug] [2025-03-23T05:26:25.683Z] Checked if tokens are valid: true, expires at: 1742711182132
+[debug] [2025-03-23T05:26:25.683Z] >>> [apiv2][query] GET https://firebasehosting.googleapis.com/v1beta1/projects/mdw-aquizi/sites pageToken=&pageSize=10
+[debug] [2025-03-23T05:26:26.596Z] <<< [apiv2][status] GET https://firebasehosting.googleapis.com/v1beta1/projects/mdw-aquizi/sites 200
+[debug] [2025-03-23T05:26:26.596Z] <<< [apiv2][body] GET https://firebasehosting.googleapis.com/v1beta1/projects/mdw-aquizi/sites {"sites":[{"name":"projects/mdw-aquizi/sites/mdw-aquizi","defaultUrl":"https://mdw-aquizi.web.app","appId":"1:703974827588:web:3106c4eb1c8fe2605d7e11","type":"DEFAULT_SITE"}]}
+[debug] [2025-03-23T05:26:26.597Z] Checked if tokens are valid: true, expires at: 1742711182132
+[debug] [2025-03-23T05:26:26.597Z] Checked if tokens are valid: true, expires at: 1742711182132
+[debug] [2025-03-23T05:26:26.597Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/-/webApps/1:703974827588:web:3106c4eb1c8fe2605d7e11/config [none]
+[debug] [2025-03-23T05:26:27.884Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/-/webApps/1:703974827588:web:3106c4eb1c8fe2605d7e11/config 200
+[debug] [2025-03-23T05:26:27.885Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/-/webApps/1:703974827588:web:3106c4eb1c8fe2605d7e11/config {"projectId":"mdw-aquizi","appId":"1:703974827588:web:3106c4eb1c8fe2605d7e11","databaseURL":"https://mdw-aquizi-default-rtdb.asia-southeast1.firebasedatabase.app","storageBucket":"mdw-aquizi.firebasestorage.app","apiKey":"AIzaSyB2qV-m4eWUgX9KWKGiy81Nh90TGyKiRSI","authDomain":"mdw-aquizi.firebaseapp.com","messagingSenderId":"703974827588","measurementId":"G-7HW4RPJH76"}

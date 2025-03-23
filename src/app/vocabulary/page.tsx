@@ -16,49 +16,45 @@ import { LearningTips } from "@/components/vocabulary/LearningTips";
 import { ProgressTracker } from "@/components/vocabulary/ProgressTracker";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { BookOpen, Info } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Button } from "@/components/ui/button";
 
 // Game tab skeleton
 const GameTabSkeleton = () => (
-  <div className="space-y-4 animate-pulse">
-    <div className="flex items-center justify-between mb-3">
-      <div className="flex items-center gap-2">
-        <Skeleton className="h-7 w-24 rounded-md" />
-        <Skeleton className="h-7 w-24 rounded-md" />
-        <Skeleton className="h-7 w-24 rounded-md" />
+  <div className="space-y-3 sm:space-y-4 animate-pulse">
+    <div className="flex items-center justify-between mb-2 sm:mb-3">
+      <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto pb-1 max-w-[60%] sm:max-w-none">
+        <Skeleton className="h-6 sm:h-7 w-20 sm:w-24 rounded-md flex-shrink-0" />
+        <Skeleton className="h-6 sm:h-7 w-20 sm:w-24 rounded-md flex-shrink-0" />
       </div>
-      <Skeleton className="h-7 w-28 rounded-md" />
     </div>
     
     <div className="rounded-lg border overflow-hidden">
-      <Skeleton className="h-16 w-full rounded-t-lg" />
-      <div className="p-4 space-y-4">
+      <Skeleton className="h-12 sm:h-16 w-full rounded-t-lg" />
+      <div className="p-3 sm:p-4 space-y-3 sm:space-y-4">
         <div className="flex justify-between items-center">
-          <div className="flex items-center gap-4">
-            <Skeleton className="h-8 w-20 rounded-full" />
-            <Skeleton className="h-8 w-20 rounded-full" />
+          <div className="flex items-center gap-2 sm:gap-4">
+            <Skeleton className="h-7 w-16 sm:h-8 sm:w-20 rounded-full" />
+            <Skeleton className="h-7 w-16 sm:h-8 sm:w-20 rounded-full" />
           </div>
-          <Skeleton className="h-6 w-16 rounded-full" />
+          <Skeleton className="h-5 w-12 sm:h-6 sm:w-16 rounded-full" />
         </div>
-        <Skeleton className="h-2 w-full rounded-full" />
-        <div className="space-y-4 mt-4">
-          <div className="space-y-2">
-            <Skeleton className="h-6 w-32" />
-            <Skeleton className="h-10 w-full" />
-            <Skeleton className="h-4 w-24 mt-2" />
+        <Skeleton className="h-1.5 w-full rounded-full" />
+        <div className="space-y-3 sm:space-y-4 mt-2 sm:mt-4">
+          <div className="space-y-1.5 sm:space-y-2">
+            <Skeleton className="h-5 w-28 sm:h-6 sm:w-32" />
+            <Skeleton className="h-9 w-full sm:h-10" />
+            <Skeleton className="h-3.5 w-20 sm:h-4 sm:w-24 mt-1.5 sm:mt-2" />
           </div>
-          <div className="space-y-2">
-            <Skeleton className="h-6 w-32" />
-            <Skeleton className="h-20 w-full" />
+          <div className="space-y-1.5 sm:space-y-2">
+            <Skeleton className="h-5 w-28 sm:h-6 sm:w-32" />
+            <Skeleton className="h-14 w-full sm:h-20" />
           </div>
-          <div className="space-y-2">
-            <Skeleton className="h-6 w-32" />
-            <Skeleton className="h-16 w-full" />
+          <div className="space-y-1.5 sm:space-y-2">
+            <Skeleton className="h-5 w-28 sm:h-6 sm:w-32" />
+            <Skeleton className="h-10 w-full sm:h-16" />
           </div>
-          <Skeleton className="h-12 w-full mt-4" />
+          <Skeleton className="h-10 w-full sm:h-12 mt-2 sm:mt-4" />
         </div>
       </div>
     </div>

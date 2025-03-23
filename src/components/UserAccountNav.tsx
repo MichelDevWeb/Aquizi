@@ -24,13 +24,13 @@ type Props = {
 };
 
 const UserAccountNav = ({ user }: Props) => {
-  const { logout } = useAuth();
+  const { signOut } = useAuth();
   const { t } = useLanguage();
   const router = useRouter();
 
   const handleSignOut = async () => {
     try {
-      await logout();
+      await signOut();
       router.push("/");
     } catch (error) {
       console.error("Error signing out:", error);

@@ -8,26 +8,25 @@ import { ThemeToggle } from "./ThemeToggle";
 import { LanguageSelector } from "./LanguageSelector";
 import { useAuth } from "@/lib/firebase/firebase-auth";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Button } from "./ui/button";
 import { BookA, Home, BookOpen, History, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const Navbar = () => {
-  const { user, loading } = useAuth();
+  const { user } = useAuth();
   const { t } = useLanguage();
   const [isUserValid, setIsUserValid] = useState(false);
   const pathname = usePathname();
   
   useEffect(() => {
     // Check if user is valid (authenticated and email verified if required)
-    if (user && !loading) {
+    if (user) {
       // You can add additional validation checks here if needed
       // For example, check if email is verified: user.emailVerified
       setIsUserValid(true);
     } else {
       setIsUserValid(false);
     }
-  }, [user, loading]);
+  }, [user]);
 
   // Adapt Firebase user to match NextAuth user format expected by UserAccountNav
   const adaptedUser = user ? {
@@ -81,19 +80,8 @@ const Navbar = () => {
         <div className="flex items-center">
           <LanguageSelector className="mr-2 sm:mr-3" />
           <ThemeToggle className="mr-2 sm:mr-4" />
-          {loading ? (
-            // Show loading state while checking authentication
-            <Button size="sm" className="text-xs sm:text-sm h-8 sm:h-10 px-2 sm:px-3" disabled>
-              <span className="animate-pulse">{t('loading')}</span>
-            </Button>
-          ) : isUserValid && adaptedUser ? (
+          {isUserValid && adaptedUser && (
             <UserAccountNav user={adaptedUser} />
-          ) : (
-            <Link href="/firebase-auth">
-              <Button size="sm" className="text-xs sm:text-sm h-8 sm:h-10 px-2 sm:px-3 font-medium">
-                {t('signIn')}
-              </Button>
-            </Link>
           )}
         </div>
       </div>

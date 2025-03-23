@@ -133,7 +133,6 @@ export default function RootLayout({
         inter.className, 
         "antialiased min-h-screen pt-16 flex flex-col touch-manipulation overscroll-none"
       )}>
-        {/* <Header /> */}
         <Providers>
           <NavBar />
           <div className="flex-grow flex flex-col z-[9]">
